@@ -148,6 +148,8 @@ class ImageHandle {
 
   ImageManager *get_manager() const;
 
+  void add_to_set(set<const ImageSingle *> &images) const;
+
  protected:
   ImageSlot *image_slot = nullptr;
   ImageManager *manager = nullptr;
@@ -221,10 +223,10 @@ class ImageManager {
   void device_load_builtin(Device *device, Scene *scene, Progress &progress);
   void device_free_builtin(Scene *scene);
 
-  void device_load_handles(Device *device,
-                           Scene *scene,
-                           Progress &progress,
-                           const set<const ImageHandle *> &handles);
+  void device_load_images(Device *device,
+                          Scene *scene,
+                          Progress &progress,
+                          const set<const ImageSingle *> &images);
 
   void device_update_requested(Device *device, Scene *scene);
 

@@ -608,7 +608,7 @@ void GeometryManager::device_update_displacement_images(Device *device,
 {
   progress.set_status("Updating Displacement Images");
   ImageManager *image_manager = scene->image_manager.get();
-  set<const ImageHandle *> bump_images;
+  set<const ImageSingle *> bump_images;
 #ifdef WITH_OSL
   bool has_osl_node = false;
 #endif
@@ -642,7 +642,7 @@ void GeometryManager::device_update_displacement_images(Device *device,
 
           ImageSlotTextureNode *image_node = static_cast<ImageSlotTextureNode *>(node);
           if (!image_node->handle.empty()) {
-            bump_images.insert(&image_node->handle);
+            image_node->handle.add_to_set(bump_images);
           }
         }
       }
@@ -657,7 +657,7 @@ void GeometryManager::device_update_displacement_images(Device *device,
   }
 #endif
 
-  image_manager->device_load_handles(device, scene, progress, bump_images);
+  image_manager->device_load_images(device, scene, progress, bump_images);
 }
 
 void GeometryManager::device_update_volume_images(Device *device, Scene *scene, Progress &progress)
@@ -665,7 +665,7 @@ void GeometryManager::device_update_volume_images(Device *device, Scene *scene, 
   progress.set_status("Updating Volume Images");
   TaskPool pool;
   ImageManager *image_manager = scene->image_manager.get();
-  set<const ImageHandle *> volume_images;
+  set<const ImageSingle *> volume_images;
 
   for (Geometry *geom : scene->geometry) {
     if (!geom->is_modified()) {
@@ -679,14 +679,14 @@ void GeometryManager::device_update_volume_images(Device *device, Scene *scene, 
 
       const ImageHandle &handle = attr.data_voxel();
       if (!handle.empty()) {
-        volume_images.insert(&handle);
+        handle.add_to_set(volume_images);
       }
     }
   }
 
   /* TODO: We don't really need to do the device updates here, just load them
    * into CPU memory. */
-  image_manager->device_load_handles(device, scene, progress, volume_images);
+  image_manager->device_load_images(device, scene, progress, volume_images);
 }
 
 void GeometryManager::device_update(Device *device,

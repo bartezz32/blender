@@ -30,6 +30,7 @@ class Device;
 class DeviceScene;
 class ImageHandle;
 class ImageManager;
+class ImageSingle;
 class OSLRenderServices;
 struct OSLGlobals;
 class Scene;
@@ -141,7 +142,7 @@ class OSLShaderManager : public ShaderManager {
   /* Get image handles used by OSL services on device. */
   static void osl_image_handles(Device *device,
                                 ImageManager *image_manager,
-                                set<const ImageHandle *> &image_handles);
+                                set<const ImageSingle *> &image_handles);
 };
 
 #endif

@@ -874,10 +874,9 @@ OSLNode *OSLShaderManager::osl_node(ShaderGraph *graph,
   return node;
 }
 
-/* Static function, so only this file needs to be compile with RTTT. */
 void OSLShaderManager::osl_image_handles(Device *device,
                                          ImageManager *image_manager,
-                                         set<const ImageHandle *> &handles)
+                                         set<const ImageSingle *> &handles)
 {
   set<OSLRenderServices *> services_shared;
   device->foreach_device([&services_shared](Device *sub_device) {
@@ -889,7 +888,7 @@ void OSLShaderManager::osl_image_handles(Device *device,
     for (auto it = services->textures.begin(); it != services->textures.end(); ++it) {
       const ImageHandle &handle = it->second.handle;
       if (handle.get_manager() == image_manager && !handle.empty()) {
-        handles.insert(&handle);
+        handle.add_to_set(handles);
       }
     }
   }

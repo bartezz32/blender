@@ -174,6 +174,22 @@ bool ImageHandle::operator==(const ImageHandle &other) const
   return image_slot == other.image_slot && manager == other.manager;
 }
 
+void ImageHandle::add_to_set(set<const ImageSingle *> &images) const
+{
+  if (empty()) {
+    return;
+  }
+
+  if (image_slot->type == ImageSlot::SINGLE) {
+    images.insert(static_cast<const ImageSingle *>(image_slot));
+  }
+  else {
+    for (const auto &tile : static_cast<const ImageUDIM *>(image_slot)->tiles) {
+      images.insert(static_cast<const ImageSingle *>(tile.second.image_slot));
+    }
+  }
+}
+
 /* Image Loader */
 
 ImageLoader::ImageLoader() = default;
@@ -899,10 +915,10 @@ void ImageManager::device_update(Device *device, Scene *scene, Progress &progres
   need_update_ = false;
 }
 
-void ImageManager::device_load_handles(Device *device,
-                                       Scene *scene,
-                                       Progress &progress,
-                                       const set<const ImageHandle *> &handles)
+void ImageManager::device_load_images(Device *device,
+                                      Scene *scene,
+                                      Progress &progress,
+                                      const set<const ImageSingle *> &images)
 {
   /* Update UDIM ids. */
   device_update_udims(device, scene);
@@ -912,7 +928,7 @@ void ImageManager::device_load_handles(Device *device,
 
   /* Load handles. */
   TaskPool pool;
-  auto load_image = [&](const ImageSingle *img) {
+  for (const ImageSingle *img : images) {
     pool.push([this, device, scene, img, &progress] {
       assert(img != nullptr);
       if (img->users == 0) {
@@ -922,21 +938,6 @@ void ImageManager::device_load_handles(Device *device,
         device_load_image(device, scene, img->id, progress);
       }
     });
-  };
-
-  for (const ImageHandle *handle : handles) {
-    if (handle->empty()) {
-      continue;
-    }
-
-    if (handle->image_slot->type == ImageSlot::SINGLE) {
-      load_image(static_cast<const ImageSingle *>(handle->image_slot));
-    }
-    else {
-      for (const auto &tile : static_cast<const ImageUDIM *>(handle->image_slot)->tiles) {
-        load_image(static_cast<const ImageSingle *>(tile.second.image_slot));
-      }
-    }
   }
   pool.wait_work();
 
