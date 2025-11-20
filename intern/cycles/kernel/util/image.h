@@ -131,7 +131,7 @@ kernel_image_tile_map(KernelGlobals kg,
                                             tex.tile_descriptor_offset + level) +
                           tile_x + tile_y * divide_up_by_shift(width, tile_size_shift);
 
-  const KernelTileDescriptor tile_descriptor = kernel_data_fetch(
+  KernelTileDescriptor tile_descriptor = kernel_data_fetch(
       image_texture_tile_descriptors, tex.tile_descriptor_offset + tile_offset);
 
   if (!kernel_tile_descriptor_loaded(tile_descriptor)) {
@@ -145,13 +145,15 @@ kernel_image_tile_map(KernelGlobals kg,
     sd->flag |= SD_CACHE_MISS;
     return tile_descriptor;
 #else
-    kg->image_cache_load_tile(
-        tex.slot,
-        level,
-        tile_x * (1 << tile_size_shift),
-        tile_y * (1 << tile_size_shift),
-        &kg->image_texture_tile_descriptors.data[tex.tile_descriptor_offset + tile_offset]);
+    KernelTileDescriptor *p_tile_descriptor =
+        &kg->image_texture_tile_descriptors.data[tex.tile_descriptor_offset + tile_offset];
+    kg->image_cache_load_tile(tex.slot,
+                              level,
+                              tile_x * (1 << tile_size_shift),
+                              tile_y * (1 << tile_size_shift),
+                              p_tile_descriptor);
 
+    tile_descriptor = *p_tile_descriptor;
     /* For CPU, load tile immediately. */
     if (!kernel_tile_descriptor_loaded(tile_descriptor)) {
       return tile_descriptor;
