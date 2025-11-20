@@ -394,43 +394,41 @@ bool resolve_tx(const string &filepath,
     return false;
   }
 
-  if (string_endswith(filepath, ".tx")) {
-    return true;
-  }
-
-  const bool absolute_cache_path = !path_is_relative(texture_cache_path);
-  const string tx_filename = unique_filename_tx(
-      filepath, texture_cache_path, colorspace, alpha_type, format_type, absolute_cache_path);
   const string filedir = path_dirname(filepath);
-  const string tx_filepath = path_join(
-      absolute_cache_path ? string(texture_cache_path) : path_join(filedir, texture_cache_path),
-      tx_filename);
-  if (!texture_cache_file_outdated(filepath, tx_filepath)) {
-    out_filepath = tx_filepath;
-    return true;
-  }
 
-  /* Check in the same directory. */
+  /* Check the specified directory if one is given. */
   if (!texture_cache_path.empty()) {
-    const string tx_local_filepath = path_join(filedir, tx_filepath);
-    if (!texture_cache_file_outdated(filepath, tx_local_filepath)) {
-      out_filepath = tx_local_filepath;
+    const bool absolute_cache_path = !path_is_relative(texture_cache_path);
+    const string tx_filename = unique_filename_tx(
+        filepath, texture_cache_path, colorspace, alpha_type, format_type, absolute_cache_path);
+    const string tx_filepath = path_join(
+        absolute_cache_path ? string(texture_cache_path) : path_join(filedir, texture_cache_path),
+        tx_filename);
+
+    out_filepath = tx_filepath;
+
+    if (!texture_cache_file_outdated(filepath, tx_filepath)) {
       return true;
     }
   }
 
-  /* Check in default subdirectory. */
-  const char *default_texture_cache_dir = "texture_cache";
+  /* Check in the default location. */
+  const char *default_texture_cache_dir = "blender_cache/textures";
   if (texture_cache_path != default_texture_cache_dir) {
-    const string tx_default_filepath = path_join(
-        path_join(path_dirname(filepath), default_texture_cache_dir), tx_filename);
+    const string tx_filename = unique_filename_tx(
+        filepath, texture_cache_path, colorspace, alpha_type, format_type, false);
+    const string tx_default_filepath = path_join(path_join(filedir, default_texture_cache_dir),
+                                                 tx_filename);
     if (!texture_cache_file_outdated(filepath, tx_default_filepath)) {
       out_filepath = tx_default_filepath;
       return true;
     }
+
+    if (texture_cache_path.empty()) {
+      out_filepath = tx_default_filepath;
+    }
   }
 
-  out_filepath = tx_filepath;
   return false;
 }
 

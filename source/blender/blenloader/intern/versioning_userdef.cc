@@ -1730,7 +1730,6 @@ void blo_do_versions_userdef(UserDef *userdef)
 
   if (!USER_VERSION_ATLEAST(501, 0)) {
     userdef->gpu_flag &= ~USER_GPU_FLAG_UNUSED_0;
-    STRNCPY(userdef->texture_cachedir, U_default.texture_cachedir);
   }
 
   /**

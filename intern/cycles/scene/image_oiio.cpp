@@ -46,7 +46,7 @@ bool OIIOImageLoader::resolve_texture_cache(const bool auto_generate,
     return false;
   }
 
-  progress.set_status("Generating tx cache", path_filename(texture_cache_filepath));
+  progress.set_status("Generating tx cache | " + path_filename(filepath), "");
 
   if (!make_tx(filepath, texture_cache_filepath, colorspace, alpha_type, IMAGE_FORMAT_PLAIN)) {
     texture_cache_filepath.clear();
