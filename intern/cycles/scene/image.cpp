@@ -550,6 +550,8 @@ void ImageManager::device_copy_image_textures(Device *device, Scene *scene)
           return;
         }
 
+        /* TODO: tile handle does not get cleared. */
+
         /* Wait for other thread to load the tile. */
         OIIO::atomic_backoff backoff;
         while (*tile_descriptor == KERNEL_TILE_LOAD_REQUEST) {
