@@ -21,6 +21,7 @@
 
 #include "ED_screen.hh"
 
+#include "UI_resources.hh"
 #include "WM_api.hh"
 
 #include "UI_interface_layout.hh"
@@ -218,6 +219,15 @@ void uiTemplateRunningJobs(uiLayout *layout, bContext *C)
       handle_event = B_STOPOTHER;
       icon = ICON_MOD_OCEAN;
       break;
+    }
+  }
+
+  /* Blend file wide jobs. */
+  if (owner == nullptr) {
+    if (WM_jobs_test(wm, bmain, WM_JOB_TYPE_GENERATE_TEXTURE_CACHE)) {
+      owner = bmain;
+      handle_event = B_STOPOTHER;
+      icon = ICON_TEXTURE;
     }
   }
 

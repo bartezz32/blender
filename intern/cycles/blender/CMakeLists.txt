@@ -33,6 +33,7 @@ set(SRC
   session.cpp
   shader.cpp
   sync.cpp
+  texture_cache.cpp
   viewport.cpp
   volume.cpp
 
