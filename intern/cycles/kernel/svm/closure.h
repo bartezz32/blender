@@ -479,8 +479,6 @@ ccl_device
           sd->flag |= bssrdf_setup(sd, bssrdf, path_flag, subsurface_method);
         }
       }
-#else
-      (void)data_subsurf;
 #endif
 
       ccl_private OrenNayarBsdf *bsdf = (ccl_private OrenNayarBsdf *)bsdf_alloc(
