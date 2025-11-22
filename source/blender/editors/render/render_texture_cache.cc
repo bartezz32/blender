@@ -81,6 +81,9 @@ static void generate_texture_cache(Main *bmain,
   int total = 0;
 
   for (const Image *image : images) {
+    if (ELEM(image->source, IMA_SRC_MOVIE, IMA_SRC_GENERATED, IMA_SRC_VIEWER)) {
+      continue;
+    }
     if (BKE_image_has_packedfile(image)) {
       continue;
     }
@@ -118,7 +121,9 @@ static void generate_texture_cache(Main *bmain,
       }
     }
 
-    /* TODO: handle image sequences. */
+    if (image->source == IMA_SRC_SEQUENCE) {
+      /* TODO: Handle image sequence. */
+    }
 
     /* Handle regular image. */
     if (BLI_is_file(filepath)) {
@@ -155,26 +160,16 @@ static void generate_texture_cache(Main *bmain,
   });
 
   /* Report stats. */
-  if (failed == 0 && completed == 0) {
-    BKE_reportf(reports, RPT_INFO, "All tx files up to date (%d total)", total);
+  if (total == 0) {
+    BKE_report(reports, RPT_INFO, "No image files found to generate tx files");
   }
-  else if (failed) {
+  else {
     BKE_reportf(reports,
-                RPT_ERROR,
+                (failed) ? RPT_WARNING : RPT_INFO,
                 "Generated %d tx files, %d failed, %d up to date",
                 completed.load(),
                 failed.load(),
                 total - completed - failed);
-  }
-  else if (completed < total) {
-    BKE_reportf(reports,
-                RPT_INFO,
-                "Generated %d tx files, %d up to date",
-                completed.load(),
-                total - completed);
-  }
-  else {
-    BKE_reportf(reports, RPT_INFO, "Generated %d tx files", completed.load());
   }
 }
 

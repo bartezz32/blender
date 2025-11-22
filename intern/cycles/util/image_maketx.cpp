@@ -510,7 +510,7 @@ static void write_stats_tx(OIIO::ImageBuf &buf, const bool use_openexr)
       desc += "oiio:SHA-1=";
       desc += hash_digest;
     }
-    LOG_DEBUG << "  SHA-1: " << hash_digest << std::endl;
+    LOG_DEBUG << "  SHA-1: " << hash_digest;
   }
 
   /* Add constant color attribute. */
@@ -523,7 +523,7 @@ static void write_stats_tx(OIIO::ImageBuf &buf, const bool use_openexr)
       desc += OIIO::Strutil::fmt::format(
           "{}oiio:ConstantColor={}", desc.length() ? " " : "", colstr);
     }
-    LOG_DEBUG << "  ConstantColor: " << colstr << std::endl;
+    LOG_DEBUG << "  ConstantColor: " << colstr;
   }
 
   /* Add average color attribtue. */
@@ -534,7 +534,7 @@ static void write_stats_tx(OIIO::ImageBuf &buf, const bool use_openexr)
   else {
     desc += OIIO::Strutil::fmt::format("{}oiio:AverageColor={}", desc.length() ? " " : "", avgstr);
   }
-  LOG_DEBUG << "  AverageColor: " << avgstr << std::endl;
+  LOG_DEBUG << "  AverageColor: " << avgstr;
 
   if (!use_openexr) {
     buf.specmod().attribute("ImageDescription", desc);
