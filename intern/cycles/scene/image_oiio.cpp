@@ -128,6 +128,11 @@ static bool oiio_load_pixels_tile(const unique_ptr<ImageInput> &in,
     tmppixels.clear();
   }
 
+  /* Can skip conform for speed if it's a Blender native tx file. */
+  if (metadata.tile_need_conform) {
+    metadata.conform_pixels(pixels, w, h, x_stride, y_stride / x_stride);
+  }
+
   return true;
 }
 

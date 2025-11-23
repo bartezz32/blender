@@ -394,6 +394,10 @@ bool resolve_tx(const string &filepath,
     return false;
   }
 
+  if (string_endswith(filepath, ".tx")) {
+    return true;
+  }
+
   const string filedir = path_dirname(filepath);
 
   /* Check the specified directory if one is given. */

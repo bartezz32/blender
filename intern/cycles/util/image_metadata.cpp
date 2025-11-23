@@ -186,6 +186,65 @@ static bool load_metadata_color(const ImageSpec &spec, const char *name, float4 
   }
 }
 
+void ImageMetaData::detect_tiles(const ImageSpec &spec, OIIO::string_view filepath)
+{
+  if (spec.tile_width == 0) {
+    return;
+  }
+
+  const std::string software = spec.get_string_attribute("Software");
+  int tx_file_format_version = INT_MAX;
+  sscanf(software.c_str(), "Blender maketx v%d", &tx_file_format_version);
+
+  if (tx_file_format_version == INT_MAX) {
+    LOG_DEBUG << "Image " << OIIO::Filesystem::filename(filepath)
+              << " has tiles, but is missing blender:TxFileFormatVersion";
+    tile_need_conform = true;
+  }
+  else if (tx_file_format_version < 0 || tx_file_format_version > TX_FILE_FORMAT_VERSION) {
+    LOG_DEBUG << "Image " << OIIO::Filesystem::filename(filepath)
+              << " has tiles, but file format version " << tx_file_format_version
+              << " is not supported by this version of Cycles";
+    return;
+  }
+  else if (!(channels == 1 || channels == 4)) {
+    LOG_DEBUG << "Image " << OIIO::Filesystem::filename(filepath)
+              << " has tiles, but expected 1 or 4 channels, found " << channels;
+    tile_need_conform = true;
+  }
+  else {
+    tile_need_conform = false;
+  }
+
+  if (!is_power_of_two(spec.tile_width)) {
+    LOG_DEBUG << "Image " << OIIO::Filesystem::filename(filepath)
+              << " has tiles, but tile size not power of two (" << spec.tile_width << ")";
+  }
+  else if (spec.tile_width != spec.tile_height) {
+    LOG_DEBUG << "Image " << OIIO::Filesystem::filename(filepath)
+              << " has tiles, but tile size is not square (" << spec.tile_width << "x"
+              << spec.tile_height << ")";
+  }
+  else if (spec.tile_depth != 1) {
+    LOG_DEBUG << "Image " << OIIO::Filesystem::filename(filepath)
+              << " has tiles, but depth is not 1";
+  }
+  else if (spec.tile_width < KERNEL_IMAGE_TEX_PADDING * 4) {
+    LOG_DEBUG << "Image " << OIIO::Filesystem::filename(filepath)
+              << " has tiles, but tile size too small (found " << spec.tile_width << ", minimum "
+              << KERNEL_IMAGE_TEX_PADDING * 4 << ")";
+  }
+  else if (width < spec.tile_width && height < spec.tile_width) {
+    // TODO: there are artifacts loading images smaller than tile size, because
+    // the repeat mode is not respected for padding. Fix and and remove this exception.
+    LOG_DEBUG << "Image " << OIIO::Filesystem::filename(filepath)
+              << " has tiles, but image resolution is smaller than tile size";
+  }
+  else {
+    tile_size = spec.tile_width;
+  }
+}
+
 bool ImageMetaData::load_metadata(OIIO::string_view filepath, OIIO::ImageSpec *r_spec)
 {
   /* Perform preliminary checks, with meaningful logging. */
@@ -291,52 +350,7 @@ bool ImageMetaData::load_metadata(OIIO::string_view filepath, OIIO::ImageSpec *r
     load_metadata_color(spec, "oiio:AverageColor", average_color);
   }
 
-  if (spec.tile_width) {
-    const std::string software = spec.get_string_attribute("Software");
-    int tx_file_format_version = INT_MAX;
-    sscanf(software.c_str(), "Blender maketx v%d", &tx_file_format_version);
-
-    if (tx_file_format_version == INT_MAX) {
-      LOG_DEBUG << "Image " << OIIO::Filesystem::filename(filepath)
-                << " has tiles, but is missing blender:TxFileFormatVersion";
-    }
-    else if (tx_file_format_version < 0 || tx_file_format_version > TX_FILE_FORMAT_VERSION) {
-      LOG_DEBUG << "Image " << OIIO::Filesystem::filename(filepath)
-                << " has tiles, but file format version " << tx_file_format_version
-                << " is not supported by this version of Cycles";
-    }
-    else if (!(channels == 1 || channels == 4)) {
-      LOG_DEBUG << "Image " << OIIO::Filesystem::filename(filepath)
-                << " has tiles, but expected 1 or 4 channels, found " << channels;
-    }
-    else if (!is_power_of_two(spec.tile_width)) {
-      LOG_DEBUG << "Image " << OIIO::Filesystem::filename(filepath)
-                << " has tiles, but tile size not power of two (" << spec.tile_width << ")";
-    }
-    else if (spec.tile_width != spec.tile_height) {
-      LOG_DEBUG << "Image " << OIIO::Filesystem::filename(filepath)
-                << " has tiles, but tile size is not square (" << spec.tile_width << "x"
-                << spec.tile_height << ")";
-    }
-    else if (spec.tile_depth != 1) {
-      LOG_DEBUG << "Image " << OIIO::Filesystem::filename(filepath)
-                << " has tiles, but depth is not 1";
-    }
-    else if (spec.tile_width < KERNEL_IMAGE_TEX_PADDING * 4) {
-      LOG_DEBUG << "Image " << OIIO::Filesystem::filename(filepath)
-                << " has tiles, but tile size too small (found " << spec.tile_width << ", minimum "
-                << KERNEL_IMAGE_TEX_PADDING * 4 << ")";
-    }
-    else if (width < spec.tile_width && height < spec.tile_width) {
-      // TODO: there are artifacts loading images smaller than tile size, because
-      // the repeat mode is not respected for padding. Fix and and remove this exception.
-      LOG_DEBUG << "Image " << OIIO::Filesystem::filename(filepath)
-                << " has tiles, but image resolution is smaller than tile size";
-    }
-    else {
-      tile_size = spec.tile_width;
-    }
-  }
+  detect_tiles(spec, filepath);
 
   LOG_DEBUG << "Image " << OIIO::Filesystem::filename(filepath) << ", " << width << "x" << height
             << ", " << (tile_size ? "tiled" : "untiled");

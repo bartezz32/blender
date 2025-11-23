@@ -689,7 +689,6 @@ KernelTileDescriptor ImageManager::device_update_tile_requested(Device *device,
                                              tile_descriptor);
 
   const size_t pixel_bytes = mem.data_elements * datatype_size(mem.data_type);
-  /* TODO: Handle case where channels > 4. */
   const size_t x_stride = pixel_bytes;
   const size_t y_stride = mem.data_width * pixel_bytes;
   const size_t x_offset = kernel_tile_descriptor_offset(tile_descriptor) * tile_size_padded *
@@ -697,7 +696,6 @@ KernelTileDescriptor ImageManager::device_update_tile_requested(Device *device,
 
   uint8_t *pixels = mem.data<uint8_t>() + x_offset;
 
-  /* TODO: opening file handles is not thread safe! */
   const bool ok = img->loader->load_pixels_tile(img->metadata,
                                                 miplevel,
                                                 x,

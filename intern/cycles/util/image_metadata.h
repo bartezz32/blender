@@ -44,6 +44,7 @@ class ImageMetaData {
   /* Tiling */
   uint32_t tile_size = 0;
   float4 average_color = zero_float4();
+  bool tile_need_conform = true;
 
   ImageMetaData();
   bool operator==(const ImageMetaData &other) const;
@@ -64,6 +65,9 @@ class ImageMetaData {
                       const int64_t height,
                       const int64_t x_stride,
                       const int64_t y_stride) const;
+
+ protected:
+  void detect_tiles(const OIIO::ImageSpec &spec, OIIO::string_view filepath);
 };
 
 CCL_NAMESPACE_END
