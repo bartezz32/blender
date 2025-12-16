@@ -45,7 +45,7 @@ BundlePtr Bundle::create()
 void Bundle::add_new(const StringRef key, const BundleItemValue &value)
 {
   BLI_assert(is_valid_key(key));
-  items_.append(StoredItem{std::move(key), value});
+  items_.add_new_as(key, value);
 }
 
 void Bundle::add_override(const StringRef key, const BundleItemValue &value)
@@ -110,12 +110,7 @@ void Bundle::add_path_new(StringRef path, const BundleItemValue &value)
 
 const BundleItemValue *Bundle::lookup(const StringRef key) const
 {
-  for (const StoredItem &item : items_) {
-    if (item.key == key) {
-      return &item.value;
-    }
-  }
-  return nullptr;
+  return items_.lookup_ptr_as(key);
 }
 
 const BundleItemValue *Bundle::lookup_path(const Span<StringRef> path) const
@@ -158,32 +153,46 @@ const BundleItemValue *Bundle::lookup_path(const StringRef path) const
   return this->lookup_path(path_elems);
 }
 
+void Bundle::ensure_owns_direct_data()
+{
+  for (const auto &item : items_.items()) {
+    if (auto *socket_value = std::get_if<BundleItemSocketValue>(&item.value.value)) {
+      socket_value->value.ensure_owns_direct_data();
+    }
+  }
+}
+
+bool Bundle::owns_direct_data() const
+{
+  for (const auto &item : items_.items()) {
+    if (const auto *socket_value = std::get_if<BundleItemSocketValue>(&item.value.value)) {
+      if (!socket_value->value.owns_direct_data()) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 BundlePtr Bundle::copy() const
 {
   BundlePtr copy_ptr = Bundle::create();
   Bundle &copy = const_cast<Bundle &>(*copy_ptr);
-  for (const StoredItem &item : items_) {
-    copy.add_new(item.key, item.value);
-  }
+  copy.items_ = items_;
   return copy_ptr;
 }
 
 bool Bundle::remove(const StringRef key)
 {
   BLI_assert(is_valid_key(key));
-  const int removed_num = items_.remove_if([&key](StoredItem &item) { return item.key == key; });
+  const int removed_num = items_.remove_if([&key](const auto &item) { return item.key == key; });
   return removed_num >= 1;
 }
 
 bool Bundle::contains(const StringRef key) const
 {
   BLI_assert(is_valid_key(key));
-  for (const StoredItem &item : items_) {
-    if (item.key == key) {
-      return true;
-    }
-  }
-  return false;
+  return items_.contains_as(key);
 }
 
 bool Bundle::contains_path(const StringRef path) const

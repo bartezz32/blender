@@ -1293,7 +1293,7 @@ static void image_colorspace_from_imbuf(Image *image, const ImBuf *ibuf)
       colorspace_name = IMB_colormanagement_colorspace_get_name(ibuf->float_buffer.colorspace);
     }
     else {
-      colorspace_name = IMB_colormanagement_role_colorspace_name_get(COLOR_ROLE_DEFAULT_FLOAT);
+      colorspace_name = IMB_colormanagement_role_colorspace_name_get(COLOR_ROLE_SCENE_LINEAR);
     }
   }
 
@@ -1859,7 +1859,7 @@ static void stampdata(
     }
 
     if (use_dynamic && stats && (scene->r.stamp & R_STAMP_MEMORY)) {
-      SNPRINTF_UTF8(stamp_data->memory, do_prefix ? "Peak Memory ddM" : "%dM", stats->mem_peak);
+      SNPRINTF_UTF8(stamp_data->memory, do_prefix ? "Peak Memory %dM" : "%dM", stats->mem_peak);
     }
     else {
       stamp_data->memory[0] = '\0';

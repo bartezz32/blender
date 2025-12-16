@@ -24,7 +24,6 @@
 #include "UI_resources.hh"
 
 struct bContext;
-struct uiBlock;
 
 namespace blender::ui {
 
@@ -128,8 +127,10 @@ class AbstractTreeView : public AbstractView, public TreeViewItemContainer {
    * The total number of items in the tree during the last redraw.
    */
   int last_tot_items_ = 0;
-
   bool scroll_active_into_view_on_draw_ = false;
+  /**
+   * Collapse/expand state of filter panel.
+   */
   std::shared_ptr<char> show_display_options_ = std::make_shared<char>(0);
   /* `char[UI_MAX_NAME_STR]` wrapped in shared pointer, to keep a stable pointer over
    * reconstruction that can be passed to buttons. */
@@ -143,14 +144,13 @@ class AbstractTreeView : public AbstractView, public TreeViewItemContainer {
  public:
   /* virtual */ ~AbstractTreeView() override = default;
 
-  void draw_overlays(const ARegion &region, const uiBlock &block) const override;
+  void draw_overlays(const ARegion &region, const Block &block) const override;
 
   void foreach_item(ItemIterFn iter_fn, IterOptions options = IterOptions::None) const;
   void foreach_root_item(ItemIterFn iter_fn) const;
 
   bool is_fully_visible() const override;
   void scroll(ViewScrollDirection direction) override;
-  /* Scroll to the active element when state is changed. */
 
   /**
    * \param xy: The mouse coordinates in window space.
@@ -183,7 +183,7 @@ class AbstractTreeView : public AbstractView, public TreeViewItemContainer {
 
   bool supports_scrolling() const override;
 
-  void draw_hierarchy_lines(const ARegion &region, const uiBlock &block) const;
+  void draw_hierarchy_lines(const ARegion &region, const Block &block) const;
   void get_hierarchy_lines(const ARegion &region,
                            const TreeViewOrItem &parent,
                            const float aspect,
@@ -191,6 +191,9 @@ class AbstractTreeView : public AbstractView, public TreeViewItemContainer {
                            int &visible_item_index) const;
 
   int count_visible_descendants(const AbstractTreeViewItem &parent) const;
+  /**
+   * Scroll the view so the active item is visible.
+   */
   void scroll_active_into_view();
 };
 
@@ -221,6 +224,7 @@ class AbstractTreeViewItem : public AbstractViewItem, public TreeViewItemContain
   std::string label_;
 
  public:
+  AbstractTreeViewItem();
   /* virtual */ ~AbstractTreeViewItem() override = default;
 
   virtual void build_row(Layout &row) = 0;
@@ -340,10 +344,10 @@ class AbstractTreeViewItem : public AbstractViewItem, public TreeViewItemContain
    */
   bool set_state_active() final;
 
-  void add_treerow_button(uiBlock &block);
+  void add_treerow_button(Block &block);
   int indent_width() const;
   void add_indent(Layout &row) const;
-  void add_collapse_chevron(uiBlock &block) const;
+  void add_collapse_chevron(Block &block) const;
   void add_rename_button(Layout &row);
 
   bool has_active_child() const;

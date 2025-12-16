@@ -46,7 +46,6 @@
 #include "BKE_curve.hh"
 #include "BKE_curves.hh"
 #include "BKE_editmesh.hh"
-#include "BKE_global.hh"
 #include "BKE_grease_pencil.hh"
 #include "BKE_layer.hh"
 #include "BKE_main.hh"
@@ -54,8 +53,7 @@
 #include "BKE_mesh.hh"
 #include "BKE_object.hh"
 #include "BKE_paint.hh"
-#include "BKE_scene.hh"
-#include "BKE_tracking.h"
+#include "BKE_tracking.hh"
 #include "BKE_workspace.hh"
 
 #include "WM_api.hh"
@@ -69,7 +67,6 @@
 #include "ED_armature.hh"
 #include "ED_curve.hh"
 #include "ED_curves.hh"
-#include "ED_gpencil_legacy.hh"
 #include "ED_grease_pencil.hh"
 #include "ED_lattice.hh"
 #include "ED_mball.hh"
@@ -79,7 +76,6 @@
 #include "ED_particle.hh"
 #include "ED_pointcloud.hh"
 #include "ED_screen.hh"
-#include "ED_sculpt.hh"
 #include "ED_select_utils.hh"
 #include "ED_uvedit.hh"
 
@@ -92,11 +88,9 @@
 #include "DEG_depsgraph.hh"
 #include "DEG_depsgraph_query.hh"
 
-#include "DRW_engine.hh"
 #include "DRW_select_buffer.hh"
 
 #include "ANIM_armature.hh"
-#include "ANIM_bone_collections.hh"
 
 #include "view3d_intern.hh" /* own include */
 
@@ -1821,13 +1815,12 @@ static bool object_mouse_select_menu(bContext *C,
     const char *name = ob->id.name + 2;
 
     BLI_strncpy_utf8(object_mouse_select_menu_data[i].idname, name, MAX_ID_NAME - 2);
-    object_mouse_select_menu_data[i].icon = UI_icon_from_id(&ob->id);
+    object_mouse_select_menu_data[i].icon = blender::ui::icon_from_id(&ob->id);
   }
 
   wmOperatorType *ot = WM_operatortype_find("VIEW3D_OT_select_menu", false);
-  PointerRNA ptr;
 
-  WM_operator_properties_create_ptr(&ptr, ot);
+  PointerRNA ptr = WM_operator_properties_create_ptr(ot);
   RNA_boolean_set(&ptr, "extend", params.sel_op == SEL_OP_ADD);
   RNA_boolean_set(&ptr, "deselect", params.sel_op == SEL_OP_SUB);
   RNA_boolean_set(&ptr, "toggle", params.sel_op == SEL_OP_XOR);
@@ -2072,9 +2065,8 @@ static bool bone_mouse_select_menu(bContext *C,
   }
 
   wmOperatorType *ot = WM_operatortype_find("VIEW3D_OT_bone_select_menu", false);
-  PointerRNA ptr;
 
-  WM_operator_properties_create_ptr(&ptr, ot);
+  PointerRNA ptr = WM_operator_properties_create_ptr(ot);
   RNA_boolean_set(&ptr, "extend", params.sel_op == SEL_OP_ADD);
   RNA_boolean_set(&ptr, "deselect", params.sel_op == SEL_OP_SUB);
   RNA_boolean_set(&ptr, "toggle", params.sel_op == SEL_OP_XOR);
@@ -5122,10 +5114,10 @@ static bool pchan_circle_doSelectJoint(void *user_data,
 
   if (len_squared_v2v2(data->mval_fl, screen_co) <= data->radius_squared) {
     if (data->select) {
-      pchan->flag |= POSE_SELECTED;
+      pchan->flag |= POSE_SELECTED_ALL;
     }
     else {
-      pchan->flag &= ~POSE_SELECTED;
+      pchan->flag &= ~POSE_SELECTED_ALL;
     }
     return true;
   }
@@ -5172,10 +5164,10 @@ static void do_circle_select_pose__doSelectBone(void *user_data,
       edge_inside_circle(data->mval_fl, data->radius, screen_co_a, screen_co_b))
   {
     if (data->select) {
-      pchan->flag |= POSE_SELECTED;
+      pchan->flag |= POSE_SELECTED_ALL;
     }
     else {
-      pchan->flag &= ~POSE_SELECTED;
+      pchan->flag &= ~POSE_SELECTED_ALL;
     }
     data->is_changed = true;
   }

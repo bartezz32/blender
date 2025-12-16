@@ -38,9 +38,9 @@
 #include "BKE_global.hh"
 #include "BKE_lib_id.hh"
 #include "BKE_main.hh"
-#include "BKE_movieclip.h"
+#include "BKE_movieclip.hh"
 #include "BKE_report.hh"
-#include "BKE_tracking.h"
+#include "BKE_tracking.hh"
 
 #include "WM_api.hh"
 #include "WM_types.hh"
@@ -170,7 +170,7 @@ static void open_init(bContext *C, wmOperator *op)
   PropertyPointerRNA *pprop;
 
   op->customdata = pprop = MEM_new<PropertyPointerRNA>("OpenPropertyPointerRNA");
-  UI_context_active_but_prop_get_templateID(C, &pprop->ptr, &pprop->prop);
+  blender::ui::context_active_but_prop_get_templateID(C, &pprop->ptr, &pprop->prop);
 }
 
 static void open_cancel(bContext * /*C*/, wmOperator *op)
@@ -1107,7 +1107,8 @@ static int frame_from_event(bContext *C, const wmEvent *event)
   else {
     float viewx, viewy;
 
-    UI_view2d_region_to_view(&region->v2d, event->mval[0], event->mval[1], &viewx, &viewy);
+    blender::ui::view2d_region_to_view(
+        &region->v2d, event->mval[0], event->mval[1], &viewx, &viewy);
 
     framenr = round_fl_to_int(viewx);
   }
@@ -1190,7 +1191,7 @@ struct ProxyJob {
   Scene *scene;
   Main *main;
   MovieClip *clip;
-  int clip_flag;
+  MovieClipFlag clip_flag;
   bool stop;
   MovieProxyBuilder *proxy_builder;
 };
@@ -1545,7 +1546,7 @@ static wmOperatorStatus clip_rebuild_proxy_exec(bContext *C, wmOperator * /*op*/
   pj->scene = scene;
   pj->main = CTX_data_main(C);
   pj->clip = clip;
-  pj->clip_flag = clip->flag & MCLIP_TIMECODE_FLAGS;
+  pj->clip_flag = MovieClipFlag(clip->flag & MCLIP_TIMECODE_FLAGS);
 
   if (clip->anim) {
     pj->proxy_builder = MOV_proxy_builder_start(clip->anim,

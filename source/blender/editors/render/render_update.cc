@@ -35,10 +35,9 @@
 #include "BKE_main_invariants.hh"
 #include "BKE_material.hh"
 #include "BKE_node_runtime.hh"
+#include "BKE_node_tree_update.hh"
 #include "BKE_paint.hh"
 #include "BKE_scene.hh"
-
-#include "NOD_composite.hh"
 
 #include "RE_engine.h"
 #include "RE_pipeline.h"
@@ -187,8 +186,9 @@ void ED_render_engine_changed(Main *bmain, const bool update_scene_data)
       update_ctx.view_layer = view_layer;
       ED_render_id_flush_update(&update_ctx, &scene->id);
     }
-    if (scene->compositing_node_group && update_scene_data) {
-      ntreeCompositUpdateRLayers(scene->compositing_node_group);
+    if (update_scene_data) {
+      BKE_ntree_update_tag_id_changed(bmain, &scene->id);
+      BKE_ntree_update(*bmain);
     }
   }
   BKE_main_ensure_invariants(*bmain);
@@ -241,14 +241,6 @@ static void texture_changed(Main *bmain, Tex *tex)
     LISTBASE_FOREACH (ViewLayer *, view_layer, &scene->view_layers) {
       BKE_paint_invalidate_overlay_tex(scene, view_layer, tex);
     }
-    /* find compositing nodes */
-    if (scene->compositing_node_group) {
-      for (bNode *node : scene->compositing_node_group->all_nodes()) {
-        if (node->id == &tex->id) {
-          blender::ed::space_node::tag_update_id(&scene->id);
-        }
-      }
-    }
   }
 
   LISTBASE_FOREACH (Brush *, brush, &bmain->brushes) {
@@ -281,6 +273,9 @@ static void image_changed(Main *bmain, Image *ima)
       texture_changed(bmain, tex);
     }
   }
+
+  /* Ensure downstream editors are made aware of changes to the Image data. */
+  WM_main_add_notifier(NC_IMAGE | NA_EDITED, ima);
 }
 
 static void scene_changed(Main *bmain, Scene *scene)

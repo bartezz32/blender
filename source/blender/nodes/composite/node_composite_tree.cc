@@ -19,7 +19,7 @@
 #include "BKE_node.hh"
 #include "BKE_node_runtime.hh"
 #include "BKE_node_tree_update.hh"
-#include "BKE_tracking.h"
+#include "BKE_tracking.hh"
 
 #include "UI_resources.hh"
 
@@ -215,24 +215,6 @@ void register_node_tree_type_cmp()
 }
 
 /* *********************************************** */
-
-void ntreeCompositUpdateRLayers(bNodeTree *ntree)
-{
-  if (ntree == nullptr) {
-    return;
-  }
-
-  for (bNode *node : ntree->all_nodes()) {
-    if (node->type_legacy == CMP_NODE_R_LAYERS) {
-      node_cmp_rlayers_outputs(ntree, node);
-    }
-    else if (node->type_legacy == CMP_NODE_CRYPTOMATTE &&
-             node->custom1 == CMP_NODE_CRYPTOMATTE_SOURCE_RENDER)
-    {
-      node->typeinfo->updatefunc(ntree, node);
-    }
-  }
-}
 
 void ntreeCompositTagRender(Scene *scene)
 {

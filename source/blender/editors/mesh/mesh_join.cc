@@ -60,10 +60,8 @@ static VectorSet<std::string> join_vertex_groups(const Span<const Object *> obje
                                                  Mesh &dst_mesh)
 {
   VectorSet<std::string> vertex_group_names;
-  bool any_vertex_group_data = false;
   for (const int i : objects_to_join.index_range()) {
     const Mesh &mesh = *static_cast<const Mesh *>(objects_to_join[i]->data);
-    any_vertex_group_data |= CustomData_has_layer(&mesh.vert_data, CD_MDEFORMVERT);
     LISTBASE_FOREACH (const bDeformGroup *, dg, &mesh.vertex_group_names) {
       if (vertex_group_names.add_as(dg->name)) {
         BLI_addtail(&dst_mesh.vertex_group_names, BKE_defgroup_duplicate(dg));
@@ -71,7 +69,7 @@ static VectorSet<std::string> join_vertex_groups(const Span<const Object *> obje
     }
   }
 
-  if (!any_vertex_group_data) {
+  if (vertex_group_names.is_empty()) {
     return vertex_group_names;
   }
 
@@ -576,6 +574,10 @@ wmOperatorStatus join_objects_exec(bContext *C, wmOperator *op)
                                        edge_ranges.total_size(),
                                        face_ranges.total_size(),
                                        corner_ranges.total_size());
+  BKE_mesh_copy_parameters_for_eval(dst_mesh, active_mesh);
+  BLI_freelistN(&dst_mesh->vertex_group_names);
+  MEM_SAFE_FREE(dst_mesh->mat);
+  dst_mesh->totcol = 0;
 
   /* Inverse transform for all selected meshes in this object,
    * See #object_join_exec for detailed comment on why the safe version is used. */
@@ -648,11 +650,6 @@ wmOperatorStatus join_objects_exec(bContext *C, wmOperator *op)
                           face_ranges,
                           corner_ranges,
                           *dst_mesh);
-
-  BKE_id_attributes_active_color_set(&dst_mesh->id,
-                                     BKE_id_attributes_active_color_name(&active_mesh->id));
-  BKE_id_attributes_default_color_set(&dst_mesh->id,
-                                      BKE_id_attributes_default_color_name(&active_mesh->id));
 
   /* Copy multires data to the out-of-main mesh. */
   if (get_multires_modifier(scene, active_object, true)) {

@@ -7,6 +7,7 @@ from bpy.types import Operator
 from bpy.props import EnumProperty
 from bpy_extras.node_utils import connect_sockets
 from bpy.app.translations import contexts as i18n_contexts
+from .. import __package__ as base_package
 
 from ..utils.constants import (
     blend_types,
@@ -35,7 +36,11 @@ class NODE_OT_merge_selected(Operator, NWBase):
         name="Mode",
         translation_context=i18n_contexts.id_nodetree,
         description="All possible blend types, boolean operations and math operations",
-        items=blend_types + [op for op in geo_combine_operations if op not in blend_types] + [op for op in operations if op not in blend_types],
+        items=(
+            blend_types +
+            [op for op in geo_combine_operations if op not in blend_types] +
+            [op for op in operations if op not in blend_types]
+        ),
     )
     merge_type: EnumProperty(
         name="Merge Type",
@@ -129,7 +134,7 @@ class NODE_OT_merge_selected(Operator, NWBase):
                 and nw_check_selected(cls, context))
 
     def execute(self, context):
-        settings = context.preferences.addons[__package__].preferences
+        settings = context.preferences.addons[base_package].preferences
         merge_hide = settings.merge_hide
         merge_position = settings.merge_position  # 'center' or 'bottom'
 
@@ -171,8 +176,8 @@ class NODE_OT_merge_selected(Operator, NWBase):
         selected_vector = []  # entry = [index, loc]
         selected_z = []  # entry = [index, loc]
         selected_alphaover = []  # entry = [index, loc]
-        selected_boolean = [] # entry = [index, loc]
-        selected_string = [] # entry = [index, loc]
+        selected_boolean = []  # entry = [index, loc]
+        selected_string = []  # entry = [index, loc]
 
         for i, node in enumerate(nodes):
             if node.select and node.outputs:
@@ -374,7 +379,7 @@ class NODE_OT_merge_selected(Operator, NWBase):
                     add = self.merge_with_multi_input(
                         nodes_list, merge_position, do_hide, loc_x, links, nodes, add_type, [1])
                     was_multi = True
-                    break # this line is here in case more types get added in the future
+                    break  # this line is here in case more types get added in the future
                 add.location = loc_x, loc_y
                 loc_y += offset_y
                 add.select = True

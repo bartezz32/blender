@@ -1057,7 +1057,7 @@ static Array<GridCoord> get_subdivided_corner_grid_coords(subdiv::Subdiv &subdiv
                                      const int /*num_edges*/,
                                      const int num_corners,
                                      const int /*num_faces*/,
-                                     const int * /*subdiv_face_offset*/) -> bool {
+                                     const Span<int> /*subdiv_face_offset*/) -> bool {
     SubdividedCornerGridCoordData *data = static_cast<SubdividedCornerGridCoordData *>(
         context->user_data);
     data->corner_grid_coords.reinitialize(num_corners);
@@ -1108,7 +1108,7 @@ static void rasterize_subdivided_face(const MultiresBaker &baker,
 {
   const IndexRange &face = mesh_arrays.faces[face_index];
 
-  /* This code operates with mesh with at leats one subdivision level applied. Such mesh only has
+  /* This code operates with mesh with at least one subdivision level applied. Such mesh only has
    * quad faces as per how subdivision works. */
   BLI_assert(face.size() == 4);
 
@@ -1313,7 +1313,7 @@ static Array<GridCoord> get_highres_mesh_loop_grid_coords(
                                      const int /*num_edges*/,
                                      const int num_corners,
                                      const int /*num_faces*/,
-                                     const int * /*subdiv_face_offset*/) -> bool {
+                                     const Span<int> /*subdiv_face_offset*/) -> bool {
     HighresCornerGridCoordData *data = static_cast<HighresCornerGridCoordData *>(
         context->user_data);
     data->corner_grid_coords.reinitialize(num_corners);

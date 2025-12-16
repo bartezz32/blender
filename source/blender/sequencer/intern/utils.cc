@@ -37,7 +37,6 @@
 #include "SEQ_render.hh"
 #include "SEQ_select.hh"
 #include "SEQ_sequencer.hh"
-#include "SEQ_time.hh"
 #include "SEQ_utils.hh"
 
 #include "IMB_imbuf_types.hh"
@@ -123,7 +122,7 @@ const char *get_default_stripname_by_type(int type)
       return CTX_DATA_(BLT_I18NCONTEXT_ID_SEQUENCE, "Clip");
     case STRIP_TYPE_MASK:
       return CTX_DATA_(BLT_I18NCONTEXT_ID_SEQUENCE, "Mask");
-    case STRIP_TYPE_SOUND_RAM:
+    case STRIP_TYPE_SOUND:
       return CTX_DATA_(BLT_I18NCONTEXT_ID_SEQUENCE, "Audio");
     case STRIP_TYPE_CROSS:
       return CTX_DATA_(BLT_I18NCONTEXT_ID_SEQUENCE, "Crossfade");
@@ -184,7 +183,7 @@ ListBase *get_seqbase_from_strip(Strip *strip, ListBase **r_channels, int *r_off
     case STRIP_TYPE_META: {
       seqbase = &strip->seqbase;
       *r_channels = &strip->channels;
-      *r_offset = time_start_frame_get(strip);
+      *r_offset = strip->content_start();
       break;
     }
     case STRIP_TYPE_SCENE: {
@@ -209,13 +208,13 @@ static MovieReader *open_anim_filepath(Strip *strip, const char *filepath, bool 
    * kept unchanged for the performance reasons. */
   if (openfile) {
     return openanim(filepath,
-                    IB_byte_data | ((strip->flag & SEQ_FILTERY) ? IB_animdeinterlace : 0),
+                    IB_byte_data | ((strip->flag & SEQ_DEINTERLACE) ? IB_animdeinterlace : 0),
                     strip->streamindex,
                     true,
                     strip->data->colorspace_settings.name);
   }
   return openanim_noload(filepath,
-                         IB_byte_data | ((strip->flag & SEQ_FILTERY) ? IB_animdeinterlace : 0),
+                         IB_byte_data | ((strip->flag & SEQ_DEINTERLACE) ? IB_animdeinterlace : 0),
                          strip->streamindex,
                          true,
                          strip->data->colorspace_settings.name);
@@ -335,7 +334,7 @@ const Strip *strip_topmost_get(const Scene *scene, int frame)
   int best_channel = -1;
 
   LISTBASE_FOREACH (const Strip *, strip, ed->current_strips()) {
-    if (render_is_muted(channels, strip) || !time_strip_intersects_frame(scene, strip, frame)) {
+    if (render_is_muted(channels, strip) || !strip->intersects_frame(scene, frame)) {
       continue;
     }
     /* Only use strips that generate an image, not ones that combine
@@ -437,7 +436,7 @@ bool strip_has_valid_data(const Strip *strip)
       return (strip->clip != nullptr);
     case STRIP_TYPE_SCENE:
       return (strip->scene != nullptr);
-    case STRIP_TYPE_SOUND_RAM:
+    case STRIP_TYPE_SOUND:
       return (strip->sound != nullptr);
   }
 

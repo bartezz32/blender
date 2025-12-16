@@ -12,6 +12,15 @@
 #include "DNA_boid_types.h"
 #include "DNA_defs.h"
 
+#ifdef __cplusplus
+namespace blender {
+template<int DimsNum> struct KDTree;
+}  // namespace blender
+using KDTree3d = blender::KDTree<3>;
+#else
+typedef struct KDTree3d KDTree3d;
+#endif
+
 struct AnimData;
 
 typedef struct HairKey {
@@ -379,7 +388,7 @@ typedef struct ParticleSystem {
   int tot_fluidsprings, alloc_fluidsprings;
 
   /** Used for interactions with self and other systems. */
-  struct KDTree_3d *tree;
+  KDTree3d *tree;
   /** Used for interactions with self and other systems. */
   struct BVHTree *bvhtree;
 

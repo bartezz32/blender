@@ -33,7 +33,7 @@
 #include "BKE_layer.hh"
 #include "BKE_library.hh"
 #include "BKE_object.hh"
-#include "BKE_tracking.h"
+#include "BKE_tracking.hh"
 
 #include "RNA_access.hh"
 #include "RNA_prototypes.hh"
@@ -436,6 +436,10 @@ static eContextResult screen_ctx_selected_pose_bones(const bContext *C, bContext
   Object *obact = BKE_view_layer_active_object_get(view_layer);
   Object *obpose = BKE_object_pose_armature_get(obact);
   if (obpose && obpose->pose && obpose->data) {
+    if (obpose->pose->flag & POSE_RECALC) {
+      /* Can happen with undo-redo, see #150451. */
+      BKE_pose_rebuild(CTX_data_main(C), obpose, (bArmature *)obpose->data, false);
+    }
     if (obpose != obact) {
       FOREACH_PCHAN_SELECTED_IN_OBJECT_BEGIN (obpose, pchan) {
         CTX_data_list_add(result, &obpose->id, &RNA_PoseBone, pchan);
@@ -544,9 +548,9 @@ static eContextResult screen_ctx_property(const bContext *C, bContextDataResult 
   PropertyRNA *prop;
   int index;
 
-  UI_context_active_but_prop_get(C, &ptr, &prop, &index);
+  blender::ui::context_active_but_prop_get(C, &ptr, &prop, &index);
   if (ptr.data && prop) {
-    /* UI_context_active_but_prop_get returns an index of 0 if the property is not
+    /* context_active_but_prop_get returns an index of 0 if the property is not
      * an array, but other functions expect -1 for non-arrays. */
     if (!RNA_property_array_check(prop)) {
       index = -1;
@@ -810,7 +814,7 @@ static eContextResult screen_ctx_active_operator(const bContext *C, bContextData
   if (sfile) {
     op = sfile->op;
   }
-  else if ((op = UI_context_active_operator_get(C))) {
+  else if ((op = blender::ui::context_active_operator_get(C))) {
     /* do nothing */
   }
   else {
@@ -1066,7 +1070,7 @@ static eContextResult screen_ctx_ui_list(const bContext *C, bContextDataResult *
   wmWindow *win = CTX_wm_window(C);
   ARegion *region = CTX_wm_region(C);
   if (region) {
-    uiList *list = UI_list_find_mouse_over(region, win->eventstate);
+    uiList *list = blender::ui::list_find_mouse_over(region, win->runtime->eventstate);
     if (list) {
       CTX_data_pointer_set(result, nullptr, &RNA_UIList, list);
       return CTX_RESULT_OK;
@@ -1113,7 +1117,7 @@ static eContextResult screen_ctx_selected_strips(const bContext *C, bContextData
   Editing *ed = blender::seq::editing_get(scene);
   if (ed) {
     LISTBASE_FOREACH (Strip *, strip, ed->current_strips()) {
-      if (strip->flag & SELECT) {
+      if (strip->flag & SEQ_SELECT) {
         CTX_data_list_add(result, &scene->id, &RNA_Strip, strip);
       }
     }
@@ -1134,9 +1138,9 @@ static eContextResult screen_ctx_selected_editable_strips(const bContext *C,
     return CTX_RESULT_NO_DATA;
   }
 
-  ListBase *channels = blender::seq::channels_displayed_get(ed);
+  const ListBase *channels = blender::seq::channels_displayed_get(ed);
   LISTBASE_FOREACH (Strip *, strip, ed->current_strips()) {
-    if (strip->flag & SELECT && !blender::seq::transform_is_locked(channels, strip)) {
+    if (strip->flag & SEQ_SELECT && !blender::seq::transform_is_locked(channels, strip)) {
       CTX_data_list_add(result, &scene->id, &RNA_Strip, strip);
     }
   }

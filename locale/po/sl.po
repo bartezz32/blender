@@ -1,9 +1,9 @@
 
 msgid ""
 msgstr ""
-"Project-Id-Version: Blender 5.0.0 Beta (b'd29f9f6118e5')\n"
+"Project-Id-Version: Blender 5.1.0 Alpha (b'7d4876cf0c11')\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-10 09:45+0000\n"
+"POT-Creation-Date: 2025-12-16 11:27+0000\n"
 "PO-Revision-Date: 2025-10-17 15:15+0000\n"
 "Last-Translator: Gorazd Gorup <gorupgorazd@gmail.com>\n"
 "Language-Team: Slovenian <https://translate.blender.org/projects/blender-ui/ui/sl/>\n"
@@ -768,10 +768,6 @@ msgid "Show only hotkeys that have this text in their name"
 msgstr "Pokaže le tiste bližnjice, ki imajo to besedilo v imenu"
 
 
-msgid "Hide Mix nodes"
-msgstr "Skrij mešalna vozlišča"
-
-
 msgid "When merging nodes with the Ctrl+Numpad0 hotkey (and similar) specify whether to collapse them or show the full node with options expanded"
 msgstr "Določite, ali se nova vozlišča skrčijo ali prikažejo z vsemi razširjenimi možnostmi, kadar združujete vozlišča z bližnjico Ctrl + Num0 (ali podobnimi)"
 
@@ -830,14 +826,6 @@ msgstr "Pokaži seznam bližnjic"
 
 msgid "Expand this box into a list of all the hotkeys for functions in this addon"
 msgstr "Razširi ta razdelek v seznam vseh bližnjic, ki jih uporablja ta dodatek"
-
-
-msgid "Show Principled naming tags"
-msgstr "Pokaži nomenklaturo Načelne DPFR"
-
-
-msgid "Expand this box into a list of all naming tags for principled texture setup"
-msgstr "Razširi ta razdelek v seznam vseh imenskih značk za postavitev načelnih tekstur"
 
 
 msgid "Fribidi Library"
@@ -2061,6 +2049,286 @@ msgid "The space where the asset shelf will show up in. Ignored for popup asset 
 msgstr "Prostor, v katerem se bo pokazala polica s sredstvi. Pojavne police to nastavitev prezrejo, saj se lahko pokažejo v katerem koli prostoru."
 
 
+msgid "Actions"
+msgstr "Akcije"
+
+
+msgid "Show Action data-blocks"
+msgstr "Pokaže podatkovne bloke akcije"
+
+
+msgid "Annotations"
+msgstr "Zaznamki"
+
+
+msgid "Show Annotation data-blocks"
+msgstr "Pokaže podatkovne bloke zaznamkov"
+
+
+msgid "Armatures"
+msgstr "Skeleti"
+
+
+msgid "Show Armature data-blocks"
+msgstr "Pokaže podatkovne bloke skeletov"
+
+
+msgid "Brushes"
+msgstr "Čopiči"
+
+
+msgid "Show Brushes data-blocks"
+msgstr "Pokaže podatkovne bloke čopičev"
+
+
+msgid "Cache Files"
+msgstr "Predpomnilniške datoteke"
+
+
+msgid "Show Cache File data-blocks"
+msgstr "Pokaže podatkovne bloke predpomnilniških datotek"
+
+
+msgid "Cameras"
+msgstr "Kamere"
+
+
+msgid "Show Camera data-blocks"
+msgstr "Pokaže podatkovne bloke kamer"
+
+
+msgid "Curves"
+msgstr "Krivulje"
+
+
+msgid "Show Curve data-blocks"
+msgstr "Pokaže podatkovne bloke krivulj"
+
+
+msgid "Hair Curves"
+msgstr "Dlačne krivulje"
+
+
+msgid "Show/hide Curves data-blocks"
+msgstr "Pokaže/skrije podatkovne bloke krivulj"
+
+
+msgid "Fonts"
+msgstr "Pisave"
+
+
+msgid "Show Font data-blocks"
+msgstr "Pokaže podatkovne bloke pisav"
+
+
+msgid "Grease Pencil"
+msgstr "Grease Pencil"
+
+
+msgid "Show Grease Pencil data-blocks"
+msgstr "Pokaže podatkovne bloke Grease Pencil"
+
+
+msgid "Collections"
+msgstr "Zbirke"
+
+
+msgid "Show Collection data-blocks"
+msgstr "Pokaže podatkovne bloke zbirk"
+
+
+msgid "Images"
+msgstr "Slike"
+
+
+msgid "Show Image data-blocks"
+msgstr "Pokaže podatkovne bloke slik"
+
+
+msgid "Lattices"
+msgstr "Kontrolne rešetke"
+
+
+msgid "Show Lattice data-blocks"
+msgstr "Pokaže podatkovne bloke kontrolnih rešetk"
+
+
+msgid "Lights"
+msgstr "Luči"
+
+
+msgid "Show Light data-blocks"
+msgstr "Pokaže podatkovne bloke luči"
+
+
+msgid "Light Probes"
+msgstr "Svetlobne sonde"
+
+
+msgid "Show Light Probe data-blocks"
+msgstr "Pokaže podatkovne bloke svetlobnih sond"
+
+
+msgid "Freestyle Linestyles"
+msgstr "Slogi potez Freestyle"
+
+
+msgid "Show Freestyle's Line Style data-blocks"
+msgstr "Pokaže podatkovne bloke slogov potez Freestyle"
+
+
+msgid "Masks"
+msgstr "Maske"
+
+
+msgid "Show Mask data-blocks"
+msgstr "Pokaže podatkovne bloke mask"
+
+
+msgid "Materials"
+msgstr "Materiali"
+
+
+msgid "Show Material data-blocks"
+msgstr "Pokaže podatkovne bloke materialov"
+
+
+msgid "Meshes"
+msgstr "Mreže"
+
+
+msgid "Show Mesh data-blocks"
+msgstr "Pokaže podatkovne bloke mrež"
+
+
+msgid "Metaballs"
+msgstr "Metažoge"
+
+
+msgid "Show Metaball data-blocks"
+msgstr "Pokaže podatkovne bloke metažog"
+
+
+msgid "Movie Clips"
+msgstr "Video izrezki"
+
+
+msgid "Show Movie Clip data-blocks"
+msgstr "Pokaže podatkovne bloke video izrezkov"
+
+
+msgid "Node Trees"
+msgstr "Vozliščna drevesa"
+
+
+msgid "Show Node Tree data-blocks"
+msgstr "Pokaže podatkovne bloke vozliščnih dreves"
+
+
+msgid "Objects"
+msgstr "Objekti"
+
+
+msgid "Show Object data-blocks"
+msgstr "Pokaže podatkovne bloke objektov"
+
+
+msgid "Paint Curves"
+msgstr "Risalne krivulje"
+
+
+msgid "Show Paint Curve data-blocks"
+msgstr "Pokaže podatkovne bloke risalnih krivulj"
+
+
+msgid "Palettes"
+msgstr "Palete"
+
+
+msgid "Show Palette data-blocks"
+msgstr "Pokaže podatkovne bloke palet"
+
+
+msgid "Particles Settings"
+msgstr "Nastavitve delcev"
+
+
+msgid "Show Particle Settings data-blocks"
+msgstr "Pokaže podatkovne bloke nastavitev delcev"
+
+
+msgid "Point Clouds"
+msgstr "Oblaki točk"
+
+
+msgid "Show/hide Point Cloud data-blocks"
+msgstr "Pokaže/skrije podatkovne bloke oblakov točk"
+
+
+msgid "Scenes"
+msgstr "Scene"
+
+
+msgid "Show Scene data-blocks"
+msgstr "Pokaže podatkovne bloke scen"
+
+
+msgid "Sounds"
+msgstr "Zvoki"
+
+
+msgid "Show Sound data-blocks"
+msgstr "Pokaže podatkovne bloke zvokov"
+
+
+msgid "Speakers"
+msgstr "Zvočniki"
+
+
+msgid "Show Speaker data-blocks"
+msgstr "Pokaže podatkovne bloke zvočnikov"
+
+
+msgid "Texts"
+msgstr "Besedila"
+
+
+msgid "Show Text data-blocks"
+msgstr "Pokaže podatkovne bloke besedil"
+
+
+msgid "Textures"
+msgstr "Teksture"
+
+
+msgid "Show Texture data-blocks"
+msgstr "Pokaže podatkovne bloke tekstur"
+
+
+msgid "Volumes"
+msgstr "Volumni"
+
+
+msgid "Show/hide Volume data-blocks"
+msgstr "Pokaže/skrije podatkovne bloke volumnov"
+
+
+msgid "Workspaces"
+msgstr "Delovni prostori"
+
+
+msgid "Show workspace data-blocks"
+msgstr "Pokaže podatkovne bloke delovnih prostorov"
+
+
+msgid "Worlds"
+msgstr "Svetovi"
+
+
+msgid "Show World data-blocks"
+msgstr "Pokaže podatkovne bloke svetov"
+
+
 msgid "Preview Size"
 msgstr "Velikost predogleda"
 
@@ -2996,10 +3264,6 @@ msgid "Main data structure representing a .blend file and all its data-blocks"
 msgstr "Glavna podatkovna struktura, ki predstavlja datoteko .blend in vse njene podatkovne bloke"
 
 
-msgid "Actions"
-msgstr "Akcije"
-
-
 msgid "Action data-blocks"
 msgstr "Akcijski podatkovni bloki"
 
@@ -3012,40 +3276,20 @@ msgid "Annotation data-blocks (legacy Grease Pencil)"
 msgstr "Podatkovni bloki zaznamkov (predhodnik Grease Pencila)"
 
 
-msgid "Armatures"
-msgstr "Skeleti"
-
-
 msgid "Armature data-blocks"
 msgstr "Podatkovni bloki skeletov"
-
-
-msgid "Brushes"
-msgstr "Čopiči"
 
 
 msgid "Brush data-blocks"
 msgstr "Podatkovni bloki čopičev"
 
 
-msgid "Cache Files"
-msgstr "Predpomnilniške datoteke"
-
-
 msgid "Cache Files data-blocks"
 msgstr "Podatkovni bloki predpomnilniških datotek"
 
 
-msgid "Cameras"
-msgstr "Kamere"
-
-
 msgid "Camera data-blocks"
 msgstr "Podatkovni bloki kamer"
-
-
-msgid "Collections"
-msgstr "Zbirke"
 
 
 msgid "Collection data-blocks"
@@ -3058,10 +3302,6 @@ msgstr "Barvni prostor"
 
 msgid "Information about the color space used for data-blocks in a blend file"
 msgstr "Informacije o barvnem prostoru podatkovnih blokov v datoteki blend"
-
-
-msgid "Curves"
-msgstr "Krivulje"
 
 
 msgid "Curve data-blocks"
@@ -3084,24 +3324,12 @@ msgid "Vector font data-blocks"
 msgstr "Podatkovni bloki vektorskih pisav"
 
 
-msgid "Grease Pencil"
-msgstr "Grease Pencil"
-
-
 msgid "Grease Pencil data-blocks"
 msgstr "Podatkovni bloki za Grease Pencil"
 
 
-msgid "Hair Curves"
-msgstr "Dlačne krivulje"
-
-
 msgid "Hair curve data-blocks"
 msgstr "Podatkovni bloki dlačnih krivulj"
-
-
-msgid "Images"
-msgstr "Slike"
 
 
 msgid "Image data-blocks"
@@ -3124,10 +3352,6 @@ msgid "Has the current session been saved to disk as a .blend file"
 msgstr "Ali je bila trenutna seja shranjena na disk kot datoteka .blend"
 
 
-msgid "Lattices"
-msgstr "Kontrolne rešetke"
-
-
 msgid "Lattice data-blocks"
 msgstr "Podatkovni bloki kontrolnih rešetk"
 
@@ -3140,16 +3364,8 @@ msgid "Library data-blocks"
 msgstr "Podatkovni bloki knjižnic"
 
 
-msgid "Light Probes"
-msgstr "Svetlobne sonde"
-
-
 msgid "Light Probe data-blocks"
 msgstr "Podatkovni bloki svetlobnih sond"
-
-
-msgid "Lights"
-msgstr "Luči"
 
 
 msgid "Light data-blocks"
@@ -3164,40 +3380,20 @@ msgid "Line Style data-blocks"
 msgstr "Podatkovni bloki slogov poteze"
 
 
-msgid "Masks"
-msgstr "Maske"
-
-
 msgid "Masks data-blocks"
 msgstr "Podatkovni bloki mask"
-
-
-msgid "Materials"
-msgstr "Materiali"
 
 
 msgid "Material data-blocks"
 msgstr "Podatkovni bloki materialov"
 
 
-msgid "Meshes"
-msgstr "Mreže"
-
-
 msgid "Mesh data-blocks"
 msgstr "Mrežni podatkovni bloki"
 
 
-msgid "Metaballs"
-msgstr "Metažoge"
-
-
 msgid "Metaball data-blocks"
 msgstr "Podatkovni bloki metažog"
-
-
-msgid "Movie Clips"
-msgstr "Video izrezki"
 
 
 msgid "Movie Clip data-blocks"
@@ -3212,24 +3408,12 @@ msgid "Node group data-blocks"
 msgstr "Podatkovni bloki skupin vozlišč"
 
 
-msgid "Objects"
-msgstr "Objekti"
-
-
 msgid "Object data-blocks"
 msgstr "Podatkovni bloki objektov"
 
 
-msgid "Paint Curves"
-msgstr "Risalne krivulje"
-
-
 msgid "Paint Curves data-blocks"
 msgstr "Podatkovni bloki risalnih krivulj"
-
-
-msgid "Palettes"
-msgstr "Palete"
 
 
 msgid "Palette data-blocks"
@@ -3244,16 +3428,8 @@ msgid "Particle data-blocks"
 msgstr "Podatkovni bloki delcev"
 
 
-msgid "Point Clouds"
-msgstr "Oblaki točk"
-
-
 msgid "Point cloud data-blocks"
 msgstr "Podatkovni bloki oblakov točk"
-
-
-msgid "Scenes"
-msgstr "Scene"
 
 
 msgid "Scene data-blocks"
@@ -3276,32 +3452,16 @@ msgid "Shape Key data-blocks"
 msgstr "Podatkovni bloki oblikovnih ključev"
 
 
-msgid "Sounds"
-msgstr "Zvoki"
-
-
 msgid "Sound data-blocks"
 msgstr "Zvočni podatkovni bloki"
-
-
-msgid "Speakers"
-msgstr "Zvočniki"
 
 
 msgid "Speaker data-blocks"
 msgstr "Podatkovni bloki zvočnikov"
 
 
-msgid "Texts"
-msgstr "Besedila"
-
-
 msgid "Text data-blocks"
 msgstr "Besedilni podatkovni bloki"
-
-
-msgid "Textures"
-msgstr "Teksture"
 
 
 msgid "Texture data-blocks"
@@ -3324,10 +3484,6 @@ msgid "File format version the .blend file was saved with"
 msgstr "Različica datotečnega formata, v katerem je bila shranjena datoteka .blend"
 
 
-msgid "Volumes"
-msgstr "Volumni"
-
-
 msgid "Volume data-blocks"
 msgstr "Podatkovni bloki volumnov"
 
@@ -3340,16 +3496,8 @@ msgid "Window manager data-blocks"
 msgstr "Podatkovni bloki upraviteljev oken"
 
 
-msgid "Workspaces"
-msgstr "Delovni prostori"
-
-
 msgid "Workspace data-blocks"
 msgstr "Podatkovni bloki delovnih prostorov"
-
-
-msgid "Worlds"
-msgstr "Svetovi"
 
 
 msgid "World data-blocks"
@@ -14029,166 +14177,6 @@ msgid "Which asset types to show/hide, when browsing an asset library"
 msgstr "Kateri tipi sredstev naj s pokažejo/skrijejo med brskanjem po knjižnici sredstev"
 
 
-msgid "Annotations"
-msgstr "Zaznamki"
-
-
-msgid "Show Annotation data-blocks"
-msgstr "Pokaže podatkovne bloke zaznamkov"
-
-
-msgid "Show Armature data-blocks"
-msgstr "Pokaže podatkovne bloke skeletov"
-
-
-msgid "Show Cache File data-blocks"
-msgstr "Pokaže podatkovne bloke predpomnilniških datotek"
-
-
-msgid "Show Camera data-blocks"
-msgstr "Pokaže podatkovne bloke kamer"
-
-
-msgid "Show Curve data-blocks"
-msgstr "Pokaže podatkovne bloke krivulj"
-
-
-msgid "Show/hide Curves data-blocks"
-msgstr "Pokaže/skrije podatkovne bloke krivulj"
-
-
-msgid "Fonts"
-msgstr "Pisave"
-
-
-msgid "Show Font data-blocks"
-msgstr "Pokaže podatkovne bloke pisav"
-
-
-msgid "Show Grease Pencil data-blocks"
-msgstr "Pokaže podatkovne bloke Grease Pencil"
-
-
-msgid "Show Image data-blocks"
-msgstr "Pokaže podatkovne bloke slik"
-
-
-msgid "Show Lattice data-blocks"
-msgstr "Pokaže podatkovne bloke kontrolnih rešetk"
-
-
-msgid "Show Light data-blocks"
-msgstr "Pokaže podatkovne bloke luči"
-
-
-msgid "Show Light Probe data-blocks"
-msgstr "Pokaže podatkovne bloke svetlobnih sond"
-
-
-msgid "Freestyle Linestyles"
-msgstr "Slogi potez Freestyle"
-
-
-msgid "Show Freestyle's Line Style data-blocks"
-msgstr "Pokaže podatkovne bloke slogov potez Freestyle"
-
-
-msgid "Show Mask data-blocks"
-msgstr "Pokaže podatkovne bloke mask"
-
-
-msgid "Show Mesh data-blocks"
-msgstr "Pokaže podatkovne bloke mrež"
-
-
-msgid "Show Metaball data-blocks"
-msgstr "Pokaže podatkovne bloke metažog"
-
-
-msgid "Show Movie Clip data-blocks"
-msgstr "Pokaže podatkovne bloke video izrezkov"
-
-
-msgid "Show Paint Curve data-blocks"
-msgstr "Pokaže podatkovne bloke risalnih krivulj"
-
-
-msgid "Show Palette data-blocks"
-msgstr "Pokaže podatkovne bloke palet"
-
-
-msgid "Particles Settings"
-msgstr "Nastavitve delcev"
-
-
-msgid "Show Particle Settings data-blocks"
-msgstr "Pokaže podatkovne bloke nastavitev delcev"
-
-
-msgid "Show/hide Point Cloud data-blocks"
-msgstr "Pokaže/skrije podatkovne bloke oblakov točk"
-
-
-msgid "Show Sound data-blocks"
-msgstr "Pokaže podatkovne bloke zvokov"
-
-
-msgid "Show Speaker data-blocks"
-msgstr "Pokaže podatkovne bloke zvočnikov"
-
-
-msgid "Show Text data-blocks"
-msgstr "Pokaže podatkovne bloke besedil"
-
-
-msgid "Show Texture data-blocks"
-msgstr "Pokaže podatkovne bloke tekstur"
-
-
-msgid "Show/hide Volume data-blocks"
-msgstr "Pokaže/skrije podatkovne bloke volumnov"
-
-
-msgid "Show workspace data-blocks"
-msgstr "Pokaže podatkovne bloke delovnih prostorov"
-
-
-msgid "Show Action data-blocks"
-msgstr "Pokaže podatkovne bloke akcije"
-
-
-msgid "Show Brushes data-blocks"
-msgstr "Pokaže podatkovne bloke čopičev"
-
-
-msgid "Show Collection data-blocks"
-msgstr "Pokaže podatkovne bloke zbirk"
-
-
-msgid "Show Material data-blocks"
-msgstr "Pokaže podatkovne bloke materialov"
-
-
-msgid "Node Trees"
-msgstr "Vozliščna drevesa"
-
-
-msgid "Show Node Tree data-blocks"
-msgstr "Pokaže podatkovne bloke vozliščnih dreves"
-
-
-msgid "Show Object data-blocks"
-msgstr "Pokaže podatkovne bloke objektov"
-
-
-msgid "Show Scene data-blocks"
-msgstr "Pokaže podatkovne bloke scen"
-
-
-msgid "Show World data-blocks"
-msgstr "Pokaže podatkovne bloke svetov"
-
-
 msgid "File Select Parameters"
 msgstr "Parametri izbire datotek"
 
@@ -15663,6 +15651,22 @@ msgstr "Sveženj"
 
 msgid "Closure"
 msgstr "Sklepanje"
+
+
+msgid "Font"
+msgstr "Pisava"
+
+
+msgid "Text"
+msgstr "Besedilo"
+
+
+msgid "Mask"
+msgstr "Maska"
+
+
+msgid "Sound"
+msgstr "Zvok"
 
 
 msgid "Freestyle Line Set"
@@ -18806,10 +18810,6 @@ msgid "Text on Curve"
 msgstr "Besedilo na krivulji"
 
 
-msgid "Font"
-msgstr "Pisava"
-
-
 msgid "Font Bold"
 msgstr "Krepka pisava"
 
@@ -21792,10 +21792,6 @@ msgid "Pitch"
 msgstr "Višina"
 
 
-msgid "Sound"
-msgstr "Zvok"
-
-
 msgid "Maximum Volume"
 msgstr "Najvišja glasnost"
 
@@ -22751,8 +22747,8 @@ msgid "Remember the last used scene for the workspace and switch to it whenever 
 msgstr "Zapomni si zadnjo uporabljeno sceno v delovnem prostoru in preklopi nanjo, kadar se spet aktivira ta delovni prostor"
 
 
-msgid "Sync Active Scene"
-msgstr "Uskladi aktivno sceno"
+msgid "Sync Scene Time"
+msgstr "Uskladi scenski čas"
 
 
 msgid "Cycles World Settings"
@@ -24772,10 +24768,6 @@ msgid "Available"
 msgstr "Na voljo"
 
 
-msgid "BBone Shape"
-msgstr "Oblika U-kosti"
-
-
 msgid "Delta Rotation"
 msgstr "Delta rotacija"
 
@@ -25532,184 +25524,12 @@ msgid "Use Material Mask"
 msgstr "Uporabi masko materiala"
 
 
-msgid "Mask"
-msgstr "Maska"
-
-
-msgid "Track"
-msgstr "Obriši"
-
-
-msgid "Quick Effects"
-msgstr "Učinki na hitro"
-
-
-msgid "Show/Hide"
-msgstr "Pokaži / skrij"
-
-
-msgid "Clean Up"
-msgstr "Počisti"
-
-
-msgid "Asset"
-msgstr "Sredstvo"
-
-
-msgid "Make Single User"
-msgstr "Naredi edinstveno uporabniku"
-
-
-msgid "Convert"
-msgstr "Pretvori"
-
-
-msgid "Link/Transfer Data"
-msgstr "Poveži / prenesi podatke"
-
-
-msgid "Hooks"
-msgstr "Kavlji"
-
-
-msgid "Trim/Add"
-msgstr "Poreži / dodaj"
-
-
-msgid "Random Mask"
-msgstr "Naključna maska"
-
-
-msgid "Clear Transform"
-msgstr "Počisti transformacijo"
-
-
-msgid "In-Betweens"
-msgstr "Vmesni okvirji"
-
-
-msgid "Propagate"
-msgstr "Razširjanje"
-
-
-msgid "Bone Collections"
-msgstr "Zbirke kosti"
-
-
-msgid "Names"
-msgstr "Imena"
-
-
-msgid "Apply"
-msgstr "Uveljavi"
-
-
-msgid "Layout"
-msgstr "Ureditev"
-
-
-msgid "Face Data"
-msgstr "Podatki lic"
-
-
-msgid "Select by Face Strength"
-msgstr "Izberi glede na krepkost lica"
-
-
-msgid "Set Face Strength"
-msgstr "Nastavi krepkost lica"
-
-
-msgid "Merge"
-msgstr "Združi"
-
-
-msgid "Adjust"
-msgstr "Prilagoditev"
-
-
-msgid "Keying"
-msgstr "Ključenje"
-
-
-msgid "Tracking"
-msgstr "Sledenje"
-
-
-msgid "Utilities"
-msgstr "Pripomočki"
-
-
-msgid "Math"
-msgstr "Matematika"
-
-
-msgid "Special Characters"
-msgstr "Posebni znaki"
-
-
-msgid "Creative"
-msgstr "Ustvarjanje"
-
-
-msgid "Kerning"
-msgstr "Spodsekavanje"
-
-
-msgid "Text"
-msgstr "Besedilo"
-
-
-msgid "Metaball"
-msgstr "Metažoga"
-
-
-msgid "Bone Roll"
-msgstr "Zasukaj kost"
-
-
-msgid "Render Preview"
-msgstr "Predogled upodobitve"
-
-
-msgid "Pivot Point"
-msgstr "Osišče"
+msgid "Mirror"
+msgstr "Zrcali"
 
 
 msgid "Snap"
 msgstr "Pritrdi"
-
-
-msgid "Proportional Editing Falloff"
-msgstr "Slabljenje sorazmernega urejanja"
-
-
-msgid "Mask Edit"
-msgstr "Urejanje maske"
-
-
-msgid "Automasking"
-msgstr "Samodejno maskiranje"
-
-
-msgid "Read"
-msgstr "Branje"
-
-
-msgid "Sample"
-msgstr "Vzorčenje"
-
-
-msgid "Write"
-msgstr "Zapiši"
-
-
-msgid "Primitives"
-msgstr "Primitivi"
-
-
-msgid "Mirror"
-msgstr "Zrcali"
 
 
 msgid "UV Mapping"
@@ -25744,14 +25564,6 @@ msgid "Select More/Less"
 msgstr "Izberi več / manj"
 
 
-msgid "Gizmo"
-msgstr "Manipulator"
-
-
-msgid "Instances"
-msgstr "Primerki"
-
-
 msgid "Select Similar"
 msgstr "Izberi sorodne"
 
@@ -25768,24 +25580,16 @@ msgid "Select Loops"
 msgstr "Izberi zanke"
 
 
-msgid "Import"
-msgstr "Uvozi"
-
-
-msgid "Deprecated"
-msgstr "Zastarelo"
-
-
 msgid "Assign Material"
 msgstr "Dodeli material"
 
 
-msgid "List"
-msgstr "Seznam"
+msgid "Metaball"
+msgstr "Metažoga"
 
 
-msgid "UV"
-msgstr "UV"
+msgid "Layout"
+msgstr "Ureditev"
 
 
 msgid "Light"
@@ -25804,8 +25608,188 @@ msgid "Relations"
 msgstr "Razmerja"
 
 
+msgid "Adjust"
+msgstr "Prilagoditev"
+
+
 msgid "Rigid Body"
 msgstr "Togo telo"
+
+
+msgid "Keying"
+msgstr "Ključenje"
+
+
+msgid "Apply"
+msgstr "Uveljavi"
+
+
+msgid "Tracking"
+msgstr "Sledenje"
+
+
+msgid "Track"
+msgstr "Obriši"
+
+
+msgid "Utilities"
+msgstr "Pripomočki"
+
+
+msgid "Math"
+msgstr "Matematika"
+
+
+msgid "Quick Effects"
+msgstr "Učinki na hitro"
+
+
+msgid "Creative"
+msgstr "Ustvarjanje"
+
+
+msgid "Show/Hide"
+msgstr "Pokaži / skrij"
+
+
+msgid "Clean Up"
+msgstr "Počisti"
+
+
+msgid "Asset"
+msgstr "Sredstvo"
+
+
+msgid "Make Single User"
+msgstr "Naredi edinstveno uporabniku"
+
+
+msgid "Convert"
+msgstr "Pretvori"
+
+
+msgid "Link/Transfer Data"
+msgstr "Poveži / prenesi podatke"
+
+
+msgid "Hooks"
+msgstr "Kavlji"
+
+
+msgid "Trim/Add"
+msgstr "Poreži / dodaj"
+
+
+msgid "Render Preview"
+msgstr "Predogled upodobitve"
+
+
+msgid "Random Mask"
+msgstr "Naključna maska"
+
+
+msgid "Clear Transform"
+msgstr "Počisti transformacijo"
+
+
+msgid "In-Betweens"
+msgstr "Vmesni okvirji"
+
+
+msgid "Propagate"
+msgstr "Razširjanje"
+
+
+msgid "Bone Collections"
+msgstr "Zbirke kosti"
+
+
+msgid "Names"
+msgstr "Imena"
+
+
+msgid "Face Data"
+msgstr "Podatki lic"
+
+
+msgid "Select by Face Strength"
+msgstr "Izberi glede na krepkost lica"
+
+
+msgid "Set Face Strength"
+msgstr "Nastavi krepkost lica"
+
+
+msgid "Merge"
+msgstr "Združi"
+
+
+msgid "Read"
+msgstr "Branje"
+
+
+msgid "Sample"
+msgstr "Vzorčenje"
+
+
+msgid "Write"
+msgstr "Zapiši"
+
+
+msgid "Primitives"
+msgstr "Primitivi"
+
+
+msgid "Special Characters"
+msgstr "Posebni znaki"
+
+
+msgid "Kerning"
+msgstr "Spodsekavanje"
+
+
+msgid "Gizmo"
+msgstr "Manipulator"
+
+
+msgid "Instances"
+msgstr "Primerki"
+
+
+msgid "Bone Roll"
+msgstr "Zasukaj kost"
+
+
+msgid "Import"
+msgstr "Uvozi"
+
+
+msgid "Deprecated"
+msgstr "Zastarelo"
+
+
+msgid "List"
+msgstr "Seznam"
+
+
+msgid "Pivot Point"
+msgstr "Osišče"
+
+
+msgid "UV"
+msgstr "UV"
+
+
+msgid "Proportional Editing Falloff"
+msgstr "Slabljenje sorazmernega urejanja"
+
+
+msgid "Mask Edit"
+msgstr "Urejanje maske"
+
+
+msgid "Automasking"
+msgstr "Samodejno maskiranje"
 
 
 msgid "Animals"
@@ -25882,8 +25866,8 @@ msgid "Console"
 msgstr "Konzola"
 
 
-msgid "Languages..."
-msgstr "Jeziki ..."
+msgid "Languages"
+msgstr "Jeziki"
 
 
 msgid "Add Attribute"
@@ -30928,6 +30912,10 @@ msgid "Blur Attribute"
 msgstr "Zabris atributov"
 
 
+msgid "Original"
+msgstr "Original"
+
+
 msgid "Camera Info"
 msgstr "Informacije o kameri"
 
@@ -30938,10 +30926,6 @@ msgstr "Zajem atributa"
 
 msgid "Collection Info"
 msgstr "Informacije zbirke"
-
-
-msgid "Original"
-msgstr "Original"
 
 
 msgid "Convex Hull"
@@ -33194,6 +33178,10 @@ msgid "Diamond"
 msgstr "Diamant"
 
 
+msgid "Volume Grid"
+msgstr "Mrežnati volumen"
+
+
 msgid "Hide Value"
 msgstr "Skrij vrednost"
 
@@ -33238,10 +33226,6 @@ msgid "Data type"
 msgstr "Tip podatkov"
 
 
-msgid "Default Value"
-msgstr "Privzeta vrednost"
-
-
 msgid "Bundle Node Socket"
 msgstr "Vtičnica vozlišča svežnja"
 
@@ -33276,6 +33260,10 @@ msgstr "Privzeti atribut"
 
 msgid "Default Input"
 msgstr "Privzeti vhod"
+
+
+msgid "Default Value"
+msgstr "Privzeta vrednost"
 
 
 msgid "Socket description"
@@ -33971,6 +33959,11 @@ msgstr "Odstrani element"
 
 
 msgctxt "Operator"
+msgid "Make Link"
+msgstr "Naredi povezavo"
+
+
+msgctxt "Operator"
 msgid "Assign New Geometry Node Group"
 msgstr "Dodeli novo skupino geometrijskih vozlišč"
 
@@ -33986,8 +33979,8 @@ msgstr "Dodaj predlogo vozliščnih barv"
 
 
 msgctxt "Operator"
-msgid "Add UV map"
-msgstr "Doda preslikavo UV"
+msgid "Add Attribute"
+msgstr "Dodaj atribut"
 
 
 msgctxt "Operator"
@@ -34023,11 +34016,6 @@ msgstr "Spremeni več hkrati"
 msgctxt "Operator"
 msgid "Reset Backdrop"
 msgstr "Ponastavi ozadje"
-
-
-msgctxt "Operator"
-msgid "Make Link"
-msgstr "Naredi povezavo"
 
 
 msgctxt "Operator"
@@ -34919,11 +34907,6 @@ msgstr "Odstrani lastnost"
 
 msgid "Generate system information, saved into a text file"
 msgstr "Pridobi informacije o sistemu in jih shrani v besedilno datoteko"
-
-
-msgctxt "Operator"
-msgid "Save System Info"
-msgstr "Shrani sistemske informacije"
 
 
 msgctxt "Operator"
@@ -38245,11 +38228,6 @@ msgstr "Odveži"
 
 
 msgctxt "Operator"
-msgid "Add Attribute"
-msgstr "Dodaj atribut"
-
-
-msgctxt "Operator"
 msgid "Convert Attribute"
 msgstr "Pretvori atribut"
 
@@ -38271,14 +38249,6 @@ msgstr "Pretvori barvni atribut"
 msgctxt "Operator"
 msgid "Duplicate Color Attribute"
 msgstr "Podvoji barvni atribut"
-
-
-msgid "3D Cursor Position"
-msgstr "Položaj 3D kazalca"
-
-
-msgid "3D Cursor Rotation"
-msgstr "Rotacija 3D kazalca"
 
 
 msgctxt "Operator"
@@ -41046,10 +41016,6 @@ msgid "After baking curves, remove redundant keys"
 msgstr "Po peki krivulj odstrani odvečne ključe"
 
 
-msgid "Clear Constraints"
-msgstr "Počisti omejevalnike"
-
-
 msgid "Remove all constraints from keyed object/bones. To get a correct bake with this setting Visual Keying should be enabled"
 msgstr "Odstrani vse omejevalnike z objektov/kosti s ključi. Za pravilno peko naj bo omogočena možnost Vizualno ključenje"
 
@@ -41729,10 +41695,6 @@ msgstr "Mešalno vozlišče"
 
 msgid "Math Node"
 msgstr "Matematično vozlišče"
-
-
-msgid "Z-Combine Node"
-msgstr "Vozlišče globinskega združevanja"
 
 
 msgctxt "NodeTree"
@@ -44464,6 +44426,10 @@ msgid "Join Area"
 msgstr "Združi območje"
 
 
+msgid "Snapping"
+msgstr "Pritrjevanje"
+
+
 msgctxt "Operator"
 msgid "Area Options"
 msgstr "Možnosti območja"
@@ -45176,6 +45142,10 @@ msgid "Replace Selection"
 msgstr "Zamenjaj izbor"
 
 
+msgid "Ignore Selection"
+msgstr "Prezri izbor"
+
+
 msgctxt "Sequence"
 msgid "Type"
 msgstr "Tip"
@@ -45544,10 +45514,6 @@ msgstr "Prevrti ključne okvirje"
 msgctxt "Operator"
 msgid "Snap Strips to the Current Frame"
 msgstr "Pritrdi trakove na trenutni okvir"
-
-
-msgid "Ignore Selection"
-msgstr "Prezri izbor"
 
 
 msgid "Color 09"
@@ -48921,16 +48887,8 @@ msgid "Second cubic spline control point between min/max speeds"
 msgstr "Druga kontrolna točka kubičnega zlepka med najmanjšo/največjo hitrostjo"
 
 
-msgid "Destination Scale"
-msgstr "Skaliranje cilja"
-
-
 msgid "Fallback Color"
 msgstr "Rezervna barva"
-
-
-msgid "From Viewer"
-msgstr "Od gledalca"
 
 
 msgid "Hit Color"
@@ -48941,20 +48899,8 @@ msgid "Miss Color"
 msgstr "Barva zgrešitve"
 
 
-msgid "Raycast Scale"
-msgstr "Skaliranje meta žarka"
-
-
-msgid "Sample Count"
-msgstr "Količina vzorcev"
-
-
 msgid "Selectable Only"
 msgstr "Samo označljivi"
-
-
-msgid "Teleport Axes"
-msgstr "Teleportacijske osi"
 
 
 msgctxt "Operator"
@@ -49282,6 +49228,78 @@ msgid "Panel containing UI elements"
 msgstr "Plošča, ki vsebuje elemente uporabniškega vmesnika"
 
 
+msgid "Overlays"
+msgstr "Pomagala"
+
+
+msgid "Guides"
+msgstr "Vodnice"
+
+
+msgid "Viewer Node"
+msgstr "Predogledno vozlišče"
+
+
+msgid "Motion Tracking"
+msgstr "Obrisovanje gibanja"
+
+
+msgid "Mesh Edit Mode"
+msgstr "Mrežni urejevalni način"
+
+
+msgid "Measurement"
+msgstr "Meritev"
+
+
+msgid "Curve Edit Mode"
+msgstr "Krivuljni urejevalni način"
+
+
+msgid "Curves Edit Mode"
+msgstr "Urejevalni način za krivulje"
+
+
+msgid "Transform Orientations"
+msgstr "Usmerjenost transformacij"
+
+
+msgid "Stroke Placement"
+msgstr "Postavitev poteze"
+
+
+msgid "Drawing Plane"
+msgstr "Risalna ravnina"
+
+
+msgid "Grease Pencil Options"
+msgstr "Možnosti Grease Pencil"
+
+
+msgid "Quad View"
+msgstr "Četverni pogled"
+
+
+msgid "Onion Skin"
+msgstr "Čebuljenje"
+
+
+msgid "Stereoscopy"
+msgstr "Stereoskopija"
+
+
+msgid "Multi Frame"
+msgstr "Multiokvir"
+
+
+msgid "Auto-Masking"
+msgstr "Samodejno maskiranje"
+
+
+msgid "Viewport Debug"
+msgstr "Razhroščevanje 3D pogleda"
+
+
 msgid "VR"
 msgstr "VR"
 
@@ -49332,82 +49350,6 @@ msgstr "Obhod upodabljanja"
 
 msgid "Compositor"
 msgstr "Stavitelj slik"
-
-
-msgid "Overlays"
-msgstr "Pomagala"
-
-
-msgid "Guides"
-msgstr "Vodnice"
-
-
-msgid "Viewer Node"
-msgstr "Predogledno vozlišče"
-
-
-msgid "Motion Tracking"
-msgstr "Obrisovanje gibanja"
-
-
-msgid "Mesh Edit Mode"
-msgstr "Mrežni urejevalni način"
-
-
-msgid "Measurement"
-msgstr "Meritev"
-
-
-msgid "Curve Edit Mode"
-msgstr "Krivuljni urejevalni način"
-
-
-msgid "Curves Edit Mode"
-msgstr "Urejevalni način za krivulje"
-
-
-msgid "Snapping"
-msgstr "Pritrjevanje"
-
-
-msgid "Transform Orientations"
-msgstr "Usmerjenost transformacij"
-
-
-msgid "Stroke Placement"
-msgstr "Postavitev poteze"
-
-
-msgid "Drawing Plane"
-msgstr "Risalna ravnina"
-
-
-msgid "Grease Pencil Options"
-msgstr "Možnosti Grease Pencil"
-
-
-msgid "Quad View"
-msgstr "Četverni pogled"
-
-
-msgid "Onion Skin"
-msgstr "Čebuljenje"
-
-
-msgid "Stereoscopy"
-msgstr "Stereoskopija"
-
-
-msgid "Multi Frame"
-msgstr "Multiokvir"
-
-
-msgid "Auto-Masking"
-msgstr "Samodejno maskiranje"
-
-
-msgid "Viewport Debug"
-msgstr "Razhroščevanje 3D pogleda"
 
 
 msgid "Import Settings"
@@ -50381,10 +50323,6 @@ msgstr "Razširitve"
 
 msgid "Repositories"
 msgstr "Repozitoriji"
-
-
-msgid "Extensions Tags"
-msgstr "Značke razširitev"
 
 
 msgid "Applications"
@@ -53301,6 +53239,10 @@ msgid "Denoising Normal"
 msgstr "Razšumljanje normal"
 
 
+msgid "Sample Count"
+msgstr "Količina vzorcev"
+
+
 msgid "Map Resolution"
 msgstr "Ločljivost teksture"
 
@@ -53327,10 +53269,6 @@ msgstr "ID jezika"
 
 msgid "Active Language"
 msgstr "Aktivni jezik"
-
-
-msgid "Languages"
-msgstr "Jeziki"
 
 
 msgid "Gloss"
@@ -57555,10 +57493,6 @@ msgid "Theme settings for the Dope Sheet"
 msgstr "Nastavitve teme za animacijski načrt"
 
 
-msgid "Interpolation Line"
-msgstr "Interpolacijska črta"
-
-
 msgid "Keyframe Border"
 msgstr "Robovi ključnega okvirja"
 
@@ -59004,10 +58938,6 @@ msgid "Boxes"
 msgstr "Več okvirjev"
 
 
-msgid "Volume Grid"
-msgstr "Mrežnati volumen"
-
-
 msgctxt "Volume"
 msgid "Data Type"
 msgstr "Tip podatkov"
@@ -59760,6 +59690,16 @@ msgstr "Zmanjša število segmentov"
 
 
 msgctxt "WindowManager"
+msgid "Snap"
+msgstr "Pritrdi"
+
+
+msgctxt "WindowManager"
+msgid "Precision"
+msgstr "Natančnost"
+
+
+msgctxt "WindowManager"
 msgid "Toggle Gradient"
 msgstr "Preklopi gradient"
 
@@ -59917,11 +59857,6 @@ msgstr "Premakni"
 msgctxt "WindowManager"
 msgid "Pan (Off)"
 msgstr "Premik (izklopljeno)"
-
-
-msgctxt "WindowManager"
-msgid "Precision"
-msgstr "Natančnost"
 
 
 msgctxt "WindowManager"
@@ -60105,11 +60040,6 @@ msgstr "Urejevalnik izrezkov"
 
 
 msgctxt "WindowManager"
-msgid "Grease Pencil Paint Mode"
-msgstr "Slikarski način Grease Pencil"
-
-
-msgctxt "WindowManager"
 msgid "Grease Pencil Brush Stroke"
 msgstr "Poteza čopiča Grease Pencil"
 
@@ -60197,11 +60127,6 @@ msgstr "Prični"
 msgctxt "WindowManager"
 msgid "Move"
 msgstr "Premakni"
-
-
-msgctxt "WindowManager"
-msgid "Snap"
-msgstr "Pritrdi"
 
 
 msgctxt "WindowManager"
@@ -60940,10 +60865,6 @@ msgid "Requires Intel GPU with Xe-HPG architecture"
 msgstr "Zahteva GPE znamke Intel z arhitekturo Xe-HPG"
 
 
-msgid "and AMD driver version %s or newer"
-msgstr "in gonilnik AMD različice %s ali novejšega"
-
-
 msgid "and Windows driver version %s or newer"
 msgstr "in gonilnik Windows različice %s ali novejšega"
 
@@ -61349,14 +61270,6 @@ msgid "Image Sequence"
 msgstr "Slikovna sekvenca"
 
 
-msgid "(Quick access: Shift+W)"
-msgstr "(Hitri dostop: Dvigalka + W)"
-
-
-msgid "To Socket"
-msgstr "Vhodna vtičnica"
-
-
 msgctxt "Operator"
 msgid "Settings from Active"
 msgstr "Nastavitve iz aktivnega"
@@ -61370,16 +61283,6 @@ msgstr "Ne zamenjaj povezav"
 msgctxt "Operator"
 msgid "Replace Links"
 msgstr "Zamenjaj povezave"
-
-
-msgctxt "Operator"
-msgid "Select frame's members (children)"
-msgstr "Izbere pripadnike okvirja (otroke)"
-
-
-msgctxt "Operator"
-msgid "Select parent frame"
-msgstr "Izbere starševski okvir"
 
 
 msgctxt "Operator"
@@ -61408,16 +61311,16 @@ msgid "Use Mix Nodes"
 msgstr "Uporabi mešalna vozlišča"
 
 
-msgid "Reloaded images"
-msgstr "Ponovno naložene slike"
-
-
-msgid "Could not write image: {}"
-msgstr "Ni bilo mogoče zapisati slike: {}"
+msgid "To Socket"
+msgstr "Vhodna vtičnica"
 
 
 msgid "Ignored {}"
 msgstr "Ne upoštevam {}"
+
+
+msgid "Could not write image: {}"
+msgstr "Ni bilo mogoče zapisati slike: {}"
 
 
 msgid "Merge Nodes (Add)"
@@ -61428,60 +61331,12 @@ msgid "Merge Nodes (Subtract)"
 msgstr "Združi vozlišča (Odštej)"
 
 
-msgid "Clear node labels"
-msgstr "Počisti označbe vozlišč"
-
-
-msgid "Modify node labels"
-msgstr "Spremeni označbe vozlišč"
-
-
-msgid "Detach outputs"
-msgstr "Odklopi izhode"
-
-
-msgid "Link to output node"
-msgstr "Poveže na izhodno vozlišče"
-
-
-msgid "Select children"
-msgstr "Izbere otroke"
-
-
-msgid "Add Principled texture setup"
-msgstr "Doda načelno postavitev tekstur"
-
-
-msgid "Delete unused nodes"
-msgstr "Izbriše neuporabljena vozlišča"
-
-
-msgid "Frame selected nodes"
-msgstr "Uokviri izbrana vozlišča"
-
-
 msgid "Swap Links"
 msgstr "Izmenjaj povezave"
 
 
-msgid "Reload images"
-msgstr "Ponovno naloži slike"
-
-
 msgid "Lazy Connect"
 msgstr "Leno poveži"
-
-
-msgid "Node Wrangler menu"
-msgstr "Meni Node Wrangler"
-
-
-msgid "Add Reroutes menu"
-msgstr "Meni dodajanja preusmeritev"
-
-
-msgid "Copy to selected (menu)"
-msgstr "Kopiraj na izbor (meni)"
 
 
 msgctxt "UI_Events_KeyMaps"
@@ -64769,11 +64624,6 @@ msgstr "Način ekstrapolacije"
 
 
 msgctxt "Operator"
-msgid "Move..."
-msgstr "Premakni ..."
-
-
-msgctxt "Operator"
 msgid "Snap"
 msgstr "Pritrdi"
 
@@ -65403,10 +65253,6 @@ msgid "Zoom 1:1"
 msgstr "Zum 1:1"
 
 
-msgid "Image*"
-msgstr "Slika*"
-
-
 msgid "Repeat Image"
 msgstr "Ponavljaj sliko"
 
@@ -65537,11 +65383,6 @@ msgstr "Premakni dol"
 msgctxt "Operator"
 msgid "Rename..."
 msgstr "Preimenuj ..."
-
-
-msgctxt "Operator"
-msgid "Track Ordering..."
-msgstr "Razporeditev stez ..."
 
 
 msgctxt "Operator"
@@ -65978,16 +65819,6 @@ msgstr "Skoči na naslednji trak (v sredino)"
 
 
 msgctxt "Operator"
-msgid "Movie"
-msgstr "Posnetek"
-
-
-msgctxt "Operator"
-msgid "Image/Sequence"
-msgstr "Slika/sekvenca"
-
-
-msgctxt "Operator"
 msgid "Fade"
 msgstr "Postopni prikaz"
 
@@ -66121,11 +65952,6 @@ msgid "Both Sides"
 msgstr "Obe strani"
 
 
-msgctxt "Operator"
-msgid "Side of Frame..."
-msgstr "V smeri od okvirja ..."
-
-
 msgid "Handle"
 msgstr "Ročica"
 
@@ -66193,11 +66019,6 @@ msgstr "Gaussov zabris"
 msgctxt "Operator"
 msgid "Show Hidden Strips"
 msgstr "Pokaži skrite trakove"
-
-
-msgctxt "Operator"
-msgid "Insert Keyframe with Keying Set"
-msgstr "Vstavi ključni okvir z množico ključev"
 
 
 msgctxt "Operator"
@@ -66451,10 +66272,6 @@ msgstr "Premakni oznako"
 msgctxt "Operator"
 msgid "Duplicate Marker"
 msgstr "Podvoji oznako"
-
-
-msgid "Sync Scene Time"
-msgstr "Uskladi scenski čas"
 
 
 msgctxt "Operator"
@@ -67706,16 +67523,6 @@ msgstr "Zvočnik"
 
 
 msgctxt "Operator"
-msgid "Mesh Plane"
-msgstr "Mrežna ravnina"
-
-
-msgctxt "Operator"
-msgid "Make Local..."
-msgstr "Naredi krajevno ..."
-
-
-msgctxt "Operator"
 msgid "Bake Action..."
 msgstr "Zapeci akcijo ..."
 
@@ -68225,11 +68032,6 @@ msgstr "Posodobi vse poti gibanja"
 
 
 msgctxt "Operator"
-msgid "Sort Elements..."
-msgstr "Razvrsti elemente ..."
-
-
-msgctxt "Operator"
 msgid "Extrude Vertices"
 msgstr "Izvleci oglišča"
 
@@ -68630,16 +68432,6 @@ msgstr "Ni zbirk, iz katerih bi naredil primerke"
 msgctxt "Operator"
 msgid "Collection Instance"
 msgstr "Primerek zbirke"
-
-
-msgctxt "Operator"
-msgid "Reference"
-msgstr "Zgled"
-
-
-msgctxt "Operator"
-msgid "Background"
-msgstr "Ozadje"
 
 
 msgctxt "Operator"
@@ -70667,10 +70459,6 @@ msgid "Library database with null library data-block pointer!"
 msgstr "Podatkovna baza knjižnice z ničelnim kazalcem na knjižnični podatkovni blok!"
 
 
-msgid "insufficient content"
-msgstr "nezadostna vsebina"
-
-
 msgid "unknown error reading file"
 msgstr "neznana napaka med zapisovanjem datoteke"
 
@@ -70697,10 +70485,6 @@ msgstr "Ne morem prebrati Blenderjeve datoteke '%s', ker podatke v glavi niso po
 
 msgid "Failed to read file '%s', not a blend file"
 msgstr "Datoteke '%s' ni bilo mogoče prebrati, ker ni Blenderjeva datoteka"
-
-
-msgid "Unable to read '%s': %s"
-msgstr "Ni mogoče prebrati '%s': %s"
 
 
 msgid "Unrecognized file format '%s'"
@@ -71210,10 +70994,6 @@ msgid "Asset cannot be modified from this file"
 msgstr "Sredstva ni mogoče spreminjati v tej datoteki"
 
 
-msgid "No applicable assets found"
-msgstr "Ne najdem ustreznih sredstev"
-
-
 msgid "Catalog Selector"
 msgstr "Izbirnik kataloga"
 
@@ -71666,16 +71446,6 @@ msgstr "Doda v uporabniško definiran kontekstni meni (shranjen v uporabniških 
 
 msgid "Only keyboard shortcuts can be edited that way, please use User Preferences otherwise"
 msgstr "Samo tipkovne bližnjice je mogoče urejati na ta način. Za ostalo uporabite uporabniške nastavitve"
-
-
-msgctxt "Operator"
-msgid "Change Shortcut"
-msgstr "Spremeni bližnjico"
-
-
-msgctxt "Operator"
-msgid "Assign Shortcut"
-msgstr "Dodeli bližnjico"
 
 
 msgctxt "Operator"
@@ -72808,10 +72578,6 @@ msgid "Thickness: %s, Depth: %s"
 msgstr "Debelina: %s, globina: %s"
 
 
-msgid "Compiled without GMP, using fast solver"
-msgstr "Program ne vsebuje GMP-ja, uporabljam hitri reševalnik"
-
-
 msgid "No intersections found"
 msgstr "Ne najdem presekov"
 
@@ -73704,18 +73470,6 @@ msgstr "netrikotniško lice"
 
 msgid "multi-res modifier"
 msgstr "modifikator večljočljivosti"
-
-
-msgid "vertex data"
-msgstr "podatki oglišč"
-
-
-msgid "edge data"
-msgstr "podatki robov"
-
-
-msgid "face data"
-msgstr "podatki lic"
 
 
 msgid "constructive modifier"
@@ -77503,12 +77257,12 @@ msgid "Vertices Z"
 msgstr "Oglišča Z"
 
 
-msgid "Start Location"
-msgstr "Začetna lega"
-
-
 msgid "End Location"
 msgstr "Končna lega"
+
+
+msgid "Start Location"
+msgstr "Začetna lega"
 
 
 msgid "Gradient Width"
@@ -79265,22 +79019,6 @@ msgstr "mikrofon"
 
 msgid "network"
 msgstr "omrežje"
-
-
-msgid "Estonian - Eesti keel"
-msgstr "Estonščina - Eesti keel"
-
-
-msgid "Amharic - አማርኛ"
-msgstr "Amharščina - አማርኛ"
-
-
-msgid "Uzbek (Cyrillic) - Ўзбек"
-msgstr "Uzbekistanščina (cirilica) - Ўзбек"
-
-
-msgid "Kazakh - Қазақша"
-msgstr "Kazahstanščina - Қазақша"
 
 
 msgid "ACES 2.0"

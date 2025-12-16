@@ -1,9 +1,9 @@
 
 msgid ""
 msgstr ""
-"Project-Id-Version: Blender 5.0.0 Beta (b'd29f9f6118e5')\n"
+"Project-Id-Version: Blender 5.1.0 Alpha (b'7d4876cf0c11')\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-10 09:45+0000\n"
+"POT-Creation-Date: 2025-12-16 11:27+0000\n"
 "PO-Revision-Date: 2025-07-23 15:14+0000\n"
 "Last-Translator: Kamil <uhkamil@gmail.com>\n"
 "Language-Team: Polish <https://translate.blender.org/projects/blender-ui/ui/pl/>\n"
@@ -654,10 +654,6 @@ msgstr "        Filtruj po nazwie"
 
 msgid "Show only hotkeys that have this text in their name"
 msgstr "Pokazuje wyłącznie skróty klawiszowe, które posiadają ten tekst w swojej nazwie"
-
-
-msgid "Hide Mix nodes"
-msgstr "Ukryj węzły mieszania"
 
 
 msgid "Always"
@@ -1549,6 +1545,258 @@ msgid "Space Type"
 msgstr "Typ przestrzeni"
 
 
+msgid "Actions"
+msgstr "Akcje"
+
+
+msgid "Show Action data-blocks"
+msgstr "Pokaż bloki danych dla akcji"
+
+
+msgid "Annotations"
+msgstr "Adnotacje"
+
+
+msgid "Armatures"
+msgstr "Szkielety"
+
+
+msgid "Show Armature data-blocks"
+msgstr "Wyświetla bloki danych dla szkieletów"
+
+
+msgid "Brushes"
+msgstr "Pędzle"
+
+
+msgid "Show Brushes data-blocks"
+msgstr "Pokaż bloki danych dla pędzli"
+
+
+msgid "Cache Files"
+msgstr "Pliki pamięci podręcznej"
+
+
+msgid "Cameras"
+msgstr "Kamery"
+
+
+msgid "Show Camera data-blocks"
+msgstr "Pokaż bloki danych dla kamer"
+
+
+msgid "Curves"
+msgstr "Krzywe"
+
+
+msgid "Show Curve data-blocks"
+msgstr "Pokaż bloki danych dla krzywych"
+
+
+msgid "Hair Curves"
+msgstr "Krzywa włosów"
+
+
+msgid "Show/hide Curves data-blocks"
+msgstr "Pokaż/ukryj bloki danych dla krzywych"
+
+
+msgid "Fonts"
+msgstr "Czcionki"
+
+
+msgid "Show Font data-blocks"
+msgstr "Pokaż bloki danych dla czcionek"
+
+
+msgid "Grease Pencil"
+msgstr "Grease Pencil"
+
+
+msgid "Collections"
+msgstr "Kolekcje"
+
+
+msgid "Show Collection data-blocks"
+msgstr "Pokaż bloki danych dla kolekcji"
+
+
+msgid "Images"
+msgstr "Obrazy"
+
+
+msgid "Show Image data-blocks"
+msgstr "Pokaż bloki danych dla obrazów"
+
+
+msgid "Lattices"
+msgstr "Kratownice"
+
+
+msgid "Show Lattice data-blocks"
+msgstr "Pokaż bloki danych dla krat"
+
+
+msgid "Lights"
+msgstr "Światła"
+
+
+msgid "Show Light data-blocks"
+msgstr "Pokaż bloki danych dla światła"
+
+
+msgid "Light Probes"
+msgstr "Sondy świetlne"
+
+
+msgid "Show Light Probe data-blocks"
+msgstr "Pokaż bloki danych dla sondy świetlnej"
+
+
+msgid "Masks"
+msgstr "Maski"
+
+
+msgid "Show Mask data-blocks"
+msgstr "Pokaż bloki danych dla masek"
+
+
+msgid "Materials"
+msgstr "Materiały"
+
+
+msgid "Show Material data-blocks"
+msgstr "Pokaż bloki danych dla materiałów"
+
+
+msgid "Meshes"
+msgstr "Siatki"
+
+
+msgid "Show Mesh data-blocks"
+msgstr "Pokaż bloki danych dla siatek"
+
+
+msgid "Metaballs"
+msgstr "Metakule"
+
+
+msgid "Show Metaball data-blocks"
+msgstr "Pokaż bloki danych dla metakuli"
+
+
+msgid "Movie Clips"
+msgstr "Klipy filmowe"
+
+
+msgid "Show Movie Clip data-blocks"
+msgstr "Pokaż bloki danych dla klipów filmowych"
+
+
+msgid "Node Trees"
+msgstr "Drzewa węzłów"
+
+
+msgid "Show Node Tree data-blocks"
+msgstr "Pokaż bloki danych dla drzewa węzłów"
+
+
+msgid "Objects"
+msgstr "Obiekty"
+
+
+msgid "Show Object data-blocks"
+msgstr "Pokaż bloki danych dla obiektów"
+
+
+msgid "Paint Curves"
+msgstr "Rysowanie krzywych"
+
+
+msgid "Show Paint Curve data-blocks"
+msgstr "Pokaż bloki danych dla krzywych malowania"
+
+
+msgid "Palettes"
+msgstr "Palety"
+
+
+msgid "Show Palette data-blocks"
+msgstr "Pokaż bloki danych dla palet"
+
+
+msgid "Particles Settings"
+msgstr "Ustawienia cząsteczek"
+
+
+msgid "Show Particle Settings data-blocks"
+msgstr "Pokaż bloki danych dla ustawień cząsteczek"
+
+
+msgid "Scenes"
+msgstr "Sceny"
+
+
+msgid "Show Scene data-blocks"
+msgstr "Pokaż bloki danych dla scen"
+
+
+msgid "Sounds"
+msgstr "Dźwięki"
+
+
+msgid "Show Sound data-blocks"
+msgstr "Pokaż bloki danych dla dźwięków"
+
+
+msgid "Speakers"
+msgstr "Głośniki"
+
+
+msgid "Show Speaker data-blocks"
+msgstr "Pokaż bloki danych dla głośników"
+
+
+msgid "Texts"
+msgstr "Teksty"
+
+
+msgid "Show Text data-blocks"
+msgstr "Pokaż bloki danych dla tekstów"
+
+
+msgid "Textures"
+msgstr "Tekstury"
+
+
+msgid "Show Texture data-blocks"
+msgstr "Pokaż bloki danych dla tekstur"
+
+
+msgid "Volumes"
+msgstr "Kubatury"
+
+
+msgid "Show/hide Volume data-blocks"
+msgstr "Pokaż/ukryj bloki danych dla kubatury"
+
+
+msgid "Workspaces"
+msgstr "Obszary robocze"
+
+
+msgid "Show workspace data-blocks"
+msgstr "Pokaż bloki danych dla obszaru roboczego"
+
+
+msgid "Worlds"
+msgstr "Światy"
+
+
+msgid "Show World data-blocks"
+msgstr "Pokaż bloki danych dla światów"
+
+
 msgid "Preview Size"
 msgstr "Rozmiar podglądu"
 
@@ -2125,10 +2373,6 @@ msgid "Main data structure representing a .blend file and all its data-blocks"
 msgstr "Główna struktura danych reprezentująca plik .blend oraz wszystkie jego bloki danych"
 
 
-msgid "Actions"
-msgstr "Akcje"
-
-
 msgid "Action data-blocks"
 msgstr "Bloki danych dla akcji"
 
@@ -2137,40 +2381,20 @@ msgid "Annotation"
 msgstr "Adnotacja"
 
 
-msgid "Armatures"
-msgstr "Szkielety"
-
-
 msgid "Armature data-blocks"
 msgstr "Bloki danych dla szkieletów"
-
-
-msgid "Brushes"
-msgstr "Pędzle"
 
 
 msgid "Brush data-blocks"
 msgstr "Bloki danych dla pędzli"
 
 
-msgid "Cache Files"
-msgstr "Pliki pamięci podręcznej"
-
-
 msgid "Cache Files data-blocks"
 msgstr "Bloki danych dla plików wymiany"
 
 
-msgid "Cameras"
-msgstr "Kamery"
-
-
 msgid "Camera data-blocks"
 msgstr "Bloki danych dla kamery"
-
-
-msgid "Collections"
-msgstr "Kolekcje"
 
 
 msgid "Collection data-blocks"
@@ -2179,10 +2403,6 @@ msgstr "Bloki danych dla kolekcji"
 
 msgid "Color Space"
 msgstr "Przestrzeń kolorów"
-
-
-msgid "Curves"
-msgstr "Krzywe"
 
 
 msgid "Curve data-blocks"
@@ -2205,24 +2425,12 @@ msgid "Vector font data-blocks"
 msgstr "Bloki danych dla czcionek wektorowych"
 
 
-msgid "Grease Pencil"
-msgstr "Grease Pencil"
-
-
 msgid "Grease Pencil data-blocks"
 msgstr "Bloki danych dla Grease Pencil"
 
 
-msgid "Hair Curves"
-msgstr "Krzywa włosów"
-
-
 msgid "Hair curve data-blocks"
 msgstr "Bloki danych dla krzywych włosów"
-
-
-msgid "Images"
-msgstr "Obrazy"
 
 
 msgid "Image data-blocks"
@@ -2245,10 +2453,6 @@ msgid "Has the current session been saved to disk as a .blend file"
 msgstr "Czy bieżąca sesja została zapisana na dysk jako plik .blend"
 
 
-msgid "Lattices"
-msgstr "Kratownice"
-
-
 msgid "Lattice data-blocks"
 msgstr "Bloki danych dla kratownicy"
 
@@ -2261,16 +2465,8 @@ msgid "Library data-blocks"
 msgstr "Bloki danych dla bibliotek"
 
 
-msgid "Light Probes"
-msgstr "Sondy świetlne"
-
-
 msgid "Light Probe data-blocks"
 msgstr "Bloki danych dla sondy świetlnej"
-
-
-msgid "Lights"
-msgstr "Światła"
 
 
 msgid "Light data-blocks"
@@ -2285,40 +2481,20 @@ msgid "Line Style data-blocks"
 msgstr "Bloki danych dla stylów linii"
 
 
-msgid "Masks"
-msgstr "Maski"
-
-
 msgid "Masks data-blocks"
 msgstr "Bloki danych dla masek"
-
-
-msgid "Materials"
-msgstr "Materiały"
 
 
 msgid "Material data-blocks"
 msgstr "Bloki danych dla materiałów"
 
 
-msgid "Meshes"
-msgstr "Siatki"
-
-
 msgid "Mesh data-blocks"
 msgstr "Bloki danych dla siatek"
 
 
-msgid "Metaballs"
-msgstr "Metakule"
-
-
 msgid "Metaball data-blocks"
 msgstr "Bloki danych dla metakuli"
-
-
-msgid "Movie Clips"
-msgstr "Klipy filmowe"
 
 
 msgid "Movie Clip data-blocks"
@@ -2333,24 +2509,12 @@ msgid "Node group data-blocks"
 msgstr "Bloki danych dla grup węzłów"
 
 
-msgid "Objects"
-msgstr "Obiekty"
-
-
 msgid "Object data-blocks"
 msgstr "Bloki danych obiektów"
 
 
-msgid "Paint Curves"
-msgstr "Rysowanie krzywych"
-
-
 msgid "Paint Curves data-blocks"
 msgstr "Bloki danych dla krzywych malowania"
-
-
-msgid "Palettes"
-msgstr "Palety"
 
 
 msgid "Palette data-blocks"
@@ -2367,10 +2531,6 @@ msgstr "Bloki danych dla cząstek"
 
 msgid "Point cloud data-blocks"
 msgstr "Bloki danych dla chmury punktów"
-
-
-msgid "Scenes"
-msgstr "Sceny"
 
 
 msgid "Scene data-blocks"
@@ -2393,32 +2553,16 @@ msgid "Shape Key data-blocks"
 msgstr "Bloki danych dla kluczy kształtów"
 
 
-msgid "Sounds"
-msgstr "Dźwięki"
-
-
 msgid "Sound data-blocks"
 msgstr "Bloki danych dźwięków"
-
-
-msgid "Speakers"
-msgstr "Głośniki"
 
 
 msgid "Speaker data-blocks"
 msgstr "Bloki danych dla głośników"
 
 
-msgid "Texts"
-msgstr "Teksty"
-
-
 msgid "Text data-blocks"
 msgstr "Bloki danych dla tekstów"
-
-
-msgid "Textures"
-msgstr "Tekstury"
 
 
 msgid "Texture data-blocks"
@@ -2441,10 +2585,6 @@ msgid "File format version the .blend file was saved with"
 msgstr "Wersja formatu pliku, w którym zapisano plik .blend"
 
 
-msgid "Volumes"
-msgstr "Kubatury"
-
-
 msgid "Volume data-blocks"
 msgstr "Kubatura bloków danych"
 
@@ -2457,16 +2597,8 @@ msgid "Window manager data-blocks"
 msgstr "Bloki danych dla manadżerów okien"
 
 
-msgid "Workspaces"
-msgstr "Obszary robocze"
-
-
 msgid "Workspace data-blocks"
 msgstr "Bloki danych obszaru roboczego"
-
-
-msgid "Worlds"
-msgstr "Światy"
 
 
 msgid "World data-blocks"
@@ -8506,142 +8638,6 @@ msgid "Which asset types to show/hide, when browsing an asset library"
 msgstr "Które typy prefabrykatów mają być pokazywane/ukrywane podczas przeglądania biblioteki prefabrykatów"
 
 
-msgid "Annotations"
-msgstr "Adnotacje"
-
-
-msgid "Show Armature data-blocks"
-msgstr "Wyświetla bloki danych dla szkieletów"
-
-
-msgid "Show Camera data-blocks"
-msgstr "Pokaż bloki danych dla kamer"
-
-
-msgid "Show Curve data-blocks"
-msgstr "Pokaż bloki danych dla krzywych"
-
-
-msgid "Show/hide Curves data-blocks"
-msgstr "Pokaż/ukryj bloki danych dla krzywych"
-
-
-msgid "Fonts"
-msgstr "Czcionki"
-
-
-msgid "Show Font data-blocks"
-msgstr "Pokaż bloki danych dla czcionek"
-
-
-msgid "Show Image data-blocks"
-msgstr "Pokaż bloki danych dla obrazów"
-
-
-msgid "Show Lattice data-blocks"
-msgstr "Pokaż bloki danych dla krat"
-
-
-msgid "Show Light data-blocks"
-msgstr "Pokaż bloki danych dla światła"
-
-
-msgid "Show Light Probe data-blocks"
-msgstr "Pokaż bloki danych dla sondy świetlnej"
-
-
-msgid "Show Mask data-blocks"
-msgstr "Pokaż bloki danych dla masek"
-
-
-msgid "Show Mesh data-blocks"
-msgstr "Pokaż bloki danych dla siatek"
-
-
-msgid "Show Metaball data-blocks"
-msgstr "Pokaż bloki danych dla metakuli"
-
-
-msgid "Show Movie Clip data-blocks"
-msgstr "Pokaż bloki danych dla klipów filmowych"
-
-
-msgid "Show Paint Curve data-blocks"
-msgstr "Pokaż bloki danych dla krzywych malowania"
-
-
-msgid "Show Palette data-blocks"
-msgstr "Pokaż bloki danych dla palet"
-
-
-msgid "Particles Settings"
-msgstr "Ustawienia cząsteczek"
-
-
-msgid "Show Particle Settings data-blocks"
-msgstr "Pokaż bloki danych dla ustawień cząsteczek"
-
-
-msgid "Show Sound data-blocks"
-msgstr "Pokaż bloki danych dla dźwięków"
-
-
-msgid "Show Speaker data-blocks"
-msgstr "Pokaż bloki danych dla głośników"
-
-
-msgid "Show Text data-blocks"
-msgstr "Pokaż bloki danych dla tekstów"
-
-
-msgid "Show Texture data-blocks"
-msgstr "Pokaż bloki danych dla tekstur"
-
-
-msgid "Show/hide Volume data-blocks"
-msgstr "Pokaż/ukryj bloki danych dla kubatury"
-
-
-msgid "Show workspace data-blocks"
-msgstr "Pokaż bloki danych dla obszaru roboczego"
-
-
-msgid "Show Action data-blocks"
-msgstr "Pokaż bloki danych dla akcji"
-
-
-msgid "Show Brushes data-blocks"
-msgstr "Pokaż bloki danych dla pędzli"
-
-
-msgid "Show Collection data-blocks"
-msgstr "Pokaż bloki danych dla kolekcji"
-
-
-msgid "Show Material data-blocks"
-msgstr "Pokaż bloki danych dla materiałów"
-
-
-msgid "Node Trees"
-msgstr "Drzewa węzłów"
-
-
-msgid "Show Node Tree data-blocks"
-msgstr "Pokaż bloki danych dla drzewa węzłów"
-
-
-msgid "Show Object data-blocks"
-msgstr "Pokaż bloki danych dla obiektów"
-
-
-msgid "Show Scene data-blocks"
-msgstr "Pokaż bloki danych dla scen"
-
-
-msgid "Show World data-blocks"
-msgstr "Pokaż bloki danych dla światów"
-
-
 msgid "File Select Parameters"
 msgstr "Parametry zaznaczanie pliku"
 
@@ -9169,6 +9165,22 @@ msgstr "Wektor normalny"
 
 msgid "Collection"
 msgstr "Kolekcja"
+
+
+msgid "Font"
+msgstr "Czcionka"
+
+
+msgid "Text"
+msgstr "Tekst"
+
+
+msgid "Mask"
+msgstr "Maska"
+
+
+msgid "Sound"
+msgstr "Dźwięk"
 
 
 msgid "Collection Negation"
@@ -9706,10 +9718,6 @@ msgstr "Rozdzielczość V"
 
 msgid "Path"
 msgstr "Ścieżka"
-
-
-msgid "Font"
-msgstr "Czcionka"
 
 
 msgid "Selected Bold"
@@ -10596,10 +10604,6 @@ msgstr "Wycisz głośnik"
 msgctxt "Sound"
 msgid "Pitch"
 msgstr "Wysokość"
-
-
-msgid "Sound"
-msgstr "Dźwięk"
 
 
 msgctxt "Text"
@@ -11527,12 +11531,72 @@ msgid "Use Material Mask"
 msgstr "Używa maski materiału"
 
 
-msgid "Mask"
-msgstr "Maska"
+msgid "Mirror"
+msgstr "Odbicie lustrzane"
+
+
+msgid "Snap"
+msgstr "Przyciągnij"
+
+
+msgid "Local View"
+msgstr "Widok lokalny"
+
+
+msgid "Viewpoint"
+msgstr "Punkt obserwacji"
+
+
+msgid "Navigation"
+msgstr "Nawigacja"
+
+
+msgid "Select Linked"
+msgstr "Zaznacz powiązane"
+
+
+msgid "Assign Material"
+msgstr "Przypisanie materiału"
+
+
+msgid "Metaball"
+msgstr "Metakula"
+
+
+msgid "Layout"
+msgstr "Układ"
+
+
+msgid "Light"
+msgstr "Światło"
+
+
+msgid "Light Probe"
+msgstr "Sonda świetlna"
+
+
+msgid "Rigid Body"
+msgstr "Bryła sztywna"
+
+
+msgid "Keying"
+msgstr "Kluczowanie"
+
+
+msgid "Apply"
+msgstr "Zastosuj"
 
 
 msgid "Track"
 msgstr "Ścieżka"
+
+
+msgid "Utilities"
+msgstr "Narzędzia"
+
+
+msgid "Math"
+msgstr "Matematyka"
 
 
 msgid "Quick Effects"
@@ -11559,48 +11623,12 @@ msgid "Bone Collections"
 msgstr "Kolekcja kości"
 
 
-msgid "Apply"
-msgstr "Zastosuj"
-
-
-msgid "Layout"
-msgstr "Układ"
-
-
 msgid "Face Data"
 msgstr "Dane ściany"
 
 
 msgid "Merge"
 msgstr "Scal"
-
-
-msgid "Keying"
-msgstr "Kluczowanie"
-
-
-msgid "Utilities"
-msgstr "Narzędzia"
-
-
-msgid "Math"
-msgstr "Matematyka"
-
-
-msgid "Text"
-msgstr "Tekst"
-
-
-msgid "Metaball"
-msgstr "Metakula"
-
-
-msgid "Snap"
-msgstr "Przyciągnij"
-
-
-msgid "Proportional Editing Falloff"
-msgstr "Proporcjonalne edytowanie spadku"
 
 
 msgid "Read"
@@ -11611,28 +11639,8 @@ msgid "Write"
 msgstr "Zapis"
 
 
-msgid "Mirror"
-msgstr "Odbicie lustrzane"
-
-
-msgid "Local View"
-msgstr "Widok lokalny"
-
-
-msgid "Viewpoint"
-msgstr "Punkt obserwacji"
-
-
-msgid "Navigation"
-msgstr "Nawigacja"
-
-
 msgid "Gizmo"
 msgstr "Gizmo"
-
-
-msgid "Select Linked"
-msgstr "Zaznacz powiązane"
 
 
 msgid "Import"
@@ -11643,20 +11651,8 @@ msgid "Deprecated"
 msgstr "Przestarzałe"
 
 
-msgid "Assign Material"
-msgstr "Przypisanie materiału"
-
-
-msgid "Light"
-msgstr "Światło"
-
-
-msgid "Light Probe"
-msgstr "Sonda świetlna"
-
-
-msgid "Rigid Body"
-msgstr "Bryła sztywna"
+msgid "Proportional Editing Falloff"
+msgstr "Proporcjonalne edytowanie spadku"
 
 
 msgid "Catalog"
@@ -11681,10 +11677,6 @@ msgstr "Zbliżenie"
 
 msgid "Console"
 msgstr "Konsola"
-
-
-msgid "Languages..."
-msgstr "Języki..."
 
 
 msgid "Add Attribute"
@@ -13082,16 +13074,16 @@ msgid "Bake Item"
 msgstr "Wypal przedmiot"
 
 
-msgid "Default Value"
-msgstr "Wartość domyślna"
-
-
 msgid "Geometry Node Socket"
 msgstr "Gniazdo węzła geometrii"
 
 
 msgid "Texture Node Socket"
 msgstr "Gniazdo węzła tekstury"
+
+
+msgid "Default Value"
+msgstr "Wartość domyślna"
 
 
 msgid "Hide in Modifier"
@@ -13240,6 +13232,11 @@ msgstr "Akcja przeliczania"
 msgctxt "Operator"
 msgid "glTF Material Output"
 msgstr "Wyjście materiału glTF"
+
+
+msgctxt "Operator"
+msgid "Add Attribute"
+msgstr "Dodaj atrybut"
 
 
 msgctxt "Operator"
@@ -13394,11 +13391,6 @@ msgstr "Edytuj właściwość"
 msgctxt "Operator"
 msgid "Edit Property Value"
 msgstr "Edytuj wartość właściwości"
-
-
-msgctxt "Operator"
-msgid "Save System Info"
-msgstr "Zapisz informacje o systemie"
 
 
 msgctxt "Operator"
@@ -14561,11 +14553,6 @@ msgstr "Bieżące pole tekstu"
 msgctxt "Operator"
 msgid "Unlink"
 msgstr "Odłącz"
-
-
-msgctxt "Operator"
-msgid "Add Attribute"
-msgstr "Dodaj atrybut"
 
 
 msgid "Add attribute to geometry"
@@ -16153,6 +16140,10 @@ msgid "Play animation"
 msgstr "Odtwarza animację"
 
 
+msgid "Snapping"
+msgstr "Przyciąganie"
+
+
 msgctxt "Operator"
 msgid "Swap Areas"
 msgstr "Zamień obszary"
@@ -17251,18 +17242,6 @@ msgid "Palette Color"
 msgstr "Kolor palety"
 
 
-msgid "Active Tool"
-msgstr "Aktywne narzędzie"
-
-
-msgid "Shadow Settings"
-msgstr "Ustawienia cienia"
-
-
-msgid "Compositor"
-msgstr "Kompozytor"
-
-
 msgid "Motion Tracking"
 msgstr "Śledzenie ruchu"
 
@@ -17279,12 +17258,20 @@ msgid "Curve Edit Mode"
 msgstr "Tryb edycji krzywej"
 
 
-msgid "Snapping"
-msgstr "Przyciąganie"
-
-
 msgid "Transform Orientations"
 msgstr "Orientacje przekształcenia"
+
+
+msgid "Active Tool"
+msgstr "Aktywne narzędzie"
+
+
+msgid "Shadow Settings"
+msgstr "Ustawienia cienia"
+
+
+msgid "Compositor"
+msgstr "Kompozytor"
 
 
 msgid "Aperture"
@@ -19955,6 +19942,11 @@ msgstr "Użyj obiektu"
 
 
 msgctxt "WindowManager"
+msgid "Snap"
+msgstr "Przyciągaj"
+
+
+msgctxt "WindowManager"
 msgid "Forward"
 msgstr "Do przodu"
 
@@ -20077,11 +20069,6 @@ msgstr "Początek"
 msgctxt "WindowManager"
 msgid "Move"
 msgstr "Przesunięcie"
-
-
-msgctxt "WindowManager"
-msgid "Snap"
-msgstr "Przyciągaj"
 
 
 msgctxt "WindowManager"
@@ -21104,11 +21091,6 @@ msgstr "Filtruj według typu:"
 
 
 msgctxt "Operator"
-msgid "Move..."
-msgstr "Przesuń..."
-
-
-msgctxt "Operator"
 msgid "Snap"
 msgstr "Przyciągaj"
 
@@ -21304,10 +21286,6 @@ msgstr "Ściana"
 msgctxt "Operator"
 msgid "Zoom 1:1"
 msgstr "Powiększenie 1:1"
-
-
-msgid "Image*"
-msgstr "Obraz*"
 
 
 msgid "Repeat Image"
@@ -21580,11 +21558,6 @@ msgstr "Ścieżki/pliki"
 
 
 msgctxt "Operator"
-msgid "Movie"
-msgstr "Film"
-
-
-msgctxt "Operator"
 msgid "Delete Keyframes..."
 msgstr "Usuń klatki kluczowe..."
 
@@ -21661,11 +21634,6 @@ msgstr "Kontrola prędkości"
 msgctxt "Operator"
 msgid "Gaussian Blur"
 msgstr "Rozmycie Gaussa"
-
-
-msgctxt "Operator"
-msgid "Insert Keyframe with Keying Set"
-msgstr "Wstaw klatkę kluczową z zestawem kluczowania"
 
 
 msgctxt "Operator"
@@ -22469,11 +22437,6 @@ msgstr "Głośnik"
 
 
 msgctxt "Operator"
-msgid "Mesh Plane"
-msgstr "Siatka płaszczyzny"
-
-
-msgctxt "Operator"
 msgid "Bake Action..."
 msgstr "Akcja przeliczenia..."
 
@@ -22628,11 +22591,6 @@ msgstr "Zmień nazwę aktywnej kości..."
 
 
 msgctxt "Operator"
-msgid "Sort Elements..."
-msgstr "Sortuj elementy..."
-
-
-msgctxt "Operator"
 msgid "Extrude Vertices"
 msgstr "Wydłuż wierzchołki"
 
@@ -22700,16 +22658,6 @@ msgstr "Brak kolekcji do instancji"
 msgctxt "Operator"
 msgid "Collection Instance"
 msgstr "Instancja kolekcji"
-
-
-msgctxt "Operator"
-msgid "Reference"
-msgstr "Odniesienie"
-
-
-msgctxt "Operator"
-msgid "Background"
-msgstr "Tło"
 
 
 msgctxt "Operator"
@@ -22850,10 +22798,6 @@ msgstr "Nie można było usunąć klatki kluczowej, ścieżka RNA jest nieprawid
 
 msgid "No action to delete keyframes from for ID = %s"
 msgstr "Brak akcji do usunięcia klatek kluczowych dla ID = %s"
-
-
-msgid "Not deleting keyframe for locked F-Curve '%s' for %s '%s'"
-msgstr "Nie można usunąć klatki kluczowej dla zablokowanej krzywej-F '%s' dla %s '%s'"
 
 
 msgid "Could not clear keyframe, as RNA path is invalid for the given ID (ID = %s, path = %s)"
@@ -23791,16 +23735,6 @@ msgstr "Nie klawiaturowe skróty"
 
 msgid "Pin"
 msgstr "Przypnij"
-
-
-msgctxt "Operator"
-msgid "Change Shortcut"
-msgstr "Zmień skrót"
-
-
-msgctxt "Operator"
-msgid "Assign Shortcut"
-msgstr "Przypisz skrót"
 
 
 msgctxt "Operator"
@@ -25600,18 +25534,6 @@ msgstr "Wykryto Modyfikatory Produktywne!"
 
 msgid "Keeping the modifiers will increase polycount when returning to object mode"
 msgstr "Zachowanie modyfikatorów zwiększy gęstość geometrii przy powrocie do trybu obiektu"
-
-
-msgid "vertex data"
-msgstr "dane wierzchołka"
-
-
-msgid "edge data"
-msgstr "dane krawędzi"
-
-
-msgid "face data"
-msgstr "dane ściany"
 
 
 msgid "Object has non-uniform scale, sculpting may be unpredictable"
@@ -28130,18 +28052,6 @@ msgstr "Właściwość musi być typu integer lub float"
 
 msgid "Property must be a none, distance, factor, percentage, angle, or pixel"
 msgstr "Właściwość musi być typu żaden, distans, współczynnik, odsetek, kąt lub piksel"
-
-
-msgid "Registering operator class: '%s', invalid bl_idname '%s', at position %d"
-msgstr "Rejestracja operator class: '%s', nieprawidłowe bl_idname '%s', w pozycji %d"
-
-
-msgid "Registering operator class: '%s', invalid bl_idname '%s', is too long, maximum length is %d"
-msgstr "Rejestracja operator class: '%s', nieprawidłowe bl_idname, '%s' jest za długie, maksymalna długość: %d"
-
-
-msgid "Registering operator class: '%s', invalid bl_idname '%s', must contain 1 '.' character"
-msgstr "Rejestracja operator class '%s', nieprawidłowe bl_idname '%s', musi zawierać 1 znak '.'"
 
 
 msgid "Cannot read %s '%s': %s"

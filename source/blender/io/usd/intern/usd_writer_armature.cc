@@ -14,6 +14,7 @@
 #include "BKE_action.hh"
 
 #include "DNA_armature_types.h"
+#include "DNA_object_types.h"
 
 #include <pxr/base/gf/matrix4d.h>
 #include <pxr/base/gf/matrix4f.h>
@@ -124,7 +125,7 @@ namespace blender::io::usd {
 static void add_anim_sample(pxr::UsdSkelAnimation &skel_anim,
                             const Object *obj,
                             const pxr::UsdTimeCode time,
-                            const blender::Map<blender::StringRef, const Bone *> *deform_map,
+                            const Map<StringRef, const Bone *> *deform_map,
                             pxr::UsdUtilsSparseValueWriter &value_writer)
 {
   if (!(skel_anim && obj && obj->pose)) {

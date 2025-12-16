@@ -58,12 +58,10 @@
 #include "BKE_collection.hh"
 #include "BKE_constraint.h"
 #include "BKE_curve.hh"
-#include "BKE_effect.h"
 #include "BKE_fcurve_driver.h"
 #include "BKE_gpencil_modifier_legacy.h"
 #include "BKE_grease_pencil.hh"
 #include "BKE_idprop.hh"
-#include "BKE_idtype.hh"
 #include "BKE_image.hh"
 #include "BKE_key.hh"
 #include "BKE_lattice.hh"
@@ -71,12 +69,11 @@
 #include "BKE_lib_id.hh"
 #include "BKE_lib_query.hh"
 #include "BKE_light.h"
-#include "BKE_mask.h"
+#include "BKE_mask.hh"
 #include "BKE_material.hh"
-#include "BKE_mball.hh"
 #include "BKE_mesh.hh"
 #include "BKE_modifier.hh"
-#include "BKE_movieclip.h"
+#include "BKE_movieclip.hh"
 #include "BKE_nla.hh"
 #include "BKE_node.hh"
 #include "BKE_node_runtime.hh"
@@ -87,7 +84,6 @@
 #include "BKE_scene.hh"
 #include "BKE_shader_fx.hh"
 #include "BKE_sound.hh"
-#include "BKE_tracking.h"
 #include "BKE_volume.hh"
 #include "BKE_world.h"
 
@@ -1905,8 +1901,7 @@ void DepsgraphNodeBuilder::build_armature_bones(ListBase *bones)
   }
 }
 
-void DepsgraphNodeBuilder::build_armature_bone_collections(
-    blender::Span<BoneCollection *> collections)
+void DepsgraphNodeBuilder::build_armature_bone_collections(Span<BoneCollection *> collections)
 {
   for (BoneCollection *bcoll : collections) {
     build_idproperties(bcoll->prop);
@@ -1965,6 +1960,21 @@ void DepsgraphNodeBuilder::build_nodetree_socket(bNodeSocket *socket)
   }
   else if (socket->type == SOCK_MATERIAL) {
     build_id((ID *)((bNodeSocketValueMaterial *)socket->default_value)->value);
+  }
+  else if (socket->type == SOCK_FONT) {
+    build_id((ID *)((bNodeSocketValueFont *)socket->default_value)->value);
+  }
+  else if (socket->type == SOCK_SCENE) {
+    build_id((ID *)((bNodeSocketValueScene *)socket->default_value)->value);
+  }
+  else if (socket->type == SOCK_TEXT_ID) {
+    /* Text data-blocks don't use the depsgraph. */
+  }
+  else if (socket->type == SOCK_MASK) {
+    build_id((ID *)((bNodeSocketValueMask *)socket->default_value)->value);
+  }
+  else if (socket->type == SOCK_SOUND) {
+    build_id((ID *)((bNodeSocketValueSound *)socket->default_value)->value);
   }
 }
 

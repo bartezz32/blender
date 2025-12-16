@@ -45,14 +45,14 @@ bool edit_strip_swap(Scene *scene, Strip *strip_a, Strip *strip_b, const char **
 {
   char name[sizeof(strip_a->name)];
 
-  if (time_strip_length_get(scene, strip_a) != time_strip_length_get(scene, strip_b)) {
+  if (strip_a->length(scene) != strip_b->length(scene)) {
     *r_error_str = N_("Strips must be the same length");
     return false;
   }
 
   /* type checking, could be more advanced but disallow sound vs non-sound copy */
   if (strip_a->type != strip_b->type) {
-    if (strip_a->type == STRIP_TYPE_SOUND_RAM || strip_b->type == STRIP_TYPE_SOUND_RAM) {
+    if (strip_a->type == STRIP_TYPE_SOUND || strip_b->type == STRIP_TYPE_SOUND) {
       *r_error_str = N_("Strips were not compatible");
       return false;
     }
@@ -115,7 +115,7 @@ static void strip_update_muting_recursive(ListBase *channels,
 
       strip_update_muting_recursive(&strip->channels, &strip->seqbase, strip_meta, strip_mute);
     }
-    else if (ELEM(strip->type, STRIP_TYPE_SOUND_RAM, STRIP_TYPE_SCENE)) {
+    else if (ELEM(strip->type, STRIP_TYPE_SOUND, STRIP_TYPE_SCENE)) {
       if (strip->runtime->scene_sound) {
         BKE_sound_mute_scene_sound(strip->runtime->scene_sound, strip_mute);
       }
@@ -265,8 +265,8 @@ static void seq_split_set_right_hold_offset(Main *bmain,
                                             Strip *strip,
                                             int timeline_frame)
 {
-  const float content_start = time_start_frame_get(strip);
-  const float content_end = time_content_end_frame_get(scene, strip);
+  const float content_start = strip->content_start();
+  const float content_end = strip->content_end(scene);
 
   /* Adjust within range of extended still-frames before strip. */
   if (timeline_frame < content_start) {
@@ -278,13 +278,13 @@ static void seq_split_set_right_hold_offset(Main *bmain,
   else if ((timeline_frame >= content_start) && (timeline_frame <= content_end)) {
     strip->endofs = 0;
     const float scene_fps = float(scene->r.frs_sec) / float(scene->r.frs_sec_base);
-    const float speed_factor = time_media_playback_rate_factor_get(strip, scene_fps);
+    const float speed_factor = strip->media_playback_rate_factor(scene_fps);
     strip->anim_endofs += round_fl_to_int((content_end - timeline_frame) * speed_factor);
   }
 
   /* Needed only to set `strip->len`. */
   add_reload_new_file(bmain, scene, strip, false);
-  time_right_handle_frame_set(scene, strip, timeline_frame);
+  strip->right_handle_set(scene, timeline_frame);
 }
 
 static void seq_split_set_left_hold_offset(Main *bmain,
@@ -292,13 +292,13 @@ static void seq_split_set_left_hold_offset(Main *bmain,
                                            Strip *strip,
                                            int timeline_frame)
 {
-  const float content_start = time_start_frame_get(strip);
-  const float content_end = time_content_end_frame_get(scene, strip);
+  const float content_start = strip->content_start();
+  const float content_end = strip->content_end(scene);
 
   /* Adjust within range of strip contents. */
   if ((timeline_frame >= content_start) && (timeline_frame <= content_end)) {
     const float scene_fps = float(scene->r.frs_sec) / float(scene->r.frs_sec_base);
-    const float speed_factor = time_media_playback_rate_factor_get(strip, scene_fps);
+    const float speed_factor = strip->media_playback_rate_factor(scene_fps);
     strip->anim_startofs += round_fl_to_int((timeline_frame - content_start) * speed_factor);
     strip->start = timeline_frame;
     strip->startofs = 0;
@@ -312,15 +312,14 @@ static void seq_split_set_left_hold_offset(Main *bmain,
 
   /* Needed only to set `strip->len`. */
   add_reload_new_file(bmain, scene, strip, false);
-  time_left_handle_frame_set(scene, strip, timeline_frame);
+  strip->left_handle_set(scene, timeline_frame);
 }
 
 static bool seq_edit_split_intersect_check(const Scene *scene,
                                            const Strip *strip,
                                            const int timeline_frame)
 {
-  return timeline_frame > time_left_handle_frame_get(scene, strip) &&
-         timeline_frame < time_right_handle_frame_get(scene, strip);
+  return timeline_frame > strip->left_handle() && timeline_frame < strip->right_handle(scene);
 }
 
 static void seq_edit_split_handle_strip_offsets(Main *bmain,
@@ -333,7 +332,7 @@ static void seq_edit_split_handle_strip_offsets(Main *bmain,
   if (seq_edit_split_intersect_check(scene, right_strip, timeline_frame)) {
     switch (method) {
       case SPLIT_SOFT:
-        time_left_handle_frame_set(scene, right_strip, timeline_frame);
+        right_strip->left_handle_set(scene, timeline_frame);
         break;
       case SPLIT_HARD:
         seq_split_set_left_hold_offset(bmain, scene, right_strip, timeline_frame);
@@ -344,7 +343,7 @@ static void seq_edit_split_handle_strip_offsets(Main *bmain,
   if (seq_edit_split_intersect_check(scene, left_strip, timeline_frame)) {
     switch (method) {
       case SPLIT_SOFT:
-        time_right_handle_frame_set(scene, left_strip, timeline_frame);
+        left_strip->right_handle_set(scene, timeline_frame);
         break;
       case SPLIT_HARD:
         seq_split_set_right_hold_offset(bmain, scene, left_strip, timeline_frame);
@@ -381,7 +380,7 @@ static bool seq_edit_split_operation_permitted_check(const Scene *scene,
                                                      const char **r_error)
 {
   for (Strip *strip : strips) {
-    ListBase *channels = channels_displayed_get(editing_get(scene));
+    const ListBase *channels = channels_displayed_get(editing_get(scene));
     if (transform_is_locked(channels, strip)) {
       *r_error = "Strip is locked.";
       return false;
@@ -473,10 +472,10 @@ Strip *edit_strip_split(Main *bmain,
 
   /* Split strips. */
   while (left_strip && right_strip) {
-    if (time_left_handle_frame_get(scene, left_strip) >= timeline_frame) {
+    if (left_strip->left_handle() >= timeline_frame) {
       edit_flag_for_removal(scene, seqbase, left_strip);
     }
-    else if (time_right_handle_frame_get(scene, right_strip) <= timeline_frame) {
+    else if (right_strip->right_handle(scene) <= timeline_frame) {
       edit_flag_for_removal(scene, seqbase, right_strip);
     }
     else if (return_strip == nullptr) {

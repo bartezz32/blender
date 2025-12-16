@@ -346,7 +346,7 @@ static wmOperatorStatus insert_key(bContext *C, wmOperator *op)
 {
   using namespace blender;
 
-  blender::Vector<PointerRNA> selection;
+  Vector<PointerRNA> selection;
   const bool found_selection = get_selection(C, &selection);
   if (!found_selection) {
     BKE_reportf(op->reports, RPT_ERROR, "Unsupported context mode");
@@ -370,7 +370,7 @@ static wmOperatorStatus insert_key(bContext *C, wmOperator *op)
       depsgraph, BKE_scene_frame_get(scene));
 
   animrig::CombinedKeyingResult combined_result;
-  blender::Set<ID *> ids;
+  Set<ID *> ids;
   for (PointerRNA &id_ptr : selection) {
     ID *selected_id = id_ptr.owner_id;
     ids.add(selected_id);
@@ -533,9 +533,9 @@ static wmOperatorStatus insert_key_menu_invoke(bContext *C,
    * to assign shortcuts to arbitrarily named keying sets. See #89560.
    * These menu items perform the key-frame insertion (not this operator)
    * hence the #OPERATOR_INTERFACE return. */
-  uiPopupMenu *pup = UI_popup_menu_begin(
+  blender::ui::PopupMenu *pup = blender::ui::popup_menu_begin(
       C, WM_operatortype_name(op->type, op->ptr).c_str(), ICON_NONE);
-  blender::ui::Layout &layout = *UI_popup_menu_layout(pup);
+  blender::ui::Layout &layout = *popup_menu_layout(pup);
 
   /* Even though `ANIM_OT_keyframe_insert_menu` can show a menu in one line,
    * prefer `ANIM_OT_keyframe_insert_by_name` so users can bind keys to specific
@@ -566,7 +566,7 @@ static wmOperatorStatus insert_key_menu_invoke(bContext *C,
     MEM_freeN(item_array);
   }
 
-  UI_popup_menu_end(C, pup);
+  popup_menu_end(C, pup);
 
   return OPERATOR_INTERFACE;
 }
@@ -768,36 +768,18 @@ static wmOperatorStatus clear_anim_v3d_exec(bContext *C, wmOperator * /*op*/)
       FCurve *fcu, *fcn;
 
       Action &action = dna_action->wrap();
-      if (action.is_action_layered()) {
-        blender::Vector<FCurve *> fcurves_to_delete;
-        foreach_fcurve_in_action_slot(action, adt->slot_handle, [&](FCurve &fcurve) {
-          if (can_delete_fcurve(&fcurve, ob)) {
-            fcurves_to_delete.append(&fcurve);
-          }
-        });
-        for (FCurve *fcurve : fcurves_to_delete) {
-          action_fcurve_remove(action, *fcurve);
-          DEG_id_tag_update(&ob->id, ID_RECALC_TRANSFORM);
-          changed = true;
+      blender::Vector<FCurve *> fcurves_to_delete;
+      foreach_fcurve_in_action_slot(action, adt->slot_handle, [&](FCurve &fcurve) {
+        if (can_delete_fcurve(&fcurve, ob)) {
+          fcurves_to_delete.append(&fcurve);
         }
-        DEG_id_tag_update(&ob->adt->action->id, ID_RECALC_ANIMATION_NO_FLUSH);
-      }
-      else {
-        for (fcu = static_cast<FCurve *>(dna_action->curves.first); fcu; fcu = fcn) {
-          fcn = fcu->next;
-          /* delete F-Curve completely */
-          if (can_delete_fcurve(fcu, ob)) {
-            blender::animrig::animdata_fcurve_delete(adt, fcu);
-            DEG_id_tag_update(&ob->id, ID_RECALC_TRANSFORM);
-            changed = true;
-          }
-        }
-      }
-
-      /* Delete the action itself if it is empty. */
-      if (action.is_action_legacy() && blender::animrig::animdata_remove_empty_action(adt)) {
+      });
+      for (FCurve *fcurve : fcurves_to_delete) {
+        action_fcurve_remove(action, *fcurve);
+        DEG_id_tag_update(&ob->id, ID_RECALC_TRANSFORM);
         changed = true;
       }
+      DEG_id_tag_update(&ob->adt->action->id, ID_RECALC_ANIMATION_NO_FLUSH);
     }
   }
   CTX_DATA_END;
@@ -1176,35 +1158,20 @@ static wmOperatorStatus delete_key_v3d_without_keying_set(bContext *C, wmOperato
       const float cfra_unmap = BKE_nla_tweakedit_remap(adt, cfra, NLATIME_CONVERT_UNMAP);
 
       Action &action = act->wrap();
-      if (action.is_action_layered()) {
-        blender::Vector<FCurve *> modified_fcurves;
-        foreach_fcurve_in_action_slot(action, adt->slot_handle, [&](FCurve &fcurve) {
-          if (!can_delete_key(&fcurve, ob, op->reports)) {
-            return;
-          }
-          if (blender::animrig::fcurve_delete_keyframe_at_time(&fcurve, cfra_unmap)) {
-            modified_fcurves.append(&fcurve);
-          }
-        });
-
-        success += modified_fcurves.size();
-        for (FCurve *fcurve : modified_fcurves) {
-          if (BKE_fcurve_is_empty(fcurve)) {
-            action_fcurve_remove(action, *fcurve);
-          }
+      blender::Vector<FCurve *> modified_fcurves;
+      foreach_fcurve_in_action_slot(action, adt->slot_handle, [&](FCurve &fcurve) {
+        if (!can_delete_key(&fcurve, ob, op->reports)) {
+          return;
         }
-      }
-      else {
-        FCurve *fcn;
-        for (FCurve *fcu = static_cast<FCurve *>(act->curves.first); fcu; fcu = fcn) {
-          fcn = fcu->next;
-          if (!can_delete_key(fcu, ob, op->reports)) {
-            continue;
-          }
-          /* Delete keyframes on current frame
-           * WARNING: this can delete the next F-Curve, hence the "fcn" copying.
-           */
-          success += delete_keyframe_fcurve_legacy(adt, fcu, cfra_unmap);
+        if (blender::animrig::fcurve_delete_keyframe_at_time(&fcurve, cfra_unmap)) {
+          modified_fcurves.append(&fcurve);
+        }
+      });
+
+      success += modified_fcurves.size();
+      for (FCurve *fcurve : modified_fcurves) {
+        if (BKE_fcurve_is_empty(fcurve)) {
+          action_fcurve_remove(action, *fcurve);
         }
       }
 
@@ -1307,7 +1274,7 @@ static wmOperatorStatus insert_key_button_exec(bContext *C, wmOperator *op)
   ToolSettings *ts = scene->toolsettings;
   PointerRNA ptr = {};
   PropertyRNA *prop = nullptr;
-  uiBut *but;
+  blender::ui::Button *but;
   const AnimationEvalContext anim_eval_context = BKE_animsys_eval_context_construct(
       CTX_data_depsgraph_pointer(C), BKE_scene_frame_get(scene));
   bool changed = false;
@@ -1317,7 +1284,7 @@ static wmOperatorStatus insert_key_button_exec(bContext *C, wmOperator *op)
 
   flag = get_keyframing_flags(scene);
 
-  if (!(but = UI_context_active_but_prop_get(C, &ptr, &prop, &index))) {
+  if (!(but = blender::ui::context_active_but_prop_get(C, &ptr, &prop, &index))) {
     /* pass event on if no active button found */
     return (OPERATOR_CANCELLED | OPERATOR_PASS_THROUGH);
   }
@@ -1347,7 +1314,7 @@ static wmOperatorStatus insert_key_button_exec(bContext *C, wmOperator *op)
                    "This property cannot be animated as it will not get updated correctly");
       }
     }
-    else if (UI_but_flag_is_set(but, UI_BUT_DRIVEN)) {
+    else if (button_flag_is_set(but, blender::ui::BUT_DRIVEN)) {
       /* Driven property - Find driver */
       FCurve *fcu;
       bool driven, special;
@@ -1428,7 +1395,7 @@ static wmOperatorStatus insert_key_button_exec(bContext *C, wmOperator *op)
     DEG_id_tag_update(id, ID_RECALC_ANIMATION_NO_FLUSH);
 
     /* send updates */
-    UI_context_update_anim_flag(C);
+    blender::ui::context_update_anim_flag(C);
 
     /* send notifiers that keyframes have been changed */
     WM_event_add_notifier(C, NC_ANIMATION | ND_KEYFRAME | NA_ADDED, nullptr);
@@ -1472,7 +1439,7 @@ static wmOperatorStatus delete_key_button_exec(bContext *C, wmOperator *op)
   int index;
   const bool all = RNA_boolean_get(op->ptr, "all");
 
-  if (!UI_context_active_but_prop_get(C, &ptr, &prop, &index)) {
+  if (!blender::ui::context_active_but_prop_get(C, &ptr, &prop, &index)) {
     /* pass event on if no active button found */
     return (OPERATOR_CANCELLED | OPERATOR_PASS_THROUGH);
   }
@@ -1539,7 +1506,7 @@ static wmOperatorStatus delete_key_button_exec(bContext *C, wmOperator *op)
 
   if (changed) {
     /* send updates */
-    UI_context_update_anim_flag(C);
+    blender::ui::context_update_anim_flag(C);
 
     /* send notifiers that keyframes have been changed */
     WM_event_add_notifier(C, NC_ANIMATION | ND_KEYFRAME | NA_REMOVED, nullptr);
@@ -1577,7 +1544,7 @@ static wmOperatorStatus clear_key_button_exec(bContext *C, wmOperator *op)
   int index;
   const bool all = RNA_boolean_get(op->ptr, "all");
 
-  if (!UI_context_active_but_prop_get(C, &ptr, &prop, &index)) {
+  if (!blender::ui::context_active_but_prop_get(C, &ptr, &prop, &index)) {
     /* pass event on if no active button found */
     return (OPERATOR_CANCELLED | OPERATOR_PASS_THROUGH);
   }
@@ -1603,7 +1570,7 @@ static wmOperatorStatus clear_key_button_exec(bContext *C, wmOperator *op)
 
   if (changed) {
     /* send updates */
-    UI_context_update_anim_flag(C);
+    blender::ui::context_update_anim_flag(C);
 
     /* send notifiers that keyframes have been changed */
     WM_event_add_notifier(C, NC_ANIMATION | ND_KEYFRAME | NA_REMOVED, nullptr);

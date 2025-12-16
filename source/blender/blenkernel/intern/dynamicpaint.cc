@@ -1636,8 +1636,8 @@ static void dynamicPaint_setInitialColor(const Scene * /*scene*/, DynamicPaintSu
   else if (surface->init_color_type == MOD_DPAINT_INITIAL_TEXTURE) {
     Tex *tex = surface->init_texture;
 
-    const blender::Span<int> corner_verts = mesh->corner_verts();
-    const blender::Span<int3> corner_tris = mesh->corner_tris();
+    const Span<int> corner_verts = mesh->corner_verts();
+    const Span<int3> corner_tris = mesh->corner_tris();
 
     if (!tex) {
       return;
@@ -1690,7 +1690,7 @@ static void dynamicPaint_setInitialColor(const Scene * /*scene*/, DynamicPaintSu
 
     /* For vertex surface, just copy colors from #MLoopCol. */
     if (surface->format == MOD_DPAINT_SURFACE_F_VERTEX) {
-      const blender::Span<int> corner_verts = mesh->corner_verts();
+      const Span<int> corner_verts = mesh->corner_verts();
       const VArraySpan col = *attributes.lookup<ColorGeometry4b>(surface->init_layername,
                                                                  bke::AttrDomain::Corner);
       if (col.is_empty()) {
@@ -1702,7 +1702,7 @@ static void dynamicPaint_setInitialColor(const Scene * /*scene*/, DynamicPaintSu
       }
     }
     else if (surface->format == MOD_DPAINT_SURFACE_F_IMAGESEQ) {
-      const blender::Span<int3> corner_tris = mesh->corner_tris();
+      const Span<int3> corner_tris = mesh->corner_tris();
       const VArraySpan col = *attributes.lookup<ColorGeometry4b>(surface->init_layername,
                                                                  bke::AttrDomain::Corner);
       if (col.is_empty()) {
@@ -1945,8 +1945,8 @@ static Mesh *dynamicPaint_Modifier_apply(DynamicPaintModifierData *pmd, Object *
 
           /* vertex color paint */
           if (surface->type == MOD_DPAINT_SURFACE_T_PAINT) {
-            const blender::OffsetIndices faces = result->faces();
-            const blender::Span<int> corner_verts = result->corner_verts();
+            const OffsetIndices faces = result->faces();
+            const Span<int> corner_verts = result->corner_verts();
 
             /* paint is stored on dry and wet layers, so mix final color first */
             float (*fcolor)[4] = MEM_calloc_arrayN<float[4]>(sData->total_points,
@@ -2020,7 +2020,7 @@ static Mesh *dynamicPaint_Modifier_apply(DynamicPaintModifierData *pmd, Object *
             float *weight = (float *)sData->type_data;
 
             /* apply weights into a vertex group, if doesn't exists add a new layer */
-            blender::MutableSpan<MDeformVert> dverts = result->deform_verts_for_write();
+            MutableSpan<MDeformVert> dverts = result->deform_verts_for_write();
             if (defgrp_index != -1) {
               for (int i = 0; i < sData->total_points; i++) {
                 MDeformVert *dv = &dverts[i];
@@ -2856,8 +2856,8 @@ int dynamicPaint_createUVSurface(Scene *scene,
     return setError(canvas, N_("Cannot bake non-'image sequence' formats"));
   }
 
-  const blender::Span<int> corner_verts = mesh->corner_verts();
-  const blender::Span<int3> corner_tris = mesh->corner_tris();
+  const Span<int> corner_verts = mesh->corner_verts();
+  const Span<int3> corner_tris = mesh->corner_tris();
 
   /* get uv map */
   const VectorSet<StringRefNull> uv_map_names = mesh->uv_map_names();
@@ -4451,7 +4451,7 @@ static void dynamic_paint_paint_particle_cell_point_cb_ex(
   const float timescale = data->timescale;
   const int c_index = data->c_index;
 
-  KDTree_3d *tree = static_cast<KDTree_3d *>(data->treeData);
+  blender::KDTree_3d *tree = static_cast<blender::KDTree_3d *>(data->treeData);
 
   const float solidradius = data->solidradius;
   const float smooth = brush->particle_smooth * surface->radius_scale;
@@ -4469,11 +4469,11 @@ static void dynamic_paint_paint_particle_cell_point_cb_ex(
    * It's enough to just find the nearest one.
    */
   {
-    KDTreeNearest_3d nearest;
+    blender::KDTreeNearest_3d nearest;
     float smooth_range, part_solidradius;
 
     /* Find nearest particle and get distance to it */
-    BLI_kdtree_3d_find_nearest(tree, bData->realCoord[bData->s_pos[index]].v, &nearest);
+    blender::kdtree_3d_find_nearest(tree, bData->realCoord[bData->s_pos[index]].v, &nearest);
     /* if outside maximum range, no other particle can influence either */
     if (nearest.dist > range) {
       return;
@@ -4507,7 +4507,7 @@ static void dynamic_paint_paint_particle_cell_point_cb_ex(
      * If we use per particle radius, we have to sample all particles
      * within max radius range
      */
-    KDTreeNearest_3d *nearest;
+    blender::KDTreeNearest_3d *nearest;
 
     float smooth_range = smooth * (1.0f - strength), dist;
     /* calculate max range that can have particles with higher influence than the nearest one */
@@ -4515,7 +4515,7 @@ static void dynamic_paint_paint_particle_cell_point_cb_ex(
     /* Make gcc happy! */
     dist = max_range;
 
-    const int particles = BLI_kdtree_3d_range_search(
+    const int particles = blender::kdtree_3d_range_search(
         tree, bData->realCoord[bData->s_pos[index]].v, &nearest, max_range);
 
     /* Find particle that produces highest influence */
@@ -4619,7 +4619,7 @@ static bool dynamicPaint_paintParticles(DynamicPaintSurface *surface,
   PaintBakeData *bData = sData->bData;
   DynamicPaintVolumeGrid *grid = bData->grid;
 
-  KDTree_3d *tree;
+  blender::KDTree_3d *tree;
   int particlesAdded = 0;
   int invalidParticles = 0;
   int p = 0;
@@ -4640,7 +4640,7 @@ static bool dynamicPaint_paintParticles(DynamicPaintSurface *surface,
   /*
    * Build a KD-tree to optimize distance search
    */
-  tree = BLI_kdtree_3d_new(psys->totpart);
+  tree = blender::kdtree_3d_new(psys->totpart);
 
   /* loop through particles and insert valid ones to the tree */
   p = 0;
@@ -4664,7 +4664,7 @@ static bool dynamicPaint_paintParticles(DynamicPaintSurface *surface,
       continue;
     }
 
-    BLI_kdtree_3d_insert(tree, p, pa->state.co);
+    blender::kdtree_3d_insert(tree, p, pa->state.co);
 
     /* calc particle system bounds */
     boundInsert(&part_bb, pa->state.co);
@@ -4677,7 +4677,7 @@ static bool dynamicPaint_paintParticles(DynamicPaintSurface *surface,
 
   /* If no suitable particles were found, exit */
   if (particlesAdded < 1) {
-    BLI_kdtree_3d_free(tree);
+    blender::kdtree_3d_free(tree);
     return true;
   }
 
@@ -4687,7 +4687,7 @@ static bool dynamicPaint_paintParticles(DynamicPaintSurface *surface,
     int total_cells = grid->dim[0] * grid->dim[1] * grid->dim[2];
 
     /* balance tree */
-    BLI_kdtree_3d_balance(tree);
+    blender::kdtree_3d_balance(tree);
 
     /* loop through space partitioning grid */
     for (c_index = 0; c_index < total_cells; c_index++) {
@@ -4716,7 +4716,7 @@ static bool dynamicPaint_paintParticles(DynamicPaintSurface *surface,
                               &settings);
     }
   }
-  BLI_kdtree_3d_free(tree);
+  blender::kdtree_3d_free(tree);
 
   return true;
 }

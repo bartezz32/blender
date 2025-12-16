@@ -59,6 +59,8 @@
 #include "SEQ_select.hh"
 #include "SEQ_sequencer.hh"
 
+#include "NOD_defaults.hh"
+
 #include "WM_api.hh"
 #include "WM_types.hh"
 
@@ -132,7 +134,7 @@ static void node_templateID_assign(bContext *C, bNodeTree *node_tree)
   PointerRNA ptr;
   PropertyRNA *prop;
 
-  UI_context_active_but_prop_get_templateID(C, &ptr, &prop);
+  ui::context_active_but_prop_get_templateID(C, &ptr, &prop);
 
   if (prop) {
     /* #RNA_property_pointer_set increases the user count, fixed here as the editor is the initial
@@ -195,7 +197,7 @@ static wmOperatorStatus add_reroute_exec(bContext *C, wmOperator *op)
     float2 loc_region;
     RNA_float_get_array(&itemptr, "loc", loc_region);
     float2 loc_view;
-    UI_view2d_region_to_view(&region.v2d, loc_region.x, loc_region.y, &loc_view.x, &loc_view.y);
+    ui::view2d_region_to_view(&region.v2d, loc_region.x, loc_region.y, &loc_view.x, &loc_view.y);
     path.append(loc_view);
     if (path.size() >= 256) {
       break;
@@ -428,11 +430,11 @@ static wmOperatorStatus node_add_group_invoke(bContext *C, wmOperator *op, const
   SpaceNode *snode = CTX_wm_space_node(C);
 
   /* Convert mouse coordinates to v2d space. */
-  UI_view2d_region_to_view(&region->v2d,
-                           event->mval[0],
-                           event->mval[1],
-                           &snode->runtime->cursor[0],
-                           &snode->runtime->cursor[1]);
+  ui::view2d_region_to_view(&region->v2d,
+                            event->mval[0],
+                            event->mval[1],
+                            &snode->runtime->cursor[0],
+                            &snode->runtime->cursor[1]);
 
   snode->runtime->cursor[0] /= UI_SCALE_FAC;
   snode->runtime->cursor[1] /= UI_SCALE_FAC;
@@ -529,11 +531,11 @@ static wmOperatorStatus node_add_group_asset_invoke(bContext *C,
   }
 
   /* Convert mouse coordinates to v2d space. */
-  UI_view2d_region_to_view(&region.v2d,
-                           event->mval[0],
-                           event->mval[1],
-                           &snode.runtime->cursor[0],
-                           &snode.runtime->cursor[1]);
+  ui::view2d_region_to_view(&region.v2d,
+                            event->mval[0],
+                            event->mval[1],
+                            &snode.runtime->cursor[0],
+                            &snode.runtime->cursor[1]);
 
   snode.runtime->cursor /= UI_SCALE_FAC;
 
@@ -543,8 +545,7 @@ static wmOperatorStatus node_add_group_asset_invoke(bContext *C,
 
   wmOperatorType *ot = WM_operatortype_find("NODE_OT_translate_attach_remove_on_cancel", true);
   BLI_assert(ot);
-  PointerRNA ptr;
-  WM_operator_properties_create_ptr(&ptr, ot);
+  PointerRNA ptr = WM_operator_properties_create_ptr(ot);
   WM_operator_name_call_ptr(C, ot, wm::OpCallContext::InvokeDefault, &ptr, nullptr);
   WM_operator_properties_free(&ptr);
 
@@ -567,13 +568,16 @@ static wmOperatorStatus node_swap_group_asset_invoke(bContext *C,
   }
   bNodeTree *node_group = reinterpret_cast<bNodeTree *>(
       asset::asset_local_id_ensure_imported(bmain, *asset));
+  if (!node_group) {
+    return OPERATOR_CANCELLED;
+  }
 
   /* Convert mouse coordinates to v2d space. */
-  UI_view2d_region_to_view(&region.v2d,
-                           event->mval[0],
-                           event->mval[1],
-                           &snode.runtime->cursor[0],
-                           &snode.runtime->cursor[1]);
+  ui::view2d_region_to_view(&region.v2d,
+                            event->mval[0],
+                            event->mval[1],
+                            &snode.runtime->cursor[0],
+                            &snode.runtime->cursor[1]);
 
   snode.runtime->cursor /= UI_SCALE_FAC;
 
@@ -584,9 +588,8 @@ static wmOperatorStatus node_swap_group_asset_invoke(bContext *C,
   }
   wmOperatorType *ot = WM_operatortype_find("NODE_OT_swap_node", true);
   BLI_assert(ot);
-  PointerRNA ptr;
   PointerRNA itemptr;
-  WM_operator_properties_create_ptr(&ptr, ot);
+  PointerRNA ptr = WM_operator_properties_create_ptr(ot);
   RNA_string_set(&ptr, "type", node_idname.data());
 
   /* Assign node group via operator.settings. This needs to be done here so that NODE_OT_swap_node
@@ -720,11 +723,11 @@ static wmOperatorStatus node_add_object_invoke(bContext *C, wmOperator *op, cons
   SpaceNode *snode = CTX_wm_space_node(C);
 
   /* Convert mouse coordinates to v2d space. */
-  UI_view2d_region_to_view(&region->v2d,
-                           event->mval[0],
-                           event->mval[1],
-                           &snode->runtime->cursor[0],
-                           &snode->runtime->cursor[1]);
+  ui::view2d_region_to_view(&region->v2d,
+                            event->mval[0],
+                            event->mval[1],
+                            &snode->runtime->cursor[0],
+                            &snode->runtime->cursor[1]);
 
   snode->runtime->cursor[0] /= UI_SCALE_FAC;
   snode->runtime->cursor[1] /= UI_SCALE_FAC;
@@ -809,11 +812,11 @@ static wmOperatorStatus node_add_collection_invoke(bContext *C,
   SpaceNode *snode = CTX_wm_space_node(C);
 
   /* Convert mouse coordinates to v2d space. */
-  UI_view2d_region_to_view(&region->v2d,
-                           event->mval[0],
-                           event->mval[1],
-                           &snode->runtime->cursor[0],
-                           &snode->runtime->cursor[1]);
+  ui::view2d_region_to_view(&region->v2d,
+                            event->mval[0],
+                            event->mval[1],
+                            &snode->runtime->cursor[0],
+                            &snode->runtime->cursor[1]);
 
   snode->runtime->cursor[0] /= UI_SCALE_FAC;
   snode->runtime->cursor[1] /= UI_SCALE_FAC;
@@ -1029,11 +1032,11 @@ static wmOperatorStatus node_add_image_invoke(bContext *C, wmOperator *op, const
   }
 
   /* Convert mouse coordinates to `v2d` space. */
-  UI_view2d_region_to_view(&region->v2d,
-                           event->mval[0],
-                           event->mval[1],
-                           &snode->runtime->cursor[0],
-                           &snode->runtime->cursor[1]);
+  ui::view2d_region_to_view(&region->v2d,
+                            event->mval[0],
+                            event->mval[1],
+                            &snode->runtime->cursor[0],
+                            &snode->runtime->cursor[1]);
 
   snode->runtime->cursor[0] /= UI_SCALE_FAC;
   snode->runtime->cursor[1] /= UI_SCALE_FAC;
@@ -1173,11 +1176,11 @@ static wmOperatorStatus node_add_material_invoke(bContext *C, wmOperator *op, co
   SpaceNode *snode = CTX_wm_space_node(C);
 
   /* Convert mouse coordinates to v2d space. */
-  UI_view2d_region_to_view(&region->v2d,
-                           event->mval[0],
-                           event->mval[1],
-                           &snode->runtime->cursor[0],
-                           &snode->runtime->cursor[1]);
+  ui::view2d_region_to_view(&region->v2d,
+                            event->mval[0],
+                            event->mval[1],
+                            &snode->runtime->cursor[0],
+                            &snode->runtime->cursor[1]);
 
   snode->runtime->cursor[0] /= UI_SCALE_FAC;
   snode->runtime->cursor[1] /= UI_SCALE_FAC;
@@ -1285,11 +1288,11 @@ static wmOperatorStatus node_add_import_node_invoke(bContext *C,
   SpaceNode *snode = CTX_wm_space_node(C);
 
   /* Convert mouse coordinates to v2d space. */
-  UI_view2d_region_to_view(&region->v2d,
-                           event->mval[0],
-                           event->mval[1],
-                           &snode->runtime->cursor[0],
-                           &snode->runtime->cursor[1]);
+  ui::view2d_region_to_view(&region->v2d,
+                            event->mval[0],
+                            event->mval[1],
+                            &snode->runtime->cursor[0],
+                            &snode->runtime->cursor[1]);
 
   snode->runtime->cursor[0] /= UI_SCALE_FAC;
   snode->runtime->cursor[1] /= UI_SCALE_FAC;
@@ -1430,11 +1433,11 @@ static wmOperatorStatus node_add_group_input_node_invoke(bContext *C,
   SpaceNode *snode = CTX_wm_space_node(C);
 
   /* Convert mouse coordinates to v2d space. */
-  UI_view2d_region_to_view(&region->v2d,
-                           event->mval[0],
-                           event->mval[1],
-                           &snode->runtime->cursor[0],
-                           &snode->runtime->cursor[1]);
+  ui::view2d_region_to_view(&region->v2d,
+                            event->mval[0],
+                            event->mval[1],
+                            &snode->runtime->cursor[0],
+                            &snode->runtime->cursor[1]);
 
   snode->runtime->cursor[0] /= UI_SCALE_FAC;
   snode->runtime->cursor[1] /= UI_SCALE_FAC;
@@ -1586,11 +1589,11 @@ static wmOperatorStatus node_add_color_invoke(bContext *C, wmOperator *op, const
   SpaceNode *snode = CTX_wm_space_node(C);
 
   /* Convert mouse coordinates to v2d space. */
-  UI_view2d_region_to_view(&region->v2d,
-                           event->mval[0],
-                           event->mval[1],
-                           &snode->runtime->cursor[0],
-                           &snode->runtime->cursor[1]);
+  ui::view2d_region_to_view(&region->v2d,
+                            event->mval[0],
+                            event->mval[1],
+                            &snode->runtime->cursor[0],
+                            &snode->runtime->cursor[1]);
 
   snode->runtime->cursor[0] /= UI_SCALE_FAC;
   snode->runtime->cursor[1] /= UI_SCALE_FAC;
@@ -1724,7 +1727,7 @@ static wmOperatorStatus new_compositing_node_group_exec(bContext *C, wmOperator 
   RNA_string_get(op->ptr, "name", tree_name);
 
   bNodeTree *ntree = new_node_tree_impl(C, tree_name, "CompositorNodeTree");
-  ED_node_composit_default_init(C, ntree);
+  blender::nodes::node_tree_composit_default_init(C, ntree);
 
   WM_event_add_notifier(C, NC_NODE | NA_ADDED, nullptr);
   BKE_ntree_update_after_single_tree_change(*bmain, *ntree);
@@ -1764,28 +1767,31 @@ void NODE_OT_new_compositing_node_group(wmOperatorType *ot)
   RNA_def_string(ot->srna, "name", nullptr, MAX_ID_NAME - 2, "Name", "");
 }
 
+/** \} */
+
 /* -------------------------------------------------------------------- */
 /** \name Duplicate Compositing Node Tree Operator
  * \{ */
-
-static wmOperatorStatus duplicate_compositing_node_group_exec(bContext *C, wmOperator * /*op*/)
+static wmOperatorStatus duplicate_and_assign_node_tree(bContext *C, bNodeTree *source_node_tree)
 {
   Main *bmain = CTX_data_main(C);
-  Scene *scene = CTX_data_scene(C);
-  PointerRNA ptr;
-
-  if (scene->compositing_node_group == nullptr) {
+  if (source_node_tree == nullptr) {
     return OPERATOR_CANCELLED;
   }
 
-  bNodeTree *node_tree = bke::node_tree_copy_tree(bmain, *scene->compositing_node_group);
-
+  bNodeTree *node_tree = bke::node_tree_copy_tree(bmain, *source_node_tree);
   node_templateID_assign(C, node_tree);
 
   WM_event_add_notifier(C, NC_NODE | NA_ADDED, nullptr);
   BKE_ntree_update_after_single_tree_change(*bmain, *node_tree);
 
   return OPERATOR_FINISHED;
+}
+
+static wmOperatorStatus duplicate_compositing_node_group_exec(bContext *C, wmOperator * /*op*/)
+{
+  Scene *scene = CTX_data_scene(C);
+  return duplicate_and_assign_node_tree(C, scene->compositing_node_group);
 }
 
 void NODE_OT_duplicate_compositing_node_group(wmOperatorType *ot)
@@ -1795,6 +1801,42 @@ void NODE_OT_duplicate_compositing_node_group(wmOperatorType *ot)
   ot->description = "Duplicate the currently assigned compositing node group.";
 
   ot->exec = duplicate_compositing_node_group_exec;
+
+  ot->flag = OPTYPE_REGISTER | OPTYPE_UNDO;
+}
+
+/** \} */
+
+/* -------------------------------------------------------------------- */
+/** \name Duplicate Compositing Modifier Node Tree Operator
+ * \{ */
+static wmOperatorStatus duplicate_compositing_modifier_node_group_exec(bContext *C,
+                                                                       wmOperator * /*op*/)
+{
+  Scene *scene = CTX_data_sequencer_scene(C);
+  Strip *strip = seq::select_active_get(scene);
+
+  if (strip == nullptr) {
+    return OPERATOR_CANCELLED;
+  }
+
+  StripModifierData *smd = seq::modifier_get_active(strip);
+
+  if (!(smd && smd->type == eSeqModifierType_Compositor)) {
+    return OPERATOR_CANCELLED;
+  }
+
+  SequencerCompositorModifierData *nmd = reinterpret_cast<SequencerCompositorModifierData *>(smd);
+  return duplicate_and_assign_node_tree(C, nmd->node_group);
+}
+
+void NODE_OT_duplicate_compositing_modifier_node_group(wmOperatorType *ot)
+{
+  ot->name = "New Compositing Node Group";
+  ot->idname = "NODE_OT_duplicate_compositing_modifier_node_group";
+  ot->description = "Duplicate the currently assigned compositing node group.";
+
+  ot->exec = duplicate_compositing_modifier_node_group_exec;
 
   ot->flag = OPTYPE_REGISTER | OPTYPE_UNDO;
 }
@@ -1857,17 +1899,19 @@ static void initialize_compositor_sequencer_node_group(const bContext *C, bNodeT
 
 static wmOperatorStatus new_compositor_sequencer_node_group_exec(bContext *C, wmOperator *op)
 {
+  Main *bmain = CTX_data_main(C);
+  Scene *scene = CTX_data_sequencer_scene(C);
+
   char tree_name[MAX_ID_NAME - 2];
   RNA_string_get(op->ptr, "name", tree_name);
 
   bNodeTree *ntree = new_node_tree_impl(C, tree_name, "CompositorNodeTree");
   initialize_compositor_sequencer_node_group(C, *ntree);
 
-  Scene *scene = CTX_data_sequencer_scene(C);
   Strip *strip = seq::select_active_get(scene);
 
   /* Add modifier and assign node tree when the strip has no active compositor modifier. */
-  if (strip != nullptr && strip->type != STRIP_TYPE_SOUND_RAM) {
+  if (strip != nullptr && strip->type != STRIP_TYPE_SOUND) {
     StripModifierData *active_smd = seq::modifier_get_active(strip);
     if (!active_smd || active_smd->type != eSeqModifierType_Compositor) {
       StripModifierData *smd = seq::modifier_new(strip, nullptr, eSeqModifierType_Compositor);
@@ -1880,7 +1924,6 @@ static wmOperatorStatus new_compositor_sequencer_node_group_exec(bContext *C, wm
 
       /* Tag depsgraph relations for an update since the modifier should now be referencing a
        * different node tree. */
-      Main *bmain = CTX_data_main(C);
       DEG_relations_tag_update(bmain);
       WM_event_add_notifier(C, NC_SCENE | ND_SEQUENCER, scene);
     }

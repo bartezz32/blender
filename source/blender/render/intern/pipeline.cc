@@ -48,11 +48,7 @@
 #include "BKE_image_format.hh"
 #include "BKE_image_save.hh"
 #include "BKE_layer.hh"
-#include "BKE_lib_id.hh"
-#include "BKE_lib_remap.hh"
 #include "BKE_main.hh"
-#include "BKE_mask.h"
-#include "BKE_modifier.hh"
 #include "BKE_node_legacy_types.hh"
 #include "BKE_node_runtime.hh"
 #include "BKE_pointcache.h"
@@ -80,7 +76,6 @@
 
 #include "RE_engine.h"
 #include "RE_pipeline.h"
-#include "RE_texture.h"
 
 #include "SEQ_relations.hh"
 #include "SEQ_render.hh"
@@ -88,7 +83,6 @@
 #include "GPU_capabilities.hh"
 #include "GPU_context.hh"
 #include "WM_api.hh"
-#include "wm_window.hh"
 
 #ifdef WITH_FREESTYLE
 #  include "FRS_freestyle.h"
@@ -200,7 +194,7 @@ static void stats_background(void * /*arg*/, RenderStats *rs)
 
   const bool show_info = CLOG_CHECK(&LOG, CLG_LEVEL_INFO);
   if (show_info) {
-    CLOG_STR_INFO(&LOG, rs->infostr);
+    CLOG_INFO(&LOG, "Fra: %d | %s", rs->cfra, rs->infostr);
     /* Flush stdout to be sure python callbacks are printing stuff after blender. */
     fflush(stdout);
   }
@@ -631,7 +625,8 @@ void RE_FreeUnusedGPUResources()
      * race condition here because we are on the main thread and new jobs can only
      * be started from the main thread. */
     if (WM_jobs_test(wm, re->owner, WM_JOB_TYPE_RENDER) ||
-        WM_jobs_test(wm, re->owner, WM_JOB_TYPE_COMPOSITE))
+        WM_jobs_test(wm, re->owner, WM_JOB_TYPE_COMPOSITE) ||
+        WM_jobs_test(wm, re->owner, WM_JOB_TYPE_OBJECT_BAKE))
     {
       do_free = false;
     }
@@ -1363,9 +1358,7 @@ bool RE_seq_render_active(Scene *scene, RenderData *rd)
   }
 
   LISTBASE_FOREACH (Strip *, strip, &ed->seqbase) {
-    if (strip->type != STRIP_TYPE_SOUND_RAM &&
-        !blender::seq::render_is_muted(&ed->channels, strip))
-    {
+    if (strip->type != STRIP_TYPE_SOUND && !blender::seq::render_is_muted(&ed->channels, strip)) {
       return true;
     }
   }
@@ -1955,6 +1948,8 @@ void RE_RenderFrame(Render *re,
                     const float subframe,
                     const bool write_still)
 {
+  CLOG_INFO(&LOG, "Rendering frame %d", frame);
+
   render_callback_exec_id(re, re->main, &scene->id, BKE_CB_EVT_RENDER_INIT);
 
   /* Ugly global still...
@@ -2147,7 +2142,7 @@ bool RE_WriteRenderViewsMovie(ReportList *reports,
       /* imbuf knows which rects are not part of ibuf */
       IMB_freeImBuf(ibuf);
     }
-    CLOG_INFO(&LOG, "Video append frame %d", scene->r.cfra);
+    CLOG_INFO_NOCHECK(&LOG, "Video append frame %d", scene->r.cfra);
   }
   else { /* R_IMF_VIEWS_STEREO_3D */
     const char *names[2] = {STEREO_LEFT_NAME, STEREO_RIGHT_NAME};
@@ -2343,7 +2338,7 @@ void RE_RenderAnim(Render *re,
                    int tfra)
 {
   if (sfra == efra) {
-    CLOG_INFO(&LOG, "Rendering single frame (frame %d)", sfra);
+    CLOG_INFO(&LOG, "Rendering single frame");
   }
   else {
     CLOG_INFO(&LOG, "Rendering animation (frames %d..%d)", sfra, efra);
@@ -2421,6 +2416,8 @@ void RE_RenderAnim(Render *re,
 
   scene->r.subframe = 0.0f;
   for (nfra = sfra, scene->r.cfra = sfra; scene->r.cfra <= efra; scene->r.cfra++) {
+    CLOG_INFO(&LOG, "Rendering frame %d", nfra);
+
     char filepath[FILE_MAX];
 
     /* Reduce GPU memory usage so renderer has more space. */

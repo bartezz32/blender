@@ -12,11 +12,9 @@
 #include "usd_mesh_utils.hh"
 #include "usd_reader_material.hh"
 #include "usd_skel_convert.hh"
-#include "usd_utils.hh"
 
 #include "BKE_attribute.h"
 #include "BKE_attribute.hh"
-#include "BKE_customdata.hh"
 #include "BKE_geometry_set.hh"
 #include "BKE_main.hh"
 #include "BKE_material.hh"
@@ -35,11 +33,9 @@
 
 #include "BLT_translation.hh"
 
-#include "DNA_customdata_types.h"
 #include "DNA_material_types.h"
 #include "DNA_modifier_types.h"
 #include "DNA_object_types.h"
-#include "DNA_windowmanager_types.h"
 
 #include <pxr/base/gf/matrix4f.h>
 #include <pxr/base/vt/array.h>
@@ -97,7 +93,7 @@ static pxr::UsdShadeMaterial compute_bound_material(const pxr::UsdPrim &prim,
 
 static void assign_materials(Main *bmain,
                              Object *ob,
-                             const blender::Map<pxr::SdfPath, int> &mat_index_map,
+                             const Map<pxr::SdfPath, int> &mat_index_map,
                              const USDImportParams &params,
                              pxr::UsdStageRefPtr stage,
                              const ImportSettings &settings)
@@ -821,7 +817,7 @@ void USDMeshReader::read_custom_data(const ImportSettings *settings,
 
 void USDMeshReader::assign_facesets_to_material_indices(pxr::UsdTimeCode time,
                                                         MutableSpan<int> material_indices,
-                                                        blender::Map<pxr::SdfPath, int> *r_mat_map)
+                                                        Map<pxr::SdfPath, int> *r_mat_map)
 {
   if (r_mat_map == nullptr) {
     return;
@@ -902,7 +898,7 @@ void USDMeshReader::readFaceSetsSample(Main *bmain, Mesh *mesh, const pxr::UsdTi
     return;
   }
 
-  blender::Map<pxr::SdfPath, int> mat_map;
+  Map<pxr::SdfPath, int> mat_map;
 
   bke::MutableAttributeAccessor attributes = mesh->attributes_for_write();
   bke::SpanAttributeWriter<int> material_indices = attributes.lookup_or_add_for_write_span<int>(
@@ -949,7 +945,7 @@ Mesh *USDMeshReader::read_mesh(Mesh *existing_mesh,
      * the material slots that were created when the object was loaded from
      * USD are still valid now. */
     if (active_mesh->faces_num != 0 && import_params_.import_materials) {
-      blender::Map<pxr::SdfPath, int> mat_map;
+      Map<pxr::SdfPath, int> mat_map;
       bke::MutableAttributeAccessor attributes = active_mesh->attributes_for_write();
       bke::SpanAttributeWriter<int> material_indices =
           attributes.lookup_or_add_for_write_span<int>("material_index", bke::AttrDomain::Face);

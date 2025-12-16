@@ -16,6 +16,7 @@
 #include "BLI_map.hh"
 #include "BLI_math_base.hh"
 #include "BLI_math_vector.h"
+#include "BLI_multi_value_map.hh"
 #include "BLI_stack.h"
 #include "BLI_stack.hh"
 #include "BLI_utildefines_stack.h"
@@ -194,7 +195,8 @@ void bmo_weld_verts_exec(BMesh *bm, BMOperator *op)
   const bool use_targetmap_all = has_selected;
   blender::Map<void *, void *> targetmap_all;
 
-  GHash *clusters = use_centroid ? BLI_ghash_ptr_new(__func__) : nullptr;
+  /* Used when use_centroid is true. */
+  blender::MultiValueMap<BMVert *, BMVert *> clusters;
 
   /* Mark merge verts for deletion. */
   BM_ITER_MESH (v, &iter, bm, BM_VERTS_OF_MESH) {
@@ -215,40 +217,28 @@ void bmo_weld_verts_exec(BMesh *bm, BMOperator *op)
 
     /* Group vertices by their survivor. */
     if (use_centroid && LIKELY(v_dst != v)) {
-      void **cluster_p;
-      if (!BLI_ghash_ensure_p(clusters, v_dst, &cluster_p)) {
-        *cluster_p = MEM_new<blender::Vector<BMVert *>>(__func__);
-      }
-      blender::Vector<BMVert *> *cluster = static_cast<blender::Vector<BMVert *> *>(*cluster_p);
-      cluster->append(v);
+      clusters.add(v_dst, v);
     }
   }
 
   if (use_centroid) {
     /* Compute centroid for each survivor. */
-    GHashIterator gh_iter;
-    GHASH_ITER (gh_iter, clusters) {
-      BMVert *v_dst = static_cast<BMVert *>(BLI_ghashIterator_getKey(&gh_iter));
-      blender::Vector<BMVert *> *cluster = static_cast<blender::Vector<BMVert *> *>(
-          BLI_ghashIterator_getValue(&gh_iter));
+    for (const auto &item : clusters.items()) {
+      BMVert *v_dst = item.key;
+      blender::Span<BMVert *> cluster = item.value;
 
       float centroid[3];
       copy_v3_v3(centroid, v_dst->co);
       int count = 1; /* Include `v_dst`. */
 
-      for (BMVert *v_duplicate : *cluster) {
+      for (BMVert *v_duplicate : cluster) {
         add_v3_v3(centroid, v_duplicate->co);
         count++;
       }
 
       mul_v3_fl(centroid, 1.0f / float(count));
       copy_v3_v3(v_dst->co, centroid);
-
-      /* Free temporary cluster storage. */
-      MEM_delete(cluster);
     }
-    BLI_ghash_free(clusters, nullptr, nullptr);
-    clusters = nullptr;
   }
 
   /* Check if any faces are getting their own corners merged
@@ -672,9 +662,9 @@ static int *bmesh_find_doubles_by_distance_impl(BMesh *bm,
   bool found_duplicates = false;
   bool has_self_index = false;
 
-  KDTree_3d *tree = BLI_kdtree_3d_new(verts_len);
+  blender::KDTree_3d *tree = blender::kdtree_3d_new(verts_len);
   for (int i = 0; i < verts_len; i++) {
-    BLI_kdtree_3d_insert(tree, i, verts[i]->co);
+    blender::kdtree_3d_insert(tree, i, verts[i]->co);
     if (has_keep_vert && BMO_vert_flag_test(bm, verts[i], VERT_KEEP)) {
       duplicates[i] = i;
       has_self_index = true;
@@ -684,7 +674,7 @@ static int *bmesh_find_doubles_by_distance_impl(BMesh *bm,
     }
   }
 
-  BLI_kdtree_3d_balance(tree);
+  blender::kdtree_3d_balance(tree);
 
   /* Given a cluster of duplicates, pick the index to keep. */
   auto deduplicate_target_calc_fn = [&verts](const int *cluster, const int cluster_num) -> int {
@@ -724,10 +714,10 @@ static int *bmesh_find_doubles_by_distance_impl(BMesh *bm,
     return i_best;
   };
 
-  found_duplicates = BLI_kdtree_3d_calc_duplicates_cb_cpp(
+  found_duplicates = blender::kdtree_calc_duplicates_cb_cpp<3>(
                          tree, dist, duplicates, has_self_index, deduplicate_target_calc_fn) != 0;
 
-  BLI_kdtree_3d_free(tree);
+  blender::kdtree_3d_free(tree);
 
   if (!found_duplicates) {
     MEM_freeN(duplicates);

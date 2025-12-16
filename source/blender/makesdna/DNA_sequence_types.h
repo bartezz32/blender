@@ -85,7 +85,7 @@ typedef struct StripTransform {
   float scale_x;
   float scale_y;
   float rotation;
-  /** 0-1 range, `seq::image_transform_origin_offset_pixelspace_get` to convert to pixelspace. */
+  /** 0-1 range, `seq::image_transform_origin_offset_pixelspace_get` to convert to pixel-space. */
   float origin[2];
   int filter; /* eStripTransformFilter */
 } StripTransform;
@@ -273,6 +273,77 @@ typedef struct Strip {
 
 #ifdef __cplusplus
   bool is_effect() const;
+
+  /**
+   * Get timeline frame where strip content starts.
+   */
+  float content_start() const;
+  /**
+   * Set frame where strip content starts.
+   * This function will also move strip handles.
+   */
+  void content_start_set(const Scene *scene, int timeline_frame);
+  /**
+   * Get timeline frame where strip content ends.
+   */
+  float content_end(const Scene *scene) const;
+  /**
+   * Get number of frames (in timeline) that can be rendered.
+   * This can change depending on scene FPS or strip speed factor.
+   */
+  int length(const Scene *scene) const;
+  /**
+   * Get the sound offset (if any) and round it to the nearest integer.
+   * This is mostly used in places where subframe data is not allowed (like re-timing key
+   * positions). Returns zero if strip is not a sound strip or if there is no offset.
+   */
+  int rounded_sound_offset(float scene_fps) const;
+  /**
+   * Get timeline frame where strip boundary starts.
+   */
+  int left_handle() const;
+  /**
+   * Get timeline frame where strip boundary ends.
+   */
+  int right_handle(const Scene *scene) const;
+  /**
+   * Set frame where strip boundary starts. This function moves only handle, content is not moved.
+   */
+  void left_handle_set(const Scene *scene, int timeline_frame);
+  /**
+   * Set frame where strip boundary ends.
+   * This function moves only handle, content is not moved.
+   */
+  void right_handle_set(const Scene *scene, int timeline_frame);
+  /**
+   * This function has same effect as calling @Strip::right_handle_frame_set and
+   * @Strip::left_handle_frame_set. If both handles are to be set after strip length changes, it is
+   * recommended to use this function as the order of setting handles is important. See #131731.
+   */
+  void handles_set(const Scene *scene,
+                   int left_handle_timeline_frame,
+                   int right_handle_timeline_frame);
+  /**
+   * Test if strip intersects with timeline frame.
+   * \note This checks if strip would be rendered at this frame. For rendering it is assumed, that
+   * timeline frame has width of 1 frame and therefore ends at timeline_frame + 1
+   *
+   * \param strip: Strip to be checked
+   * \param timeline_frame: absolute frame position
+   * \return true if strip intersects with timeline frame.
+   */
+  bool intersects_frame(const Scene *scene, int timeline_frame) const;
+  /**
+   * Get difference between scene and movie strip frame-rate.
+   * Returns 1.0f for all other strip types.
+   */
+  float media_playback_rate_factor(float scene_fps) const;
+  /**
+   * Get FPS rate of source media. Movie, scene and movie-clip strips are supported.
+   * Returns 0 for unsupported strip or if media can't be loaded.
+   */
+  float media_fps(Scene *scene);
+
 #endif
 } Strip;
 
@@ -308,6 +379,11 @@ typedef struct EditingRuntime {
   SourceImageCache *source_image_cache;
   FinalImageCache *final_image_cache;
   PreviewCache *preview_cache;
+  /** Used for rendering a different frame using sequencer_draw_get_transform_preview from the box
+   * blade tool. */
+  int transform_preview_frame;
+  /** Determines if transform_preview_frame should be used for transform preview. */
+  uint32_t flag; /* eEditingRuntimeFlag */
 } EditingRuntime;
 
 typedef struct Editing {
@@ -641,6 +717,14 @@ typedef struct PitchModifierData {
   int quality; /*ePitchQuality*/
 } PitchModifierData;
 
+typedef struct EchoModifierData {
+  StripModifierData modifier;
+  float delay;
+  float feedback;
+  float mix;
+  char _pad[4];
+} EchoModifierData;
+
 /** \} */
 
 /* -------------------------------------------------------------------- */
@@ -686,32 +770,29 @@ typedef enum eSeqRetimingKeyFlag {
   SEQ_KEY_SELECTED = (1 << 4),
 } eSeqRetimingKeyFlag;
 
-/* From: `DNA_object_types.h`, see it's doc-string there. */
-#define SELECT 1
-
 /** #Strip.flag */
 typedef enum eStripFlag {
-  /* `SELECT = (1 << 0)` */
+  SEQ_SELECT = (1 << 0),
   SEQ_LEFTSEL = (1 << 1),
   SEQ_RIGHTSEL = (1 << 2),
-  SEQ_FLAG_UNUSED_3 = (1 << 3), /* Cleared. */
-  SEQ_FILTERY = (1 << 4),
+  /* (1 << 3) unused, set to zero by versioning code. */
+  SEQ_DEINTERLACE = (1 << 4),
   SEQ_MUTE = (1 << 5),
   SEQ_FLAG_TEXT_EDITING_ACTIVE = (1 << 6),
   SEQ_REVERSE_FRAMES = (1 << 7),
-  SEQ_IPO_FRAME_LOCKED = (1 << 8),
-  SEQ_FLAG_UNUSED_9 = (1 << 9),   /* Cleared. */
-  SEQ_FLAG_UNUSED_10 = (1 << 10), /* Potentially dirty, see #84057. */
+  /* (1 << 8) unused, set to zero by versioning code. */
+  /* (1 << 9) unused, set to zero by versioning code. */
+  /* (1 << 10) unused, set to zero by versioning code. */
   SEQ_FLIPX = (1 << 11),
   SEQ_FLIPY = (1 << 12),
   SEQ_MAKE_FLOAT = (1 << 13),
   SEQ_LOCK = (1 << 14),
   SEQ_USE_PROXY = (1 << 15),
-  SEQ_FLAG_UNUSED_16 = (1 << 16), /* Cleared. */
+  /* (1 << 16) unused, set to zero by versioning code. */
   SEQ_AUTO_PLAYBACK_RATE = (1 << 17),
   SEQ_SINGLE_FRAME_CONTENT = (1 << 18),
   SEQ_SHOW_RETIMING = (1 << 19),
-  SEQ_FLAG_UNUSED_20 = (1 << 20),
+  /* (1 << 20) unused, set to zero by versioning code. */
   SEQ_MULTIPLY_ALPHA = (1 << 21),
 
   SEQ_USE_EFFECT_DEFAULT_FADE = (1 << 22),
@@ -740,7 +821,7 @@ typedef enum eStripProxyStorageFlag {
 } eStripProxyStorageFlag;
 
 /* Convenience define for all selection flags. */
-#define STRIP_ALLSEL (SELECT + SEQ_LEFTSEL + SEQ_RIGHTSEL)
+#define STRIP_ALLSEL (SEQ_SELECT + SEQ_LEFTSEL + SEQ_RIGHTSEL)
 
 typedef enum eModColorBalanceInverseFlag {
   SEQ_COLOR_BALANCE_INVERSE_GAIN = 1 << 0,
@@ -791,7 +872,7 @@ typedef enum StripType {
   STRIP_TYPE_META = 1,
   STRIP_TYPE_SCENE = 2,
   STRIP_TYPE_MOVIE = 3,
-  STRIP_TYPE_SOUND_RAM = 4,
+  STRIP_TYPE_SOUND = 4,
   STRIP_TYPE_SOUND_HD = 5, /* DEPRECATED */
   STRIP_TYPE_MOVIECLIP = 6,
   STRIP_TYPE_MASK = 7,
@@ -858,11 +939,7 @@ typedef enum StripBlendMode {
 } StripBlendMode;
 
 #define STRIP_HAS_PATH(_strip) \
-  (ELEM((_strip)->type, \
-        STRIP_TYPE_MOVIE, \
-        STRIP_TYPE_IMAGE, \
-        STRIP_TYPE_SOUND_RAM, \
-        STRIP_TYPE_SOUND_HD))
+  (ELEM((_strip)->type, STRIP_TYPE_MOVIE, STRIP_TYPE_IMAGE, STRIP_TYPE_SOUND, STRIP_TYPE_SOUND_HD))
 
 /* Modifiers */
 
@@ -879,6 +956,7 @@ typedef enum eStripModifierType {
   eSeqModifierType_SoundEqualizer = 8,
   eSeqModifierType_Compositor = 9,
   eSeqModifierType_Pitch = 10,
+  eSeqModifierType_Echo = 11,
   /* Keep last. */
   NUM_STRIP_MODIFIER_TYPES,
 } eStripModifierType;
@@ -952,5 +1030,9 @@ typedef enum eSeqChannelFlag {
   SEQ_CHANNEL_LOCK = (1 << 0),
   SEQ_CHANNEL_MUTE = (1 << 1),
 } eSeqChannelFlag;
+
+typedef enum eEditingRuntimeFlag {
+  SEQ_SHOW_TRANSFORM_PREVIEW = (1 << 0),
+} eEditingRuntimeFlag;
 
 /** \} */

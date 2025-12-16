@@ -9,7 +9,7 @@
  *
  * We should avoid adding code here, and prefer:
  * - `source/blender/makesrna/intern/rna_context.cc` using the RNA C API.
- * - `scripts/modules/_bpy_types.py` when additions c an be written in Python.
+ * - `scripts/modules/_bpy_types.py` when additions can be written in Python.
  *
  * Otherwise functions can be added here as a last resort.
  */
@@ -292,7 +292,7 @@ void BPY_rna_types_extend_capi()
   pyrna_struct_type_extend_capi(
       &RNA_BlendDataLibraries, pyrna_blenddatalibraries_methods, nullptr);
 
-  /* uiLayout */
+  /* blender::ui::Layout */
   ARRAY_SET_ITEMS(pyrna_uilayout_methods, BPY_rna_uilayout_introspect_method_def);
   BLI_STATIC_ASSERT(ARRAY_SIZE(pyrna_uilayout_methods) == 2, "Unexpected number of methods")
   pyrna_struct_type_extend_capi(&RNA_UILayout, pyrna_uilayout_methods, nullptr);

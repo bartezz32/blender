@@ -73,7 +73,6 @@
 
 #include "SEQ_proxy.hh"
 #include "SEQ_sequencer.hh"
-#include "SEQ_time.hh"
 
 #include "BLO_read_write.hh"
 #include "BLO_readfile.hh"
@@ -269,7 +268,7 @@ static void strip_convert_transform_crop_lb(const Scene *scene,
 {
 
   LISTBASE_FOREACH (Strip *, strip, lb) {
-    if (!ELEM(strip->type, STRIP_TYPE_SOUND_RAM, STRIP_TYPE_SOUND_HD)) {
+    if (!ELEM(strip->type, STRIP_TYPE_SOUND, STRIP_TYPE_SOUND_HD)) {
       strip_convert_transform_crop(scene, strip, render_size);
     }
     if (strip->type == STRIP_TYPE_META) {
@@ -355,7 +354,7 @@ static void strip_convert_transform_crop_lb_2(const Scene *scene,
 {
 
   LISTBASE_FOREACH (Strip *, strip, lb) {
-    if (!ELEM(strip->type, STRIP_TYPE_SOUND_RAM, STRIP_TYPE_SOUND_HD)) {
+    if (!ELEM(strip->type, STRIP_TYPE_SOUND, STRIP_TYPE_SOUND_HD)) {
       strip_convert_transform_crop_2(scene, strip, render_size);
     }
     if (strip->type == STRIP_TYPE_META) {
@@ -375,13 +374,13 @@ static void seq_update_meta_disp_range(Scene *scene)
   LISTBASE_FOREACH_BACKWARD (MetaStack *, ms, &ed->metastack) {
     /* Update ms->disp_range from meta. */
     if (ms->disp_range[0] == ms->disp_range[1]) {
-      ms->disp_range[0] = blender::seq::time_left_handle_frame_get(scene, ms->parent_strip);
-      ms->disp_range[1] = blender::seq::time_right_handle_frame_get(scene, ms->parent_strip);
+      ms->disp_range[0] = ms->parent_strip->left_handle();
+      ms->disp_range[1] = ms->parent_strip->right_handle(scene);
     }
 
     /* Update meta strip endpoints. */
-    blender::seq::time_left_handle_frame_set(scene, ms->parent_strip, ms->disp_range[0]);
-    blender::seq::time_right_handle_frame_set(scene, ms->parent_strip, ms->disp_range[1]);
+    ms->parent_strip->left_handle_set(scene, ms->disp_range[0]);
+    ms->parent_strip->right_handle_set(scene, ms->disp_range[1]);
 
     /* Recalculate effects using meta strip. */
     ListBase *old_seqbasep = ms->old_strip ? &ms->old_strip->seqbase : &ed->seqbase;
@@ -1415,7 +1414,7 @@ void blo_do_versions_290(FileData *fd, Library * /*lib*/, Main *bmain)
       LISTBASE_FOREACH (MovieClip *, clip, &bmain->movieclips) {
         MovieTracking *tracking = &clip->tracking;
         MovieTrackingSettings *settings = &tracking->settings;
-        int new_refine_camera_intrinsics = 0;
+        TrackingRefineCameraFlag new_refine_camera_intrinsics = REFINE_NO_INTRINSICS;
 
         if (settings->refine_camera_intrinsics & REFINE_FOCAL_LENGTH) {
           new_refine_camera_intrinsics |= REFINE_FOCAL_LENGTH;

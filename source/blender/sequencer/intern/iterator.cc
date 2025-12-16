@@ -19,7 +19,6 @@
 #include "SEQ_iterator.hh"
 #include "SEQ_relations.hh"
 #include "SEQ_render.hh"
-#include "SEQ_time.hh"
 
 namespace blender::seq {
 
@@ -120,7 +119,7 @@ static void query_strips_recursive_at_frame(const Scene *scene,
                                             VectorSet<Strip *> &strips)
 {
   LISTBASE_FOREACH (Strip *, strip, seqbase) {
-    if (!time_strip_intersects_frame(scene, strip, timeline_frame)) {
+    if (!strip->intersects_frame(scene, timeline_frame)) {
       continue;
     }
     if (strip->type == STRIP_TYPE_META) {
@@ -152,7 +151,7 @@ VectorSet<Strip *> query_selected_strips(ListBase *seqbase)
 {
   VectorSet<Strip *> strips;
   LISTBASE_FOREACH (Strip *, strip, seqbase) {
-    if ((strip->flag & SELECT) != 0) {
+    if ((strip->flag & SEQ_SELECT) != 0) {
       strips.add(strip);
     }
   }
@@ -166,7 +165,7 @@ static VectorSet<Strip *> query_strips_at_frame(const Scene *scene,
   VectorSet<Strip *> strips;
 
   LISTBASE_FOREACH (Strip *, strip, seqbase) {
-    if (time_strip_intersects_frame(scene, strip, timeline_frame)) {
+    if (strip->intersects_frame(scene, timeline_frame)) {
       strips.add(strip);
     }
   }
@@ -218,7 +217,7 @@ static void collection_filter_rendered_strips(VectorSet<Strip *> &strips, ListBa
   /* Remove sound strips and muted strips from VectorSet, because these are not rendered.
    * Function #must_render_strip() don't have to check for these strips anymore. */
   strips.remove_if([&](Strip *strip) {
-    return strip->type == STRIP_TYPE_SOUND_RAM || render_is_muted(channels, strip);
+    return strip->type == STRIP_TYPE_SOUND || render_is_muted(channels, strip);
   });
 
   strips.remove_if([&](Strip *strip) { return !must_render_strip(strips, strip); });
@@ -242,7 +241,7 @@ VectorSet<Strip *> query_unselected_strips(ListBase *seqbase)
 {
   VectorSet<Strip *> strips;
   LISTBASE_FOREACH (Strip *, strip, seqbase) {
-    if ((strip->flag & SELECT) != 0) {
+    if ((strip->flag & SEQ_SELECT) != 0) {
       continue;
     }
     strips.add(strip);

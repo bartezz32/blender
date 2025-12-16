@@ -44,7 +44,6 @@ struct Layout;
 namespace blender::ed::space_node {
 
 void tree_update(const bContext *C);
-void tag_update_id(ID *id);
 
 float grid_size_get();
 
@@ -142,7 +141,7 @@ bool node_editor_is_for_geometry_nodes_modifier(const SpaceNode &snode,
 void ui_template_node_asset_menu_items(ui::Layout &layout,
                                        const bContext &C,
                                        StringRef catalog_path,
-                                       const NodeAssetMenuOperatorType operator_type);
+                                       const blender::ui::NodeAssetMenuOperatorType operator_type);
 
 /** See #SpaceNode_Runtime::node_can_sync_states. */
 Map<int, bool> &node_can_sync_cache_get(SpaceNode &snode);
@@ -150,5 +149,7 @@ Map<int, bool> &node_can_sync_cache_get(SpaceNode &snode);
 void node_tree_interface_draw(bContext &C, ui::Layout &layout, bNodeTree &tree);
 
 const char *node_socket_get_label(const bNodeSocket *socket, const char *panel_label = nullptr);
+
+const char *node_socket_get_description(const bNodeSocket *socket);
 
 }  // namespace blender::ed::space_node

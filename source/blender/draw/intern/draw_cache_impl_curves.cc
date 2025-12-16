@@ -474,8 +474,8 @@ static void calc_edit_handles_ibo(const OffsetIndices<int> points_by_curve,
   BLI_assert(lines.size() == points_num + extra_bezier_segments);
   MutableSpan<uint2> curve_or_handle_segments = lines.take_front(points_num);
 
-#ifdef NDEBUG
-  lines.fill(uint2(std::numeric_limits<uint32_t>::min()));
+#ifndef NDEBUG
+  lines.fill(uint2(std::numeric_limits<uint32_t>::max()));
 #endif
 
   create_segments_with_cyclic(
@@ -507,7 +507,7 @@ static void calc_edit_handles_ibo(const OffsetIndices<int> points_by_curve,
     }
   });
 
-  BLI_assert(!lines.contains(uint2(std::numeric_limits<uint32_t>::min())));
+  BLI_assert(!lines.contains(uint2(std::numeric_limits<uint32_t>::max())));
 
   GPU_indexbuf_build_in_place_ex(
       &builder, 0, handles_and_points_num(points_num, bezier_offsets), false, &ibo);
@@ -544,8 +544,8 @@ static gpu::VertBufPtr ensure_control_point_attribute(const bke::CurvesGeometry 
   if (!attribute) {
     /* Attribute doesn't exist or is of an incompatible type.
      * Replace it with a black curve domain attribute. */
-    /* TODO(fclem): Eventually, this should become unecessary if merge all attributes in one buffer
-     * and use an indirection table. */
+    /* TODO(@fclem): Eventually, this should become unnecessary if we merge
+     * all attributes into one buffer and use an indirection table. */
     GPU_vertbuf_data_alloc(*vbo, curves.curves_num());
     vbo->data<ColorGeometry4f>().fill({0.0f, 0.0f, 0.0f, 1.0f});
     r_is_point_domain = false;
@@ -983,6 +983,12 @@ gpu::VertBufPtr &DRW_curves_texture_for_evaluated_attribute(Curves *curves,
                                                             bool &r_valid_attribute)
 {
   CurvesEvalCache &cache = get_batch_cache(*curves).eval_cache;
+
+  if (curves->geometry.wrap().is_empty()) {
+    r_valid_attribute = false;
+    r_is_point_domain = false;
+    return cache.evaluated_attributes_buf[0];
+  }
 
   request_attribute(*curves, name);
 

@@ -416,6 +416,13 @@ void GLStateManager::set_blend(const GPUBlend value)
       dst_alpha = GL_ONE_MINUS_SRC_ALPHA;
       break;
     }
+    case GPU_BLEND_TRANSPARENCY: {
+      src_rgb = GL_ONE;
+      dst_rgb = GL_SRC_ALPHA;
+      src_alpha = GL_ZERO;
+      dst_alpha = GL_SRC_ALPHA;
+      break;
+    }
   }
 
   if (value == GPU_BLEND_MIN) {
@@ -535,16 +542,6 @@ void GLStateManager::texture_bind_apply()
       }
     }
   }
-}
-
-void GLStateManager::texture_unpack_row_length_set(uint len)
-{
-  texture_unpack_row_length_ = len;
-}
-
-uint GLStateManager::texture_unpack_row_length_get() const
-{
-  return texture_unpack_row_length_;
 }
 
 uint64_t GLStateManager::bound_texture_slots()

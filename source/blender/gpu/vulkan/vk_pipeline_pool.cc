@@ -5,6 +5,9 @@
 /** \file
  * \ingroup gpu
  */
+
+#include <sstream>
+
 #include "BKE_appdir.hh"
 #include "BKE_blender_version.h"
 
@@ -134,16 +137,14 @@ VkPipeline VKPipelinePool::get_or_create_graphics_pipeline(const VKGraphicsInfo 
       graphics_info, vk_pipeline_cache, vk_pipeline_base, name, r_created);
 }
 
-template<>
-VkPipeline VKPipelineMap<VKGraphicsInfo>::create(const VKGraphicsInfo &graphics_info,
-                                                 VkPipelineCache vk_pipeline_cache,
-                                                 VkPipeline vk_pipeline_base,
-                                                 StringRefNull name)
+static VkPipeline create_graphics_pipeline_no_libs(const VKGraphicsInfo &graphics_info,
+                                                   VkPipelineCache vk_pipeline_cache,
+                                                   VkPipeline vk_pipeline_base,
+                                                   StringRefNull name)
 {
   VKDevice &device = VKBackend::get().device;
-  const VKExtensions &extensions = device.extensions_get();
   VKGraphicsPipelineCreateInfoBuilder builder;
-  builder.build_full(graphics_info, extensions, vk_pipeline_base);
+  builder.build_full(device, graphics_info, vk_pipeline_base);
 
   /* Build pipeline. */
   VkPipeline pipeline = VK_NULL_HANDLE;
@@ -163,20 +164,461 @@ VkPipeline VKPipelineMap<VKGraphicsInfo>::create(const VKGraphicsInfo &graphics_
   return pipeline;
 }
 
+static VkPipeline create_graphics_pipeline_libs(const VKGraphicsInfo &graphics_info,
+                                                VkPipelineCache vk_pipeline_cache,
+                                                VkPipeline vk_pipeline_base,
+                                                StringRefNull name)
+{
+  double start_time = BLI_time_now_seconds();
+  VKDevice &device = VKBackend::get().device;
+
+  VkPipeline vertex_input_lib = device.pipelines.get_or_create_vertex_input_lib(
+      graphics_info.vertex_in);
+  VkPipeline shaders_lib = device.pipelines.get_or_create_shaders_lib(graphics_info.shaders);
+  VkPipeline fragment_output_lib = device.pipelines.get_or_create_fragment_output_lib(
+      graphics_info.fragment_out);
+
+  std::array<VkPipeline, 3> pipeline_libraries = {
+      vertex_input_lib, shaders_lib, fragment_output_lib};
+
+  /* Linking */
+  VkPipeline pipeline = VK_NULL_HANDLE;
+  VkPipelineLibraryCreateInfoKHR vk_pipeline_library_create_info = {
+      VK_STRUCTURE_TYPE_PIPELINE_LIBRARY_CREATE_INFO_KHR,
+      nullptr,
+      uint32_t(pipeline_libraries.size()),
+      pipeline_libraries.data()};
+  VkGraphicsPipelineCreateInfo linking_pipeline_create_info = {
+      VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
+      &vk_pipeline_library_create_info,
+      VK_PIPELINE_CREATE_LINK_TIME_OPTIMIZATION_BIT_EXT,
+      0,
+      nullptr,
+      nullptr,
+      nullptr,
+      nullptr,
+      nullptr,
+      nullptr,
+      nullptr,
+      nullptr,
+      nullptr,
+      nullptr,
+      graphics_info.shaders.vk_pipeline_layout,
+      VK_NULL_HANDLE,
+      0,
+      vk_pipeline_base,
+      0};
+  double start_link_time = BLI_time_now_seconds();
+  vkCreateGraphicsPipelines(
+      device.vk_handle(), vk_pipeline_cache, 1, &linking_pipeline_create_info, nullptr, &pipeline);
+  double end_time = BLI_time_now_seconds();
+  debug::object_label(pipeline, name);
+  CLOG_TRACE(&LOG,
+             "Linking graphics pipeline %s in %fms ",
+             name.c_str(),
+             (end_time - start_link_time) * 1000.0);
+  CLOG_DEBUG(&LOG,
+             "Compiling graphics pipeline %s in %fms ",
+             name.c_str(),
+             (end_time - start_time) * 1000.0);
+  return pipeline;
+}
+
+template<>
+VkPipeline VKPipelineMap<VKGraphicsInfo>::create(const VKGraphicsInfo &graphics_info,
+                                                 VkPipelineCache vk_pipeline_cache,
+                                                 VkPipeline vk_pipeline_base,
+                                                 StringRefNull name)
+{
+  VKDevice &device = VKBackend::get().device;
+  const VKExtensions &extensions = device.extensions_get();
+  if (extensions.graphics_pipeline_library) {
+    return create_graphics_pipeline_libs(graphics_info, vk_pipeline_cache, vk_pipeline_base, name);
+  }
+  else {
+    return create_graphics_pipeline_no_libs(
+        graphics_info, vk_pipeline_cache, vk_pipeline_base, name);
+  }
+}
+
+std::string VKGraphicsInfo::pipeline_info_source() const
+{
+  std::stringstream result;
+  result << "info.pipeline_state()\n";
+  result << "  .primitive(";
+  switch (vertex_in.vk_topology) {
+    case VK_PRIMITIVE_TOPOLOGY_POINT_LIST:
+      result << "GPU_PRIM_POINTS";
+      break;
+    case VK_PRIMITIVE_TOPOLOGY_LINE_LIST:
+      result << "GPU_PRIM_LINES";
+      break;
+    case VK_PRIMITIVE_TOPOLOGY_LINE_STRIP:
+      result << "GPU_PRIM_LINE_STRIP";
+      break;
+    case VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST:
+      result << "GPU_PRIM_TRIS";
+      break;
+    case VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP:
+      result << "GPU_PRIM_TRI_STRIP";
+      break;
+    case VK_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN:
+      result << "GPU_PRIM_TRI_FAN";
+      break;
+    case VK_PRIMITIVE_TOPOLOGY_LINE_LIST_WITH_ADJACENCY:
+      result << "GPU_PRIM_LINES_ADJ";
+      break;
+    case VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST_WITH_ADJACENCY:
+      result << "GPU_PRIM_TRIS_ADJ";
+      break;
+    default:
+      BLI_assert_unreachable();
+  };
+  result << ")\n";
+  result << "  .state(";
+  /* Write mask */
+  Vector<std::string> write_masks;
+  if (fragment_out.state.write_mask & GPU_WRITE_COLOR) {
+    if ((fragment_out.state.write_mask & GPU_WRITE_COLOR) == GPU_WRITE_COLOR) {
+      write_masks.append("GPU_WRITE_COLOR");
+    }
+    else {
+      if (fragment_out.state.write_mask & GPU_WRITE_RED) {
+        write_masks.append("GPU_WRITE_RED");
+      }
+      if (fragment_out.state.write_mask & GPU_WRITE_GREEN) {
+        write_masks.append("GPU_WRITE_GREEN");
+      }
+      if (fragment_out.state.write_mask & GPU_WRITE_BLUE) {
+        write_masks.append("GPU_WRITE_BLUE");
+      }
+      if (fragment_out.state.write_mask & GPU_WRITE_ALPHA) {
+        write_masks.append("GPU_WRITE_ALPHA");
+      }
+    }
+  }
+  if (fragment_out.state.write_mask & GPU_WRITE_DEPTH) {
+    write_masks.append("GPU_WRITE_DEPTH");
+  }
+  if (fragment_out.state.write_mask & GPU_WRITE_STENCIL) {
+    write_masks.append("GPU_WRITE_STENCIL");
+  }
+  if (write_masks.is_empty()) {
+    write_masks.append("GPU_WRITE_NONE");
+  }
+  for (const std::string &write_mask : write_masks) {
+    result << write_mask;
+    if (&write_mask != &write_masks.last()) {
+      result << " | ";
+    }
+  }
+  /* Blending mode */
+  result << ",\n         ";
+  switch (fragment_out.state.blend) {
+    case GPU_BLEND_NONE:
+      result << "GPU_BLEND_NONE";
+      break;
+    case GPU_BLEND_ALPHA:
+      result << "GPU_BLEND_ALPHA";
+      break;
+    case GPU_BLEND_ALPHA_PREMULT:
+      result << "GPU_BLEND_ALPHA_PREMULT";
+      break;
+    case GPU_BLEND_ADDITIVE:
+      result << "GPU_BLEND_ADDITIVE";
+      break;
+    case GPU_BLEND_ADDITIVE_PREMULT:
+      result << "GPU_BLEND_ADDITIVE_PREMULT";
+      break;
+    case GPU_BLEND_MULTIPLY:
+      result << "GPU_BLEND_MULTIPLY";
+      break;
+    case GPU_BLEND_SUBTRACT:
+      result << "GPU_BLEND_SUBTRACT";
+      break;
+    case GPU_BLEND_INVERT:
+      result << "GPU_BLEND_INVERT";
+      break;
+    case GPU_BLEND_MIN:
+      result << "GPU_BLEND_MIN";
+      break;
+    case GPU_BLEND_MAX:
+      result << "GPU_BLEND_MAX";
+      break;
+    case GPU_BLEND_OIT:
+      result << "GPU_BLEND_OIT";
+      break;
+    case GPU_BLEND_BACKGROUND:
+      result << "GPU_BLEND_BACKGROUND";
+      break;
+    case GPU_BLEND_CUSTOM:
+      result << "GPU_BLEND_CUSTOM";
+      break;
+    case GPU_BLEND_ALPHA_UNDER_PREMUL:
+      result << "GPU_BLEND_ALPHA_UNDER_PREMUL";
+      break;
+    case GPU_BLEND_OVERLAY_MASK_FROM_ALPHA:
+      result << "GPU_BLEND_OVERLAY_MASK_FROM_ALPHA";
+      break;
+    case GPU_BLEND_TRANSPARENCY:
+      result << "GPU_BLEND_TRANSPARENCY";
+      break;
+    default:
+      BLI_assert_unreachable();
+  }
+  /* Culling test */
+  result << ",\n         ";
+  switch (shaders.state.culling_test) {
+    case GPU_CULL_NONE:
+      result << "GPU_CULL_NONE";
+      break;
+    case GPU_CULL_FRONT:
+      result << "GPU_CULL_FRONT";
+      break;
+    case GPU_CULL_BACK:
+      result << "GPU_CULL_BACK";
+      break;
+    default:
+      BLI_assert_unreachable();
+  }
+  /* Depth test */
+  result << ",\n         ";
+  switch (shaders.state.depth_test) {
+    case GPU_DEPTH_NONE:
+      result << "GPU_DEPTH_NONE";
+      break;
+    case GPU_DEPTH_LESS:
+      result << "GPU_DEPTH_LESS";
+      break;
+    case GPU_DEPTH_LESS_EQUAL:
+      result << "GPU_DEPTH_LESS_EQUAL";
+      break;
+    case GPU_DEPTH_EQUAL:
+      result << "GPU_DEPTH_EQUAL";
+      break;
+    case GPU_DEPTH_GREATER:
+      result << "GPU_DEPTH_GREATER";
+      break;
+    case GPU_DEPTH_GREATER_EQUAL:
+      result << "GPU_DEPTH_GREATER_EQUAL";
+      break;
+    case GPU_DEPTH_ALWAYS:
+      result << "GPU_DEPTH_ALWAYS";
+      break;
+    default:
+      BLI_assert_unreachable();
+  }
+  /* Stencil test */
+  result << ",\n         ";
+  switch (shaders.state.stencil_test) {
+    case GPU_STENCIL_NONE:
+      result << "GPU_STENCIL_NONE";
+      break;
+    case GPU_STENCIL_ALWAYS:
+      result << "GPU_STENCIL_ALWAYS";
+      break;
+    case GPU_STENCIL_EQUAL:
+      result << "GPU_STENCIL_EQUAL";
+      break;
+    case GPU_STENCIL_NEQUAL:
+      result << "GPU_STENCIL_NEQUAL";
+      break;
+    default:
+      BLI_assert_unreachable();
+  }
+  /* Stencil operation */
+  result << ",\n         ";
+  switch (shaders.state.stencil_op) {
+    case GPU_STENCIL_OP_NONE:
+      result << "GPU_STENCIL_OP_NONE";
+      break;
+    case GPU_STENCIL_OP_REPLACE:
+      result << "GPU_STENCIL_OP_REPLACE";
+      break;
+    case GPU_STENCIL_OP_COUNT_DEPTH_PASS:
+      result << "GPU_STENCIL_OP_COUNT_DEPTH_PASS";
+      break;
+    case GPU_STENCIL_OP_COUNT_DEPTH_FAIL:
+      result << "GPU_STENCIL_OP_COUNT_DEPTH_FAIL";
+      break;
+    default:
+      BLI_assert_unreachable();
+  }
+  /* Provoking vertex */
+  result << ",\n         ";
+  switch (shaders.state.provoking_vert) {
+    case GPU_VERTEX_FIRST:
+      result << "GPU_VERTEX_FIRST";
+      break;
+    case GPU_VERTEX_LAST:
+      result << "GPU_VERTEX_LAST";
+      break;
+    default:
+      BLI_assert_unreachable();
+  }
+  result << ")\n";
+  /* viewports */
+  result << "  .viewports(" << shaders.viewport_count << ")\n";
+  /* Depth format */
+  if (fragment_out.depth_attachment_format != VK_FORMAT_UNDEFINED) {
+    result << "  .depth_format(gpu::TextureTargetFormat::"
+           << to_gpu_format_string(fragment_out.depth_attachment_format) << ")\n";
+  }
+  /* Stencil format */
+  if (fragment_out.stencil_attachment_format != VK_FORMAT_UNDEFINED) {
+    result << "  .stencil_format(gpu::TextureTargetFormat::"
+           << to_gpu_format_string(fragment_out.stencil_attachment_format) << ")\n";
+  }
+  /* Color formats */
+  for (const VkFormat format : fragment_out.color_attachment_formats) {
+    result << "  .color_format(gpu::TextureTargetFormat::" << to_gpu_format_string(format)
+           << ")\n";
+  }
+  result << ";";
+  return result.str();
+}
+
+/* \} */
+
+/* -------------------------------------------------------------------- */
+/** \name Vertex input library
+ * \{ */
+
+VkPipeline VKPipelinePool::get_or_create_vertex_input_lib(
+    const VKGraphicsInfo::VertexIn &vertex_input_info)
+{
+  bool created = false;
+  return vertex_input_libs_.get_or_create(
+      vertex_input_info, vk_pipeline_cache_static_, VK_NULL_HANDLE, "VertexInLib", created);
+}
+
+template<>
+VkPipeline VKPipelineMap<VKGraphicsInfo::VertexIn>::create(
+    const VKGraphicsInfo::VertexIn &vertex_input_info,
+    VkPipelineCache vk_pipeline_cache,
+    VkPipeline vk_pipeline_base,
+    StringRefNull name)
+{
+  VKDevice &device = VKBackend::get().device;
+  VKGraphicsPipelineCreateInfoBuilder builder;
+  builder.build_vertex_input_lib(device, vertex_input_info, vk_pipeline_base);
+
+  /* Build pipeline. */
+  VkPipeline pipeline = VK_NULL_HANDLE;
+  double start_time = BLI_time_now_seconds();
+  vkCreateGraphicsPipelines(device.vk_handle(),
+                            vk_pipeline_cache,
+                            1,
+                            &builder.vk_graphics_pipeline_create_info,
+                            nullptr,
+                            &pipeline);
+  double end_time = BLI_time_now_seconds();
+  debug::object_label(pipeline, name);
+  CLOG_TRACE(&LOG, "Compiled vertex input library in %fms ", (end_time - start_time) * 1000.0);
+  return pipeline;
+}
+
+/* \} */
+
+/* -------------------------------------------------------------------- */
+/** \name Shaders library
+ * \{ */
+
+VkPipeline VKPipelinePool::get_or_create_shaders_lib(const VKGraphicsInfo::Shaders &shaders_info)
+{
+  bool created = false;
+  return shaders_libs_.get_or_create(
+      shaders_info, vk_pipeline_cache_non_static_, VK_NULL_HANDLE, "ShadersLib", created);
+}
+
+template<>
+VkPipeline VKPipelineMap<VKGraphicsInfo::Shaders>::create(
+    const VKGraphicsInfo::Shaders &shaders_info,
+    VkPipelineCache vk_pipeline_cache,
+    VkPipeline vk_pipeline_base,
+    StringRefNull name)
+{
+  VKDevice &device = VKBackend::get().device;
+  const VKExtensions &extensions = device.extensions_get();
+  VKGraphicsPipelineCreateInfoBuilder builder;
+  builder.build_shaders_lib(shaders_info, extensions, vk_pipeline_base);
+
+  /* Build pipeline. */
+  VkPipeline pipeline = VK_NULL_HANDLE;
+  double start_time = BLI_time_now_seconds();
+  vkCreateGraphicsPipelines(device.vk_handle(),
+                            vk_pipeline_cache,
+                            1,
+                            &builder.vk_graphics_pipeline_create_info,
+                            nullptr,
+                            &pipeline);
+  double end_time = BLI_time_now_seconds();
+  debug::object_label(pipeline, name);
+  CLOG_TRACE(&LOG, "Compiled shaders library in %fms ", (end_time - start_time) * 1000.0);
+  return pipeline;
+}
+
+/* \} */
+
+/* -------------------------------------------------------------------- */
+/** \name Fragment output library
+ * \{ */
+
+VkPipeline VKPipelinePool::get_or_create_fragment_output_lib(
+    const VKGraphicsInfo::FragmentOut &fragment_output_info)
+{
+  bool created = false;
+  return fragment_output_libs_.get_or_create(
+      fragment_output_info, vk_pipeline_cache_static_, VK_NULL_HANDLE, "FragmentOutLib", created);
+}
+
+template<>
+VkPipeline VKPipelineMap<VKGraphicsInfo::FragmentOut>::create(
+    const VKGraphicsInfo::FragmentOut &fragment_output_info,
+    VkPipelineCache vk_pipeline_cache,
+    VkPipeline vk_pipeline_base,
+    StringRefNull name)
+{
+  VKDevice &device = VKBackend::get().device;
+  const VKExtensions &extensions = device.extensions_get();
+  VKGraphicsPipelineCreateInfoBuilder builder;
+  builder.build_fragment_output_lib(fragment_output_info, extensions, vk_pipeline_base);
+
+  /* Build pipeline. */
+  VkPipeline pipeline = VK_NULL_HANDLE;
+  double start_time = BLI_time_now_seconds();
+  vkCreateGraphicsPipelines(device.vk_handle(),
+                            vk_pipeline_cache,
+                            1,
+                            &builder.vk_graphics_pipeline_create_info,
+                            nullptr,
+                            &pipeline);
+  double end_time = BLI_time_now_seconds();
+  debug::object_label(pipeline, name);
+  CLOG_TRACE(&LOG, "Compiled fragment output library in %fms ", (end_time - start_time) * 1000.0);
+  return pipeline;
+}
+
 /* \} */
 
 void VKPipelinePool::discard(VKDiscardPool &discard_pool, VkPipelineLayout vk_pipeline_layout)
 {
   graphics_.discard(discard_pool, vk_pipeline_layout);
   compute_.discard(discard_pool, vk_pipeline_layout);
+  shaders_libs_.discard(discard_pool, vk_pipeline_layout);
+  /* vertex_input_libs_ and fragment_output_libs_ are NOT dependent on vk_pipeline_layout. */
 }
 
 void VKPipelinePool::free_data()
 {
-  VKDevice &device = VKBackend::get().device;
+  const VKDevice &device = VKBackend::get().device;
+  const VkDevice vk_device = device.vk_handle();
 
-  graphics_.free_data(device.vk_handle());
-  compute_.free_data(device.vk_handle());
+  graphics_.free_data(vk_device);
+  compute_.free_data(vk_device);
+  vertex_input_libs_.free_data(vk_device);
+  shaders_libs_.free_data(vk_device);
+  fragment_output_libs_.free_data(vk_device);
 
   vkDestroyPipelineCache(device.vk_handle(), vk_pipeline_cache_static_, nullptr);
   vkDestroyPipelineCache(device.vk_handle(), vk_pipeline_cache_non_static_, nullptr);

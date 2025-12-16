@@ -59,12 +59,10 @@ static void context_path_add_object_data(Vector<ui::ContextPathItem> &path, Obje
 static std::function<void(bContext &)> tree_path_handle_func(int i)
 {
   return [i](bContext &C) {
-    PointerRNA op_props;
     wmOperatorType *ot = WM_operatortype_find("NODE_OT_tree_path_parent", false);
-    WM_operator_properties_create_ptr(&op_props, ot);
+    PointerRNA op_props = WM_operator_properties_create_ptr(ot);
     RNA_int_set(&op_props, "parent_tree_index", i);
-    WM_operator_name_call_ptr(
-        &C, ot, blender::wm::OpCallContext::InvokeDefault, &op_props, nullptr);
+    WM_operator_name_call_ptr(&C, ot, wm::OpCallContext::InvokeDefault, &op_props, nullptr);
     WM_operator_properties_free(&op_props);
   };
 }
@@ -107,7 +105,7 @@ static void context_path_add_node_tree_and_node_groups(const SpaceNode &snode,
     }
 
     if (path_item != snode.treepath.last) {
-      // We don't need to add handle function to last nodetree
+      /* We don't need to add handle function to last node-tree. */
       ui::context_path_add_generic(
           path, RNA_NodeTree, path_item->nodetree, icon, tree_path_handle_func(i));
     }

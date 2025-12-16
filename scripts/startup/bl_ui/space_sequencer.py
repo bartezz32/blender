@@ -566,7 +566,7 @@ class SEQUENCER_MT_select(Menu):
             col.separator()
 
         if has_sequencer:
-            col.operator_menu_enum("sequencer.select_side_of_frame", "side", text="Side of Frame...")
+            col.operator_menu_enum("sequencer.select_side_of_frame", "side", text="Side of Frame")
             col.menu("SEQUENCER_MT_select_handle", text="Handle")
             col.menu("SEQUENCER_MT_select_channel", text="Channel")
 
@@ -662,8 +662,13 @@ class SEQUENCER_MT_add(Menu):
     bl_options = {'SEARCH_ON_KEY_PRESS'}
 
     def draw(self, context):
-
         layout = self.layout
+
+        if layout.operator_context == 'EXEC_REGION_WIN':
+            layout.operator_context = 'INVOKE_REGION_WIN'
+            layout.operator("WM_OT_search_single_menu", text="Search...",
+                            icon='VIEWZOOM').menu_idname = "SEQUENCER_MT_add"
+            layout.separator()
         layout.operator_context = 'INVOKE_REGION_WIN'
 
         layout.menu("SEQUENCER_MT_add_scene", text="Scene", icon='SCENE_DATA')
@@ -890,7 +895,7 @@ class SEQUENCER_MT_strip_animation(Menu):
 
         col = layout.column()
         col.operator("anim.keyframe_insert", text="Insert Keyframe")
-        col.operator("anim.keyframe_insert_menu", text="Insert Keyframe with Keying Set").always_prompt = True
+        col.operator("anim.keyframe_insert_menu", text="Insert Keyframe with Keying Set...").always_prompt = True
         col.operator("anim.keying_set_active_set", text="Change Keying Set...")
         col.operator("anim.keyframe_delete_vse", text="Delete Keyframes...")
         col.operator("anim.keyframe_clear_vse", text="Clear Keyframes...")
@@ -1482,6 +1487,7 @@ class SEQUENCER_MT_modifier_add(Menu):
         if strip.type == 'SOUND':
             self.operator_modifier_add(layout, 'SOUND_EQUALIZER')
             self.operator_modifier_add(layout, 'PITCH')
+            self.operator_modifier_add(layout, 'ECHO')
 
         else:
             self.operator_modifier_add(layout, 'BRIGHT_CONTRAST')

@@ -935,7 +935,7 @@ static void select_random_ui(bContext * /*C*/, wmOperator *op)
   ui::Layout &layout = *op->layout;
 
   layout.prop(op->ptr, "seed", UI_ITEM_NONE, std::nullopt, ICON_NONE);
-  layout.prop(op->ptr, "probability", UI_ITEM_R_SLIDER, IFACE_("Probability"), ICON_NONE);
+  layout.prop(op->ptr, "probability", ui::ITEM_R_SLIDER, IFACE_("Probability"), ICON_NONE);
 }
 
 static void CURVES_OT_select_random(wmOperatorType *ot)
@@ -1779,6 +1779,7 @@ static wmOperatorStatus exec(bContext *C, wmOperator *op)
     });
 
     curves.calculate_bezier_auto_handles();
+    curves.calculate_bezier_aligned_handles();
     curves.tag_topology_changed();
 
     DEG_id_tag_update(&curves_id->id, ID_RECALC_GEOMETRY);

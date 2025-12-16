@@ -259,9 +259,9 @@ struct bNodeType {
   std::string storagename; /* struct name for DNA */
 
   /* Draw the option buttons on the node */
-  void (*draw_buttons)(ui::Layout *, bContext *C, PointerRNA *ptr) = nullptr;
+  void (*draw_buttons)(ui::Layout &, bContext *C, PointerRNA *ptr) = nullptr;
   /* Additional parameters in the side panel */
-  void (*draw_buttons_ex)(ui::Layout *, bContext *C, PointerRNA *ptr) = nullptr;
+  void (*draw_buttons_ex)(ui::Layout &, bContext *C, PointerRNA *ptr) = nullptr;
 
   /* Additional drawing on backdrop */
   void (*draw_backdrop)(SpaceNode *snode, ImBuf *backdrop, bNode *node, int x, int y) = nullptr;
@@ -550,11 +550,15 @@ struct bNodeTreeType {
  * \{ */
 
 bNodeTreeType *node_tree_type_find(StringRef idname);
+bNodeTreeType *node_tree_type_find_builtin(const int tree_type);
 void node_tree_type_add(bNodeTreeType &nt);
 void node_tree_type_free_link(const bNodeTreeType &nt);
 bool node_tree_is_registered(const bNodeTree &ntree);
 
 Span<bNodeTreeType *> node_tree_types_get();
+
+bool node_tree_type_supports_socket_type_static(const int ntree_type,
+                                                const eNodeSocketDatatype socket_type);
 
 /**
  * Try to initialize all type-info in a node tree.

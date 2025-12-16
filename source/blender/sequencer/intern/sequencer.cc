@@ -16,6 +16,7 @@
 
 #include "DNA_listBase.h"
 #include "DNA_mask_types.h"
+#include "DNA_movieclip_types.h"
 #include "DNA_scene_types.h"
 #include "DNA_sequence_types.h"
 #include "DNA_sound_types.h"
@@ -52,7 +53,6 @@
 #include "SEQ_sequencer.hh"
 #include "SEQ_sound.hh"
 #include "SEQ_thumbnail_cache.hh"
-#include "SEQ_time.hh"
 #include "SEQ_transform.hh"
 #include "SEQ_utils.hh"
 
@@ -87,7 +87,7 @@ static StripData *strip_data_alloc(StripType type)
 {
   StripData *data = MEM_callocN<StripData>("strip");
 
-  if (type != STRIP_TYPE_SOUND_RAM) {
+  if (type != STRIP_TYPE_SOUND) {
     data->transform = MEM_callocN<StripTransform>("StripTransform");
     data->transform->scale_x = 1;
     data->transform->scale_y = 1;
@@ -132,7 +132,7 @@ Strip *strip_alloc(ListBase *lb, int timeline_frame, int channel, StripType type
   *((short *)strip->name) = ID_SEQ;
   strip->name[2] = 0;
 
-  strip->flag = SELECT;
+  strip->flag = SEQ_SELECT;
   strip->start = timeline_frame;
   strip_channel_set(strip, channel);
   strip->sat = 1.0;
@@ -206,7 +206,7 @@ static void seq_strip_free_ex(Scene *scene,
       ed->act_strip = nullptr;
     }
 
-    if (strip->runtime->scene_sound && ELEM(strip->type, STRIP_TYPE_SOUND_RAM, STRIP_TYPE_SCENE)) {
+    if (strip->runtime->scene_sound && ELEM(strip->type, STRIP_TYPE_SOUND, STRIP_TYPE_SCENE)) {
       BKE_sound_remove_scene_sound(scene, strip->runtime->scene_sound);
     }
   }
@@ -432,8 +432,8 @@ static MetaStack *seq_meta_stack_alloc(const Scene *scene, Strip *strip_meta)
   /* Reference to previously displayed timeline data. */
   ms->old_strip = lookup_meta_by_strip(ed, strip_meta);
 
-  ms->disp_range[0] = time_left_handle_frame_get(scene, ms->parent_strip);
-  ms->disp_range[1] = time_right_handle_frame_get(scene, ms->parent_strip);
+  ms->disp_range[0] = ms->parent_strip->left_handle();
+  ms->disp_range[1] = ms->parent_strip->right_handle(scene);
   return ms;
 }
 
@@ -520,14 +520,14 @@ static void seq_duplicate_postprocess(StripDuplicateContext &ctx)
   if (flag_is_set(ctx.dupe_flag, StripDuplicate::Data)) {
     /* Remapping newids in Scenes will usually trigger a view_layers/collections resync after each
      * scene. Besides performances considerations, this is also bad because it means some
-     * not-yet-remapped scenes will get their viewlayer updated while still referencing old
+     * not-yet-remapped scenes will get their view-layer updated while still referencing old
      * (source) collections, objects etc. This can e.g. lead to losing the active object in the
      * duplicated scenes.
      *
-     * So instead, prevent any resync untill all new IDs have been remapped. */
+     * So instead, prevent any resync until all new IDs have been remapped. */
     BKE_layer_collection_resync_forbid();
 
-    /* Newly created datablocks may reference IDs that themselves have also been duplicated in the
+    /* Newly created data-blocks may reference IDs that themselves have also been duplicated in the
      * "current duplication". E.g. a scene may have a custom property that refers to itself; when
      * it is duplicated, we should ensure that these references are properly remapped.
      *
@@ -696,7 +696,7 @@ static Strip *strip_duplicate(StripDuplicateContext &ctx, ListBase *seqbase_dst,
   else if (strip->type == STRIP_TYPE_MOVIE) {
     strip_new->data->stripdata = static_cast<StripElem *>(MEM_dupallocN(strip->data->stripdata));
   }
-  else if (strip->type == STRIP_TYPE_SOUND_RAM) {
+  else if (strip->type == STRIP_TYPE_SOUND) {
     strip_new->data->stripdata = static_cast<StripElem *>(MEM_dupallocN(strip->data->stripdata));
     strip_new->runtime->scene_sound = nullptr;
     if ((ctx.copy_flag & LIB_ID_CREATE_NO_USER_REFCOUNT) == 0) {
@@ -778,7 +778,7 @@ static void seqbase_duplicate_recursive_impl(StripDuplicateContext &ctx,
                                              const ListBase *seqbase_src)
 {
   LISTBASE_FOREACH (Strip *, strip, seqbase_src) {
-    if ((strip->flag & SELECT) == 0 && !flag_is_set(ctx.dupe_flag, StripDuplicate::All)) {
+    if ((strip->flag & SEQ_SELECT) == 0 && !flag_is_set(ctx.dupe_flag, StripDuplicate::All)) {
       continue;
     }
 
@@ -880,7 +880,7 @@ static bool strip_write_data_cb(Strip *strip, void *userdata)
       BLO_write_struct_array(
           writer, StripElem, MEM_allocN_len(data->stripdata) / sizeof(StripElem), data->stripdata);
     }
-    else if (ELEM(strip->type, STRIP_TYPE_MOVIE, STRIP_TYPE_SOUND_RAM)) {
+    else if (ELEM(strip->type, STRIP_TYPE_MOVIE, STRIP_TYPE_SOUND)) {
       BLO_write_struct(writer, StripElem, data->stripdata);
     }
   }
@@ -979,7 +979,7 @@ static bool strip_read_data_cb(Strip *strip, void *user_data)
     if (ELEM(strip->type,
              STRIP_TYPE_IMAGE,
              STRIP_TYPE_MOVIE,
-             STRIP_TYPE_SOUND_RAM,
+             STRIP_TYPE_SOUND,
              STRIP_TYPE_SOUND_HD))
     {
       /* FIXME In #STRIP_TYPE_IMAGE case, there is currently no available information about the
@@ -1042,7 +1042,7 @@ static bool strip_doversion_250_sound_proxy_update_cb(Strip *strip, void *user_d
                   strip->data->stripdata->filename);
     BLI_path_abs(filepath_abs, BKE_main_blendfile_path(bmain));
     strip->sound = BKE_sound_new_file(bmain, filepath_abs);
-    strip->type = STRIP_TYPE_SOUND_RAM;
+    strip->type = STRIP_TYPE_SOUND;
   }
   return true;
 }
@@ -1084,10 +1084,15 @@ static void strip_update_mix_sounds(Scene *scene, Strip *strip)
 
 static void strip_update_sound_properties(const Scene *scene, const Strip *strip)
 {
+  const Strip *meta = lookup_meta_by_strip(editing_get(scene), strip);
+  float output_volume = strip->volume;
+  if (meta != nullptr) {
+    output_volume *= meta->volume;
+  }
   const int frame = BKE_scene_frame_get(scene);
   BKE_sound_set_scene_sound_volume_at_frame(strip->runtime->scene_sound,
                                             frame,
-                                            strip->volume,
+                                            output_volume,
                                             (strip->flag & SEQ_AUDIO_VOLUME_ANIMATED) != 0);
   retiming_sound_animation_data_set(scene, strip);
   BKE_sound_set_scene_sound_pan_at_frame(

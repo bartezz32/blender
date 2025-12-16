@@ -945,16 +945,16 @@ float2 SMAAAreaDiag(SMAATexture2D(areaTex), float2 dist, float2 e, float offset)
   float2 texcoord = mad(
       float2(SMAA_AREATEX_MAX_DISTANCE_DIAG, SMAA_AREATEX_MAX_DISTANCE_DIAG), e, dist);
 
-  // We do a scale and bias for mapping to texel space:
+  /* We do a scale and bias for mapping to texel space: */
   texcoord = mad(SMAA_AREATEX_PIXEL_SIZE, texcoord, 0.5f * SMAA_AREATEX_PIXEL_SIZE);
 
-  // Diagonal areas are on the second half of the texture:
+  /* Diagonal areas are on the second half of the texture: */
   texcoord.x += 0.5f;
 
-  // Move to proper place, according to the subpixel offset:
+  /* Move to proper place, according to the subpixel offset: */
   texcoord.y += SMAA_AREATEX_SUBTEX_SIZE * offset;
 
-  // Do it!
+  /* Do it! */
   return SMAA_AREATEX_SELECT(SMAASampleLevelZero(areaTex, texcoord));
 }
 
@@ -976,13 +976,14 @@ float2 SMAACalculateDiagWeights(SMAATexture2D(edgesTex),
     d.xz = SMAASearchDiag1(SMAATexturePass2D(edgesTex), texcoord, float2(-1.0f, 1.0f), end);
     d.x += float(end.y > 0.9f);
   }
-  else
+  else {
     d.xz = float2(0.0f, 0.0f);
+  }
   d.yw = SMAASearchDiag1(SMAATexturePass2D(edgesTex), texcoord, float2(1.0f, -1.0f), end);
 
   SMAA_BRANCH
   if (d.x + d.y > 2.0f) {  // d.x + d.y + 1 > 3
-    // Fetch the crossing edges:
+    /* Fetch the crossing edges: */
     float4 coords = mad(
         float4(-d.x + 0.25f, d.x, d.y, -d.y - 0.25f), SMAA_RT_METRICS.xyxy, texcoord.xyxy);
     float4 c;
@@ -1014,8 +1015,9 @@ float2 SMAACalculateDiagWeights(SMAATexture2D(edgesTex),
     d.yw = SMAASearchDiag2(SMAATexturePass2D(edgesTex), texcoord, float2(1.0f, 1.0f), end);
     d.y += float(end.y > 0.9f);
   }
-  else
+  else {
     d.yw = float2(0.0f, 0.0f);
+  }
 
   SMAA_BRANCH
   if (d.x + d.y > 2.0f) {  // d.x + d.y + 1 > 3
@@ -1300,8 +1302,9 @@ float4 SMAABlendingWeightCalculationPS(float2 texcoord,
 
 #  if !defined(SMAA_DISABLE_DIAG_DETECTION)
     }
-    else
+    else {
       e.r = 0.0f;  // Skip vertical processing.
+    }
 #  endif
   }
 

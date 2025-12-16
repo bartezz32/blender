@@ -34,6 +34,8 @@
 
 #  include "DEG_depsgraph.hh"
 
+#  include "NOD_defaults.hh"
+
 #  include "WM_api.hh"
 #  include "WM_types.hh"
 
@@ -79,7 +81,7 @@ static void rna_Light_use_nodes_update(bContext *C, PointerRNA *ptr)
   Main *bmain = CTX_data_main(C);
 
   if (la->use_nodes && la->nodetree == nullptr) {
-    ED_node_shader_default(C, bmain, &la->id);
+    blender::nodes::node_tree_shader_default(C, bmain, &la->id);
   }
 
   rna_Light_update(CTX_data_main(C), CTX_data_scene(C), ptr);
@@ -153,12 +155,13 @@ static void rna_def_light(BlenderRNA *brna)
   RNA_def_property_translation_context(prop, BLT_I18NCONTEXT_ID_LIGHT);
   RNA_def_property_update(prop, 0, "rna_Light_draw_update");
 
+  RNA_define_lib_overridable(true);
+
   prop = RNA_def_property(srna, "use_temperature", PROP_BOOLEAN, PROP_NONE);
   RNA_def_property_boolean_sdna(prop, nullptr, "mode", LA_USE_TEMPERATURE);
   RNA_def_property_ui_text(
       prop, "Use Temperature", "Use blackbody temperature to define a natural light color");
   RNA_def_property_translation_context(prop, BLT_I18NCONTEXT_ID_LIGHT);
-  RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, 0, "rna_Light_draw_update");
 
   prop = RNA_def_property(srna, "color", PROP_FLOAT, PROP_COLOR);
@@ -166,7 +169,6 @@ static void rna_def_light(BlenderRNA *brna)
   RNA_def_property_array(prop, 3);
   RNA_def_property_float_array_default(prop, default_color);
   RNA_def_property_ui_text(prop, "Color", "Light color");
-  RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, 0, "rna_Light_draw_update");
 
   prop = RNA_def_property(srna, "temperature", PROP_FLOAT, PROP_COLOR_TEMPERATURE);
@@ -174,9 +176,12 @@ static void rna_def_light(BlenderRNA *brna)
   RNA_def_property_range(prop, 800.0f, 20000.0f);
   RNA_def_property_ui_range(prop, 800.0f, 20000.0f, 400.0f, 1);
   RNA_def_property_ui_text(prop, "Temperature", "Light color temperature in Kelvin");
-  RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, 0, "rna_Light_update");
 
+  RNA_define_lib_overridable(false);
+
+  /* Excluded from being overridable because it's a read-only property with a
+   * dynamically-generated value based on the 'temperature' property above. */
   prop = RNA_def_property(srna, "temperature_color", PROP_FLOAT, PROP_COLOR);
   RNA_def_property_array(prop, 3);
   RNA_def_property_clear_flag(prop, PROP_EDITABLE);
@@ -184,12 +189,13 @@ static void rna_def_light(BlenderRNA *brna)
   RNA_def_property_ui_text(prop, "Temperature Color", "Color from Temperature");
   RNA_def_property_update(prop, 0, "rna_Light_draw_update");
 
+  RNA_define_lib_overridable(true);
+
   prop = RNA_def_property(srna, "specular_factor", PROP_FLOAT, PROP_FACTOR);
   RNA_def_property_float_sdna(prop, nullptr, "spec_fac");
   RNA_def_property_range(prop, 0.0f, FLT_MAX);
   RNA_def_property_ui_range(prop, 0.0f, 1.0f, 0.01, 2);
   RNA_def_property_ui_text(prop, "Specular Factor", "Specular reflection multiplier");
-  RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, 0, "rna_Light_update");
 
   prop = RNA_def_property(srna, "diffuse_factor", PROP_FLOAT, PROP_FACTOR);
@@ -197,7 +203,6 @@ static void rna_def_light(BlenderRNA *brna)
   RNA_def_property_range(prop, 0.0f, FLT_MAX);
   RNA_def_property_ui_range(prop, 0.0f, 1.0f, 0.01, 2);
   RNA_def_property_ui_text(prop, "Diffuse Factor", "Diffuse reflection multiplier");
-  RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, 0, "rna_Light_update");
 
   prop = RNA_def_property(srna, "transmission_factor", PROP_FLOAT, PROP_FACTOR);
@@ -205,7 +210,6 @@ static void rna_def_light(BlenderRNA *brna)
   RNA_def_property_range(prop, 0.0f, FLT_MAX);
   RNA_def_property_ui_range(prop, 0.0f, 1.0f, 0.01, 2);
   RNA_def_property_ui_text(prop, "Transmission Factor", "Transmission light multiplier");
-  RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, 0, "rna_Light_update");
 
   prop = RNA_def_property(srna, "volume_factor", PROP_FLOAT, PROP_FACTOR);
@@ -213,7 +217,6 @@ static void rna_def_light(BlenderRNA *brna)
   RNA_def_property_range(prop, 0.0f, FLT_MAX);
   RNA_def_property_ui_range(prop, 0.0f, 1.0f, 0.01, 2);
   RNA_def_property_ui_text(prop, "Volume Factor", "Volume light multiplier");
-  RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, 0, "rna_Light_update");
 
   prop = RNA_def_property(srna, "use_custom_distance", PROP_BOOLEAN, PROP_NONE);
@@ -221,7 +224,6 @@ static void rna_def_light(BlenderRNA *brna)
   RNA_def_property_ui_text(prop,
                            "Custom Attenuation",
                            "Use custom attenuation distance instead of global light threshold");
-  RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, 0, "rna_Light_update");
 
   prop = RNA_def_property(srna, "cutoff_distance", PROP_FLOAT, PROP_DISTANCE);
@@ -230,12 +232,10 @@ static void rna_def_light(BlenderRNA *brna)
   RNA_def_property_ui_range(prop, 0.01f, 100.0f, 1.0, 2);
   RNA_def_property_ui_text(
       prop, "Cutoff Distance", "Distance at which the light influence will be set to 0");
-  RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, 0, "rna_Light_update");
 
   prop = RNA_def_property(srna, "use_shadow", PROP_BOOLEAN, PROP_NONE);
   RNA_def_property_boolean_sdna(prop, nullptr, "mode", LA_SHADOW);
-  RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, 0, "rna_Light_draw_update");
 
   prop = RNA_def_property(srna, "exposure", PROP_FLOAT, PROP_FACTOR);
@@ -246,7 +246,6 @@ static void rna_def_light(BlenderRNA *brna)
       prop,
       "Exposure",
       "Scales the power of the light exponentially, multiplying the intensity by 2^exposure");
-  RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, 0, "rna_Light_update");
 
   prop = RNA_def_property(srna, "normalize", PROP_BOOLEAN, PROP_NONE);
@@ -256,8 +255,9 @@ static void rna_def_light(BlenderRNA *brna)
                            "Normalize",
                            "Normalize intensity by light area, for consistent total light "
                            "output regardless of size and shape");
-  RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, 0, "rna_Light_draw_update");
+
+  RNA_define_lib_overridable(false);
 
   /* nodes */
   prop = RNA_def_property(srna, "node_tree", PROP_POINTER, PROP_NONE);
@@ -282,6 +282,8 @@ static void rna_def_light_energy(StructRNA *srna, const short light_type)
 {
   PropertyRNA *prop;
 
+  RNA_define_lib_overridable(true);
+
   switch (light_type) {
     case LA_SUN: {
       /* Distant light strength has no unit defined,
@@ -291,7 +293,6 @@ static void rna_def_light_energy(StructRNA *srna, const short light_type)
       RNA_def_property_ui_text(
           prop, "Strength", "Sunlight strength in watts per meter squared (W/m²)");
       RNA_def_property_translation_context(prop, BLT_I18NCONTEXT_ID_LIGHT);
-      RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
       RNA_def_property_update(prop, 0, "rna_Light_draw_update");
       break;
     }
@@ -306,7 +307,6 @@ static void rna_def_light_energy(StructRNA *srna, const short light_type)
           "The energy this light would emit over its entire area "
           "if it wasn't limited by the spot angle, in units of radiant power (W)");
       RNA_def_property_translation_context(prop, BLT_I18NCONTEXT_ID_LIGHT);
-      RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
       RNA_def_property_update(prop, 0, "rna_Light_draw_update");
       break;
     }
@@ -320,16 +320,19 @@ static void rna_def_light_energy(StructRNA *srna, const short light_type)
                                "Light energy emitted over the entire area of the light in all "
                                "directions, in units of radiant power (W)");
       RNA_def_property_translation_context(prop, BLT_I18NCONTEXT_ID_LIGHT);
-      RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
       RNA_def_property_update(prop, 0, "rna_Light_draw_update");
       break;
     }
   }
+
+  RNA_define_lib_overridable(false);
 }
 
 static void rna_def_light_shadow(StructRNA *srna, bool sun)
 {
   PropertyRNA *prop;
+
+  RNA_define_lib_overridable(true);
 
   prop = RNA_def_property(srna, "shadow_buffer_clip_start", PROP_FLOAT, PROP_DISTANCE);
   RNA_def_property_float_sdna(prop, nullptr, "clipsta");
@@ -346,7 +349,6 @@ static void rna_def_light_shadow(StructRNA *srna, bool sun)
   RNA_def_property_ui_range(prop, 0, 100, 0.1, 3);
   RNA_def_property_ui_text(
       prop, "Shadow Soft Size", "Light size for ray shadow sampling (Raytraced shadows)");
-  RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, 0, "rna_Light_draw_update");
 
   /* Eevee */
@@ -355,7 +357,6 @@ static void rna_def_light_shadow(StructRNA *srna, bool sun)
   RNA_def_property_ui_range(prop, 0.0f, 5.0f, 1.0f, 2);
   RNA_def_property_ui_text(
       prop, "Shadow Filter Radius", "Blur shadow aliasing using Percentage Closer Filtering");
-  RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, 0, "rna_Light_update");
 
   prop = RNA_def_property(srna, "shadow_maximum_resolution", PROP_FLOAT, PROP_DISTANCE);
@@ -365,7 +366,6 @@ static void rna_def_light_shadow(StructRNA *srna, bool sun)
                            "Shadows Resolution Limit",
                            "Minimum size of a shadow map pixel. Higher values use less memory at "
                            "the cost of shadow quality.");
-  RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, 0, "rna_Light_update");
 
   prop = RNA_def_property(srna, "use_shadow_jitter", PROP_BOOLEAN, PROP_NONE);
@@ -375,7 +375,6 @@ static void rna_def_light_shadow(StructRNA *srna, bool sun)
       "Shadow Jitter",
       "Enable jittered soft shadows to increase shadow precision (disabled in viewport unless "
       "enabled in the render settings). Has a high performance impact.");
-  RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, 0, "rna_Light_update");
 
   prop = RNA_def_property(srna, "shadow_jitter_overblur", PROP_FLOAT, PROP_PERCENTAGE);
@@ -385,7 +384,6 @@ static void rna_def_light_shadow(StructRNA *srna, bool sun)
       prop,
       "Shadow Jitter Overblur",
       "Apply shadow tracing to each jittered sample to reduce under-sampling artifacts");
-  RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, 0, "rna_Light_update");
 
   if (sun) {
@@ -426,9 +424,10 @@ static void rna_def_light_shadow(StructRNA *srna, bool sun)
                              "Absolute Resolution Limit",
                              "Limit the resolution at 1 unit from the light origin instead of "
                              "relative to the shadowed pixel");
-    RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
     RNA_def_property_update(prop, 0, "rna_Light_update");
   }
+
+  RNA_define_lib_overridable(false);
 }
 
 static void rna_def_point_light(BlenderRNA *brna)
@@ -475,11 +474,12 @@ static void rna_def_area_light(BlenderRNA *brna)
   rna_def_light_energy(srna, LA_AREA);
   rna_def_light_shadow(srna, false);
 
+  RNA_define_lib_overridable(true);
+
   prop = RNA_def_property(srna, "shape", PROP_ENUM, PROP_NONE);
   RNA_def_property_enum_sdna(prop, nullptr, "area_shape");
   RNA_def_property_enum_items(prop, prop_areashape_items);
   RNA_def_property_ui_text(prop, "Shape", "Shape of the area Light");
-  RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, 0, "rna_Light_draw_update");
 
   prop = RNA_def_property(srna, "size", PROP_FLOAT, PROP_DISTANCE);
@@ -488,7 +488,6 @@ static void rna_def_area_light(BlenderRNA *brna)
   RNA_def_property_ui_range(prop, 0, 100, 0.1, 3);
   RNA_def_property_ui_text(
       prop, "Size", "Size of the area of the area light, X direction size for rectangle shapes");
-  RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, 0, "rna_Light_draw_update");
 
   prop = RNA_def_property(srna, "size_y", PROP_FLOAT, PROP_DISTANCE);
@@ -499,7 +498,6 @@ static void rna_def_area_light(BlenderRNA *brna)
       prop,
       "Size Y",
       "Size of the area of the area light in the Y direction for rectangle shapes");
-  RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, 0, "rna_Light_draw_update");
 
   prop = RNA_def_property(srna, "spread", PROP_FLOAT, PROP_ANGLE);
@@ -510,6 +508,8 @@ static void rna_def_area_light(BlenderRNA *brna)
       "Spread",
       "How widely the emitted light fans out, as in the case of a gridded softbox");
   RNA_def_property_update(prop, 0, "rna_Light_draw_update");
+
+  RNA_define_lib_overridable(false);
 }
 
 static void rna_def_spot_light(BlenderRNA *brna)
@@ -525,6 +525,8 @@ static void rna_def_spot_light(BlenderRNA *brna)
   rna_def_light_energy(srna, LA_SPOT);
   rna_def_light_shadow(srna, false);
 
+  RNA_define_lib_overridable(true);
+
   prop = RNA_def_property(srna, "use_square", PROP_BOOLEAN, PROP_NONE);
   RNA_def_property_boolean_sdna(prop, nullptr, "mode", LA_SQUARE);
   RNA_def_property_ui_text(prop, "Square", "Cast a square spot light shape");
@@ -534,14 +536,12 @@ static void rna_def_spot_light(BlenderRNA *brna)
   RNA_def_property_float_sdna(prop, nullptr, "spotblend");
   RNA_def_property_range(prop, 0.0f, 1.0f);
   RNA_def_property_ui_text(prop, "Spot Blend", "The softness of the spotlight edge");
-  RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, 0, "rna_Light_draw_update");
 
   prop = RNA_def_property(srna, "spot_size", PROP_FLOAT, PROP_ANGLE);
   RNA_def_property_float_sdna(prop, nullptr, "spotsize");
   RNA_def_property_range(prop, DEG2RADF(1.0f), DEG2RADF(180.0f));
   RNA_def_property_ui_text(prop, "Beam Angle", "Angular diameter of the spotlight beam");
-  RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, 0, "rna_Light_draw_update");
 
   prop = RNA_def_property(srna, "show_cone", PROP_BOOLEAN, PROP_NONE);
@@ -550,7 +550,6 @@ static void rna_def_spot_light(BlenderRNA *brna)
       prop,
       "Show Cone",
       "Display transparent cone in 3D view to visualize which objects are contained in it");
-  RNA_def_property_override_flag(prop, PROPOVERRIDE_OVERRIDABLE_LIBRARY);
   RNA_def_property_update(prop, 0, "rna_Light_draw_update");
 
   prop = RNA_def_property(srna, "use_soft_falloff", PROP_BOOLEAN, PROP_NONE);
@@ -560,6 +559,8 @@ static void rna_def_spot_light(BlenderRNA *brna)
       "Soft Falloff",
       "Apply falloff to avoid sharp edges when the light geometry intersects with other objects");
   RNA_def_property_update(prop, 0, "rna_Light_draw_update");
+
+  RNA_define_lib_overridable(false);
 }
 
 static void rna_def_sun_light(BlenderRNA *brna)

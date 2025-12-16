@@ -54,8 +54,8 @@
 static wmOperatorStatus preferences_reset_default_theme_exec(bContext *C, wmOperator * /*op*/)
 {
   Main *bmain = CTX_data_main(C);
-  UI_theme_init_default();
-  UI_style_init_default();
+  blender::ui::theme::init_default();
+  blender::ui::style_init_default();
   WM_reinit_gizmomap_all(bmain);
   WM_event_add_notifier(C, NC_WINDOW, nullptr);
   U.runtime.is_dirty = true;
@@ -424,46 +424,46 @@ static wmOperatorStatus preferences_extension_repo_add_invoke(bContext *C,
 static void preferences_extension_repo_add_ui(bContext * /*C*/, wmOperator *op)
 {
 
-  uiLayout *layout = op->layout;
-  layout->use_property_split_set(true);
-  layout->use_property_decorate_set(false);
+  blender::ui::Layout &layout = *op->layout;
+  layout.use_property_split_set(true);
+  layout.use_property_decorate_set(false);
 
   PointerRNA *ptr = op->ptr;
   const bUserExtensionRepoAddType repo_type = bUserExtensionRepoAddType(RNA_enum_get(ptr, "type"));
 
   switch (repo_type) {
     case bUserExtensionRepoAddType::Remote: {
-      layout->prop(op->ptr, "remote_url", UI_ITEM_R_IMMEDIATE, std::nullopt, ICON_NONE);
-      layout->prop(op->ptr, "use_sync_on_startup", UI_ITEM_NONE, std::nullopt, ICON_NONE);
+      layout.prop(op->ptr, "remote_url", blender::ui::ITEM_R_IMMEDIATE, std::nullopt, ICON_NONE);
+      layout.prop(op->ptr, "use_sync_on_startup", UI_ITEM_NONE, std::nullopt, ICON_NONE);
 
-      layout->separator(0.2f, LayoutSeparatorType::Line);
+      layout.separator(0.2f, blender::ui::LayoutSeparatorType::Line);
 
       const bool use_access_token = RNA_boolean_get(ptr, "use_access_token");
       const int token_icon = (use_access_token && RNA_string_length(op->ptr, "access_token")) ?
                                  ICON_LOCKED :
                                  ICON_UNLOCKED;
 
-      uiLayout *row = &layout->row(true, IFACE_("Authentication"));
-      row->prop(op->ptr, "use_access_token", UI_ITEM_NONE, std::nullopt, ICON_NONE);
-      uiLayout *col = &layout->row(false);
-      col->active_set(use_access_token);
+      blender::ui::Layout &row = layout.row(true, IFACE_("Authentication"));
+      row.prop(op->ptr, "use_access_token", UI_ITEM_NONE, std::nullopt, ICON_NONE);
+      blender::ui::Layout &col = layout.row(false);
+      col.active_set(use_access_token);
       /* Use "immediate" flag to refresh the icon. */
-      col->prop(op->ptr, "access_token", UI_ITEM_R_IMMEDIATE, std::nullopt, token_icon);
+      col.prop(op->ptr, "access_token", blender::ui::ITEM_R_IMMEDIATE, std::nullopt, token_icon);
 
-      layout->separator(0.2f, LayoutSeparatorType::Line);
+      layout.separator(0.2f, blender::ui::LayoutSeparatorType::Line);
 
       break;
     }
     case bUserExtensionRepoAddType::Local: {
-      layout->prop(op->ptr, "name", UI_ITEM_R_IMMEDIATE, std::nullopt, ICON_NONE);
+      layout.prop(op->ptr, "name", blender::ui::ITEM_R_IMMEDIATE, std::nullopt, ICON_NONE);
       break;
     }
   }
 
-  layout->prop(op->ptr, "use_custom_directory", UI_ITEM_NONE, std::nullopt, ICON_NONE);
-  uiLayout *col = &layout->row(false);
-  col->active_set(RNA_boolean_get(ptr, "use_custom_directory"));
-  col->prop(op->ptr, "custom_directory", UI_ITEM_NONE, std::nullopt, ICON_NONE);
+  layout.prop(op->ptr, "use_custom_directory", UI_ITEM_NONE, std::nullopt, ICON_NONE);
+  blender::ui::Layout &col = layout.row(false);
+  col.active_set(RNA_boolean_get(ptr, "use_custom_directory"));
+  col.prop(op->ptr, "custom_directory", UI_ITEM_NONE, std::nullopt, ICON_NONE);
 }
 
 static void PREFERENCES_OT_extension_repo_add(wmOperatorType *ot)
@@ -804,8 +804,7 @@ static wmOperatorStatus preferences_extension_url_drop_invoke(bContext *C,
   wmOperatorType *ot = WM_operatortype_find(idname_external, true);
   wmOperatorStatus retval;
   if (ot) {
-    PointerRNA props_ptr;
-    WM_operator_properties_create_ptr(&props_ptr, ot);
+    PointerRNA props_ptr = WM_operator_properties_create_ptr(ot);
     if (use_url) {
       RNA_string_set(&props_ptr, "url", url.c_str());
     }

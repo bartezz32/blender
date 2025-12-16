@@ -101,7 +101,16 @@ static void node_declare(blender::nodes::NodeDeclarationBuilder &b)
       input.supports_field();
     }
     /* Labels are ugly in combination with data-block pickers and are usually disabled. */
-    input.optional_label(ELEM(data_type, SOCK_OBJECT, SOCK_IMAGE, SOCK_COLLECTION, SOCK_MATERIAL));
+    input.optional_label(ELEM(data_type,
+                              SOCK_OBJECT,
+                              SOCK_IMAGE,
+                              SOCK_COLLECTION,
+                              SOCK_MATERIAL,
+                              SOCK_FONT,
+                              SOCK_SCENE,
+                              SOCK_TEXT_ID,
+                              SOCK_MASK,
+                              SOCK_SOUND));
     input.structure_type(value_structure_type);
     auto &item_output = b.add_output<decl::Bool>(enum_item.name, std::move(identifier))
                             .align_with_previous()
@@ -115,16 +124,16 @@ static void node_declare(blender::nodes::NodeDeclarationBuilder &b)
   b.add_input<decl::Extend>("", "__extend__")
       .structure_type(StructureType::Dynamic)
       .custom_draw([](CustomSocketDrawParams &params) {
-        uiLayout &layout = params.layout;
+        ui::Layout &layout = params.layout;
         layout.emboss_set(ui::EmbossType::None);
         PointerRNA op_ptr = layout.op("node.enum_definition_item_add", "", ICON_ADD);
         RNA_int_set(&op_ptr, "node_identifier", params.node.identifier);
       });
 }
 
-static void node_layout(uiLayout *layout, bContext * /*C*/, PointerRNA *ptr)
+static void node_layout(ui::Layout &layout, bContext * /*C*/, PointerRNA *ptr)
 {
-  layout->prop(ptr, "data_type", UI_ITEM_NONE, "", ICON_NONE);
+  layout.prop(ptr, "data_type", UI_ITEM_NONE, "", ICON_NONE);
 }
 
 static void node_init(bNodeTree *tree, bNode *node)
@@ -473,14 +482,14 @@ static NodeOperation *get_compositor_operation(Context &context, DNode node)
   return new MenuSwitchOperation(context, node);
 }
 
-static void node_layout_ex(uiLayout *layout, bContext *C, PointerRNA *ptr)
+static void node_layout_ex(ui::Layout &layout, bContext *C, PointerRNA *ptr)
 {
   bNodeTree &tree = *reinterpret_cast<bNodeTree *>(ptr->owner_id);
   bNode &node = *static_cast<bNode *>(ptr->data);
 
-  layout->prop(ptr, "data_type", UI_ITEM_NONE, "", ICON_NONE);
+  layout.prop(ptr, "data_type", UI_ITEM_NONE, "", ICON_NONE);
 
-  if (uiLayout *panel = layout->panel(C, "menu_switch_items", false, IFACE_("Menu Items"))) {
+  if (ui::Layout *panel = layout.panel(C, "menu_switch_items", false, IFACE_("Menu Items"))) {
     socket_items::ui::draw_items_list_with_operators<MenuSwitchItemsAccessor>(
         C, panel, tree, node);
     socket_items::ui::draw_active_item_props<MenuSwitchItemsAccessor>(

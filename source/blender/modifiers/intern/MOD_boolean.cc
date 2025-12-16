@@ -181,18 +181,18 @@ static bool BMD_error_messages(const Object *ob, ModifierData *md)
 #ifndef WITH_GMP
   /* If compiled without GMP, return a error. */
   if (use_exact) {
-    BKE_modifier_set_error(ob, md, "Compiled without GMP, using fast solver");
+    BKE_modifier_set_error(ob, md, "Compiled without GMP, using \"float\" solver");
     error_returns_result = false;
   }
 #endif
 
-  /* If intersect is selected using fast solver, return a error. */
+  /* If intersect is selected using "float" solver, return a error. */
   if (operand_collection && operation_intersect && !(use_exact || use_manifold)) {
     BKE_modifier_set_error(ob, md, "Cannot execute, intersect only available using exact solver");
     error_returns_result = true;
   }
 
-  /* If the selected collection is empty and using fast solver, return a error. */
+  /* If the selected collection is empty and using "float" solver, return a error. */
   if (operand_collection) {
     if (!use_exact && BKE_collection_is_empty(col)) {
       BKE_modifier_set_error(ob, md, "Cannot execute, non-exact solver and empty collection");
@@ -618,54 +618,54 @@ static void required_data_mask(ModifierData * /*md*/, CustomData_MeshMasks *r_cd
 
 static void panel_draw(const bContext * /*C*/, Panel *panel)
 {
-  uiLayout *layout = panel->layout;
+  blender::ui::Layout &layout = *panel->layout;
   PointerRNA *ptr = modifier_panel_get_property_pointers(panel, nullptr);
 
-  layout->prop(ptr, "operation", UI_ITEM_R_EXPAND, std::nullopt, ICON_NONE);
+  layout.prop(ptr, "operation", blender::ui::ITEM_R_EXPAND, std::nullopt, ICON_NONE);
 
-  layout->use_property_split_set(true);
+  layout.use_property_split_set(true);
 
-  layout->prop(ptr, "operand_type", UI_ITEM_NONE, std::nullopt, ICON_NONE);
+  layout.prop(ptr, "operand_type", UI_ITEM_NONE, std::nullopt, ICON_NONE);
   if (RNA_enum_get(ptr, "operand_type") == eBooleanModifierFlag_Object) {
-    layout->prop(ptr, "object", UI_ITEM_NONE, std::nullopt, ICON_NONE);
+    layout.prop(ptr, "object", UI_ITEM_NONE, std::nullopt, ICON_NONE);
   }
   else {
-    layout->prop(ptr, "collection", UI_ITEM_NONE, std::nullopt, ICON_NONE);
+    layout.prop(ptr, "collection", UI_ITEM_NONE, std::nullopt, ICON_NONE);
   }
 
-  layout->prop(ptr, "solver", UI_ITEM_R_EXPAND, std::nullopt, ICON_NONE);
+  layout.prop(ptr, "solver", blender::ui::ITEM_R_EXPAND, std::nullopt, ICON_NONE);
 
   modifier_error_message_draw(layout, ptr);
 }
 
 static void solver_options_panel_draw(const bContext * /*C*/, Panel *panel)
 {
-  uiLayout *layout = panel->layout;
+  blender::ui::Layout &layout = *panel->layout;
   PointerRNA *ptr = modifier_panel_get_property_pointers(panel, nullptr);
 
   const bool use_exact = RNA_enum_get(ptr, "solver") == eBooleanModifierSolver_Mesh_Arr;
   const bool use_manifold = RNA_enum_get(ptr, "solver") == eBooleanModifierSolver_Manifold;
 
-  layout->use_property_split_set(true);
+  layout.use_property_split_set(true);
 
-  uiLayout *col = &layout->column(true);
+  blender::ui::Layout &col = layout.column(true);
   if (use_exact) {
-    col->prop(ptr, "material_mode", UI_ITEM_NONE, IFACE_("Materials"), ICON_NONE);
+    col.prop(ptr, "material_mode", UI_ITEM_NONE, IFACE_("Materials"), ICON_NONE);
     /* When operand is collection, we always use_self. */
     if (RNA_enum_get(ptr, "operand_type") == eBooleanModifierFlag_Object) {
-      col->prop(ptr, "use_self", UI_ITEM_NONE, std::nullopt, ICON_NONE);
+      col.prop(ptr, "use_self", UI_ITEM_NONE, std::nullopt, ICON_NONE);
     }
-    col->prop(ptr, "use_hole_tolerant", UI_ITEM_NONE, std::nullopt, ICON_NONE);
+    col.prop(ptr, "use_hole_tolerant", UI_ITEM_NONE, std::nullopt, ICON_NONE);
   }
   else if (use_manifold) {
-    col->prop(ptr, "material_mode", UI_ITEM_NONE, IFACE_("Materials"), ICON_NONE);
+    col.prop(ptr, "material_mode", UI_ITEM_NONE, IFACE_("Materials"), ICON_NONE);
   }
   else {
-    col->prop(ptr, "double_threshold", UI_ITEM_NONE, std::nullopt, ICON_NONE);
+    col.prop(ptr, "double_threshold", UI_ITEM_NONE, std::nullopt, ICON_NONE);
   }
 
   if (G.debug) {
-    col->prop(ptr, "debug_options", UI_ITEM_NONE, std::nullopt, ICON_NONE);
+    col.prop(ptr, "debug_options", UI_ITEM_NONE, std::nullopt, ICON_NONE);
   }
 }
 

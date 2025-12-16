@@ -188,11 +188,11 @@ Mesh *MOD_solidify_nonmanifold_modifyMesh(ModifierData *md,
 
   const bool do_flat_faces = dvert && (smd->flag & MOD_SOLIDIFY_NONMANIFOLD_FLAT_FACES);
 
-  const blender::Span<blender::float3> orig_vert_positions = mesh->vert_positions();
-  const blender::Span<int2> orig_edges = mesh->edges();
-  const blender::OffsetIndices orig_faces = mesh->faces();
-  const blender::Span<int> orig_corner_verts = mesh->corner_verts();
-  const blender::Span<int> orig_corner_edges = mesh->corner_edges();
+  const Span<blender::float3> orig_vert_positions = mesh->vert_positions();
+  const Span<int2> orig_edges = mesh->edges();
+  const OffsetIndices orig_faces = mesh->faces();
+  const Span<int> orig_corner_verts = mesh->corner_verts();
+  const Span<int> orig_corner_edges = mesh->corner_edges();
   const bke::AttributeAccessor orig_attributes = mesh->attributes();
 
   /* These might be null. */
@@ -222,7 +222,7 @@ Mesh *MOD_solidify_nonmanifold_modifyMesh(ModifierData *md,
   /* Calculate face to #NewFaceRef map. */
   {
     for (const int i : orig_faces.index_range()) {
-      const blender::IndexRange &face = orig_faces[i];
+      const IndexRange &face = orig_faces[i];
       /* Make normals for faces without area (should really be avoided though). */
       if (len_squared_v3(face_nors[i]) < 0.5f) {
         const int2 &edge = orig_edges[orig_corner_edges[face.start()]];
@@ -381,16 +381,43 @@ Mesh *MOD_solidify_nonmanifold_modifyMesh(ModifierData *md,
                   (ELEM(vm[orig_edges[k][0]], v1, v2) != ELEM(vm[orig_edges[k][1]], v1, v2)))
               {
                 for (uint j = 0; j < edge_adj_faces[k]->faces_len && can_merge; j++) {
-                  const blender::IndexRange face = orig_faces[edge_adj_faces[k]->faces[j]];
+                  const IndexRange face = orig_faces[edge_adj_faces[k]->faces[j]];
                   uint changes = 0;
+                  /* Ensure there are at least 3 unique vertices in this face.
+                   * Without this check a duplicate edge would be created
+                   * (although this seems only to happen rarely, see: #150854).
+                   *
+                   * Logically this could be handled with a `set` created from the
+                   * unique vertices that would make up this face (after collapsing),
+                   * however it is simpler to check for at least two other unique vertices.
+                   *
+                   * NOTE(@ideasman42): we *could* remove this check, then perform
+                   * the merge and remove the face (as is done for `is_singularity`)
+                   * however in that case there is still the extra edge to de-duplicate.
+                   * Updating the topology is more involved but it's possible.
+                   * We might be better to use more generic mesh "weld" logic,
+                   * operating on tagged edges (for examples), which has the benefit
+                   * of avoiding nested (potentially inefficient) loops like this. */
+                  bool has_multiple_unique_others = false;
+                  uint unique_other_vert = MOD_SOLIDIFY_EMPTY_TAG;
+
                   int cur = face.size() - 1;
                   for (int next = 0; next < face.size() && changes <= 2; next++) {
                     uint cur_v = vm[orig_corner_verts[face[cur]]];
                     uint next_v = vm[orig_corner_verts[face[next]]];
                     changes += (ELEM(cur_v, v1, v2) != ELEM(next_v, v1, v2));
+                    if (!ELEM(cur_v, v1, v2)) {
+                      if (unique_other_vert == MOD_SOLIDIFY_EMPTY_TAG) {
+                        unique_other_vert = cur_v;
+                      }
+                      else if (unique_other_vert != cur_v) {
+                        has_multiple_unique_others = true;
+                      }
+                    }
                     cur = next;
                   }
-                  can_merge = can_merge && changes <= 2;
+                  can_merge = can_merge && changes <= 2 &&
+                              !(changes == 2 && has_multiple_unique_others == false);
                 }
               }
             }
@@ -1968,11 +1995,11 @@ Mesh *MOD_solidify_nonmanifold_modifyMesh(ModifierData *md,
   result = BKE_mesh_new_nomain_from_template(
       mesh, int(new_verts_num), int(new_edges_num), int(new_faces_num), int(new_loops_num));
 
-  blender::MutableSpan<float3> vert_positions = result->vert_positions_for_write();
-  blender::MutableSpan<int2> edges = result->edges_for_write();
-  blender::MutableSpan<int> face_offsets = result->face_offsets_for_write();
-  blender::MutableSpan<int> corner_verts = result->corner_verts_for_write();
-  blender::MutableSpan<int> corner_edges = result->corner_edges_for_write();
+  MutableSpan<float3> vert_positions = result->vert_positions_for_write();
+  MutableSpan<int2> edges = result->edges_for_write();
+  MutableSpan<int> face_offsets = result->face_offsets_for_write();
+  MutableSpan<int> corner_verts = result->corner_verts_for_write();
+  MutableSpan<int> corner_edges = result->corner_edges_for_write();
   bke::MutableAttributeAccessor result_attributes = result->attributes_for_write();
 
   bke::LegacyMeshInterpolator vert_interp(*mesh, *result, bke::AttrDomain::Point);
@@ -2093,8 +2120,7 @@ Mesh *MOD_solidify_nonmanifold_modifyMesh(ModifierData *md,
   }
 
   /* DEBUG CODE FOR BUG-FIXING (can not be removed because every bug-fix needs this badly!). */
-#if 0
-  {
+  if (false) {
     /* this code will output the content of orig_vert_groups_arr.
      * in orig_vert_groups_arr these conditions must be met for every vertex:
      * - new_edge value should have no duplicates
@@ -2117,18 +2143,18 @@ Mesh *MOD_solidify_nonmanifold_modifyMesh(ModifierData *md,
       EdgeGroup *gs = *gs_ptr;
       /* check if the vertex is present (may be dissolved because of proximity) */
       if (gs) {
-        printf("%d:\n", i);
+        printf("%u:\n", i);
         for (EdgeGroup *g = gs; g->valid; g++) {
           NewEdgeRef **e = g->edges;
           for (uint j = 0; j < g->edges_len; j++, e++) {
-            printf("%u/%d, ", (*e)->old_edge, int(*e)->new_edge);
+            printf("%u/%d, ", (*e)->old_edge, int((*e)->new_edge));
           }
           printf("(tg:%u)(s:%u,c:%d)\n", g->topo_group, g->split, g->is_orig_closed);
         }
       }
     }
   }
-#endif
+
   const VArraySpan src_material_index = *orig_attributes.lookup<int>("material_index",
                                                                      bke::AttrDomain::Face);
   bke::SpanAttributeWriter dst_material_index =
@@ -2310,7 +2336,7 @@ Mesh *MOD_solidify_nonmanifold_modifyMesh(ModifierData *md,
 
               for (uint k = 0; g2->valid && k < j; g2++) {
                 if ((do_rim && !g2->is_orig_closed) || (do_shell && g2->split)) {
-                  const blender::IndexRange face = g2->edges[0]->faces[0]->face;
+                  const IndexRange face = g2->edges[0]->faces[0]->face;
                   for (int l = 0; l < face.size(); l++) {
                     const int vert = orig_corner_verts[face[l]];
                     if (vm[vert] == i) {
@@ -2371,7 +2397,7 @@ Mesh *MOD_solidify_nonmanifold_modifyMesh(ModifierData *md,
         }
 
         const uint orig_face_index = (*new_edges)->faces[0]->index;
-        const blender::IndexRange face = (*new_edges)->faces[0]->face;
+        const IndexRange face = (*new_edges)->faces[0]->face;
         face_interp.copy(int((*new_edges)->faces[0]->index), int(face_index), 1);
         face_offsets[face_index] = int(loop_index);
         dst_material_index.span[face_index] = (!src_material_index.is_empty() ?

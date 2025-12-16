@@ -32,7 +32,8 @@
 
 namespace node_interface = blender::bke::node_interface;
 
-namespace blender::ui::nodes {
+namespace blender::ui {
+namespace nodes {
 
 namespace {
 
@@ -100,7 +101,7 @@ class NodeSocketViewItem : public BasicTreeViewItem {
     });
   }
 
-  void build_row(uiLayout &row) override
+  void build_row(Layout &row) override
   {
     if (ID_IS_LINKED(&nodetree_)) {
       row.enabled_set(false);
@@ -108,26 +109,26 @@ class NodeSocketViewItem : public BasicTreeViewItem {
 
     row.use_property_decorate_set(false);
 
-    uiLayout *input_socket_layout = &row.row(true);
+    Layout &input_socket_layout = row.row(true);
     if (socket_.flag & NODE_INTERFACE_SOCKET_INPUT) {
       /* Context is not used by the template function. */
-      uiTemplateNodeSocket(input_socket_layout, /*C*/ nullptr, socket_.socket_color());
+      template_node_socket(&input_socket_layout, /*C*/ nullptr, socket_.socket_color());
     }
     else {
       /* Blank item to align output socket labels with inputs. */
-      input_socket_layout->label("", ICON_BLANK1);
+      input_socket_layout.label("", ICON_BLANK1);
     }
 
     this->add_label(row, IFACE_(label_.c_str()));
 
-    uiLayout *output_socket_layout = &row.row(true);
+    Layout &output_socket_layout = row.row(true);
     if (socket_.flag & NODE_INTERFACE_SOCKET_OUTPUT) {
       /* Context is not used by the template function. */
-      uiTemplateNodeSocket(output_socket_layout, /*C*/ nullptr, socket_.socket_color());
+      template_node_socket(&output_socket_layout, /*C*/ nullptr, socket_.socket_color());
     }
     else {
       /* Blank item to align input socket labels with outputs. */
-      output_socket_layout->label("", ICON_BLANK1);
+      output_socket_layout.label("", ICON_BLANK1);
     }
   }
 
@@ -195,22 +196,22 @@ class NodePanelViewItem : public BasicTreeViewItem {
     is_always_collapsible_ = true;
   }
 
-  void build_row(uiLayout &row) override
+  void build_row(Layout &row) override
   {
     if (ID_IS_LINKED(&nodetree_)) {
       row.enabled_set(false);
     }
     /* Add boolean socket if panel has a toggle. */
     if (toggle_ != nullptr) {
-      uiLayout *toggle_layout = &row.row(true);
+      Layout &toggle_layout = row.row(true);
       /* Context is not used by the template function. */
-      uiTemplateNodeSocket(toggle_layout, /*C*/ nullptr, toggle_->socket_color());
+      template_node_socket(&toggle_layout, /*C*/ nullptr, toggle_->socket_color());
     }
 
     this->add_label(row, IFACE_(label_.c_str()));
 
-    uiLayout *sub = &row.row(true);
-    sub->use_property_decorate_set(false);
+    Layout &sub = row.row(true);
+    sub.use_property_decorate_set(false);
   }
 
  protected:
@@ -298,7 +299,7 @@ class NodeTreeInterfaceView : public AbstractTreeView {
 
  protected:
   void add_items_for_panel_recursive(bNodeTreeInterfacePanel &parent,
-                                     ui::TreeViewOrItem &parent_item,
+                                     TreeViewOrItem &parent_item,
                                      const bNodeTreeInterfaceItem *skip_item = nullptr)
   {
     for (bNodeTreeInterfaceItem *item : parent.items()) {
@@ -489,17 +490,9 @@ bool NodePanelDropTarget::can_drop(const wmDrag &drag, const char ** /*r_disable
   if (drag.type != WM_DRAG_NODE_TREE_INTERFACE) {
     return false;
   }
-  bNodeTreeInterfaceItemReference *drag_data = get_drag_node_tree_declaration(drag);
-
-  /* Can't drop an item onto its children. */
-  if (const bNodeTreeInterfacePanel *panel = node_interface::get_item_as<bNodeTreeInterfacePanel>(
-          drag_data->item))
-  {
-    if (panel->contains(panel_.item)) {
-      return false;
-    }
+  if (is_dragging_parent_panel(drag, panel_.item)) {
+    return false;
   }
-
   return true;
 }
 
@@ -562,12 +555,10 @@ bool NodePanelDropTarget::on_drop(bContext *C, const DragInfo &drag_info) const
   ED_undo_push(C, "Insert node group item");
   return true;
 }
-
 }  // namespace
+}  // namespace nodes
 
-}  // namespace blender::ui::nodes
-
-void uiTemplateNodeTreeInterface(uiLayout *layout, const bContext *C, PointerRNA *ptr)
+void template_tree_interface(Layout *layout, const bContext *C, PointerRNA *ptr)
 {
   if (!ptr->data) {
     return;
@@ -578,14 +569,16 @@ void uiTemplateNodeTreeInterface(uiLayout *layout, const bContext *C, PointerRNA
   bNodeTree &nodetree = *reinterpret_cast<bNodeTree *>(ptr->owner_id);
   bNodeTreeInterface &interface = *static_cast<bNodeTreeInterface *>(ptr->data);
 
-  uiBlock *block = layout->block();
+  Block *block = layout->block();
 
-  blender::ui::AbstractTreeView *tree_view = UI_block_add_view(
+  AbstractTreeView *tree_view = block_add_view(
       *block,
       "Node Tree Declaration Tree View",
-      std::make_unique<blender::ui::nodes::NodeTreeInterfaceView>(nodetree, interface));
+      std::make_unique<nodes::NodeTreeInterfaceView>(nodetree, interface));
   tree_view->set_context_menu_title("Node Tree Interface");
   tree_view->set_default_rows(5);
 
-  blender::ui::TreeViewBuilder::build_tree_view(*C, *tree_view, *layout);
+  TreeViewBuilder::build_tree_view(*C, *tree_view, *layout);
 }
+
+}  // namespace blender::ui

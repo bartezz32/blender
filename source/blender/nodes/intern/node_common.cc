@@ -370,6 +370,31 @@ static BaseSocketDeclarationBuilder &build_interface_socket_declaration(
                     .default_value_fn(get_default_id_getter(tree.tree_interface, io_socket));
         break;
       }
+      case SOCK_FONT: {
+        decl = &b.add_socket<decl::Font>(name, identifier, in_out)
+                    .default_value_fn(get_default_id_getter(tree.tree_interface, io_socket));
+        break;
+      }
+      case SOCK_SCENE: {
+        decl = &b.add_socket<decl::Scene>(name, identifier, in_out)
+                    .default_value_fn(get_default_id_getter(tree.tree_interface, io_socket));
+        break;
+      }
+      case SOCK_TEXT_ID: {
+        decl = &b.add_socket<decl::Text>(name, identifier, in_out)
+                    .default_value_fn(get_default_id_getter(tree.tree_interface, io_socket));
+        break;
+      }
+      case SOCK_MASK: {
+        decl = &b.add_socket<decl::Mask>(name, identifier, in_out)
+                    .default_value_fn(get_default_id_getter(tree.tree_interface, io_socket));
+        break;
+      }
+      case SOCK_SOUND: {
+        decl = &b.add_socket<decl::Sound>(name, identifier, in_out)
+                    .default_value_fn(get_default_id_getter(tree.tree_interface, io_socket));
+        break;
+      }
       case SOCK_BUNDLE: {
         decl = &b.add_socket<decl::Bundle>(name, identifier, in_out);
         break;
@@ -877,14 +902,14 @@ static bool group_output_insert_link(blender::bke::NodeInsertLinkParams &params)
   return true;
 }
 
-static void node_group_input_layout(uiLayout *layout, bContext *C, PointerRNA *ptr)
+static void node_group_input_layout(ui::Layout &layout, bContext *C, PointerRNA *ptr)
 {
-  ed::space_node::node_tree_interface_draw(*C, *layout, *id_cast<bNodeTree *>(ptr->owner_id));
+  ed::space_node::node_tree_interface_draw(*C, layout, *id_cast<bNodeTree *>(ptr->owner_id));
 }
 
-static void node_group_output_layout(uiLayout *layout, bContext *C, PointerRNA *ptr)
+static void node_group_output_layout(ui::Layout &layout, bContext *C, PointerRNA *ptr)
 {
-  ed::space_node::node_tree_interface_draw(*C, *layout, *id_cast<bNodeTree *>(ptr->owner_id));
+  ed::space_node::node_tree_interface_draw(*C, layout, *id_cast<bNodeTree *>(ptr->owner_id));
 }
 
 }  // namespace blender::nodes

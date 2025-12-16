@@ -268,6 +268,36 @@ void VKCommandBufferWrapper::set_line_width(const float line_width)
 {
   vkCmdSetLineWidth(vk_command_buffer_, line_width);
 }
+void VKCommandBufferWrapper::set_stencil_compare_mask(const uint32_t compare_mask)
+{
+  vkCmdSetStencilCompareMask(vk_command_buffer_, VK_STENCIL_FACE_FRONT_AND_BACK, compare_mask);
+}
+void VKCommandBufferWrapper::set_stencil_write_mask(const uint32_t write_mask)
+{
+  vkCmdSetStencilWriteMask(vk_command_buffer_, VK_STENCIL_FACE_FRONT_AND_BACK, write_mask);
+}
+void VKCommandBufferWrapper::set_stencil_reference(const uint32_t reference)
+{
+  vkCmdSetStencilReference(vk_command_buffer_, VK_STENCIL_FACE_FRONT_AND_BACK, reference);
+}
+void VKCommandBufferWrapper::set_front_face(const VkFrontFace front_face)
+{
+  const VKDevice &device = VKBackend::get().device;
+  BLI_assert(device.functions.vkCmdSetFrontFace);
+  device.functions.vkCmdSetFrontFace(vk_command_buffer_, front_face);
+}
+void VKCommandBufferWrapper::set_vertex_input(
+    Span<VkVertexInputBindingDescription2EXT> vertex_binding_descriptions,
+    Span<VkVertexInputAttributeDescription2EXT> vertex_attribute_descriptions)
+{
+  const VKDevice &device = VKBackend::get().device;
+  BLI_assert(device.functions.vkCmdSetVertexInput);
+  device.functions.vkCmdSetVertexInput(vk_command_buffer_,
+                                       vertex_binding_descriptions.size(),
+                                       vertex_binding_descriptions.data(),
+                                       vertex_attribute_descriptions.size(),
+                                       vertex_attribute_descriptions.data());
+}
 
 void VKCommandBufferWrapper::begin_rendering(const VkRenderingInfo *p_rendering_info)
 {

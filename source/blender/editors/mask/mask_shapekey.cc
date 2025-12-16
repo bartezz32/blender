@@ -11,7 +11,7 @@
 #include "BLI_listbase.h"
 
 #include "BKE_context.hh"
-#include "BKE_mask.h"
+#include "BKE_mask.hh"
 
 #include "DNA_mask_types.h"
 #include "DNA_scene_types.h"
@@ -27,6 +27,14 @@
 #include "ED_mask.hh" /* own include */
 
 #include "mask_intern.hh" /* own include */
+
+static void select_only_layer_shape(MaskLayer *mask_layer, MaskLayerShape *mask_layer_shape)
+{
+  LISTBASE_FOREACH (MaskLayerShape *, mask_layer_shape_iter, &mask_layer->splines_shapes) {
+    mask_layer_shape_iter->flag &= ~MASK_SHAPE_SELECT;
+  }
+  mask_layer_shape->flag |= MASK_SHAPE_SELECT;
+}
 
 static wmOperatorStatus mask_shape_key_insert_exec(bContext *C, wmOperator * /*op*/)
 {
@@ -45,6 +53,8 @@ static wmOperatorStatus mask_shape_key_insert_exec(bContext *C, wmOperator * /*o
     mask_layer_shape = BKE_mask_layer_shape_verify_frame(mask_layer, frame);
     BKE_mask_layer_shape_from_mask(mask_layer, mask_layer_shape);
     changed = true;
+
+    select_only_layer_shape(mask_layer, mask_layer_shape);
   }
 
   if (changed) {
@@ -151,9 +161,8 @@ static wmOperatorStatus mask_shape_key_feather_reset_exec(bContext *C, wmOperato
             for (int i = 0; i < spline->tot_point; i++) {
               MaskSplinePoint *point = &spline->points[i];
 
-              if (MASKPOINT_ISSEL_ANY(point)) {
-                /* TODO: nicer access here. */
-                shape_ele_dst->value[6] = shape_ele_src->value[6];
+              if (BKE_mask_point_selected(point)) {
+                shape_ele_dst->weight = shape_ele_src->weight;
               }
 
               shape_ele_src++;
@@ -313,12 +322,13 @@ static wmOperatorStatus mask_shape_key_rekey_exec(bContext *C, wmOperator *op)
                 /* not especially efficient but makes this easier to follow */
                 std::swap(*shape_ele_src, *shape_ele_dst);
 
-                if (MASKPOINT_ISSEL_ANY(point)) {
+                if (BKE_mask_point_selected(point)) {
                   if (do_location) {
-                    memcpy(shape_ele_dst->value, shape_ele_src->value, sizeof(float[6]));
+                    memcpy(
+                        shape_ele_dst->point, shape_ele_src->point, sizeof(shape_ele_src->point));
                   }
                   if (do_feather) {
-                    shape_ele_dst->value[6] = shape_ele_src->value[6];
+                    shape_ele_dst->weight = shape_ele_src->weight;
                   }
                 }
 
@@ -379,6 +389,8 @@ void ED_mask_layer_shape_auto_key(MaskLayer *mask_layer, const int frame)
 
   mask_layer_shape = BKE_mask_layer_shape_verify_frame(mask_layer, frame);
   BKE_mask_layer_shape_from_mask(mask_layer, mask_layer_shape);
+
+  select_only_layer_shape(mask_layer, mask_layer_shape);
 }
 
 bool ED_mask_layer_shape_auto_key_all(Mask *mask, const int frame)

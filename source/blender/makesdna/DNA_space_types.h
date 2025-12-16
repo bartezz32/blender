@@ -374,9 +374,9 @@ typedef struct MaskSpaceInfo {
   /* **** mask editing **** */
   struct Mask *mask;
   /* draw options */
-  char draw_flag;
-  char draw_type;
-  char overlay_mode;
+  char draw_flag;    /* MaskDrawFlag */
+  char draw_type;    /* MaskDrawType */
+  char overlay_mode; /* MaskOverlayMode */
   char _pad3[1];
   float blend_factor;
 } MaskSpaceInfo;
@@ -679,7 +679,7 @@ typedef struct SpaceImage {
 
   float uv_opacity;
   float uv_face_opacity;
-  char _pad2[4];
+  float uv_edge_opacity;
 
   float stretch_opacity;
 
@@ -1028,7 +1028,7 @@ typedef struct SpaceClip {
    */
   float stabmat[4][4], unistabmat[4][4];
 
-  /** Movie postprocessing. */
+  /** Movie postprocessing (#MovieClipPostprocFlag). */
   int postproc_flag;
 
   /* grease pencil */

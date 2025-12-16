@@ -1300,7 +1300,7 @@ void fcurve_to_keylist(AnimData *adt,
   /* The indices for which keys have been added to the key columns. Initialized as invalid bounds
    * for the case that no keyframes get added to the key-columns, which happens when the given
    * range doesn't overlap with the existing keyframes. */
-  blender::Bounds<int> index_bounds(int(fcu->totvert), 0);
+  Bounds<int> index_bounds(int(fcu->totvert), 0);
   /* The following is used to find the keys that are JUST outside the range. This is done so
    * drawing in the dope sheet can create lines that extend off-screen. */
   float left_outside_key_x = -FLT_MAX;
@@ -1395,14 +1395,6 @@ void action_to_keylist(AnimData *adt,
   }
 
   blender::animrig::Action &action = dna_action->wrap();
-
-  /* TODO: move this into fcurves_for_action_slot(). */
-  if (action.is_action_legacy()) {
-    LISTBASE_FOREACH (FCurve *, fcu, &action.curves) {
-      fcurve_to_keylist(adt, fcu, keylist, saction_flag, range, true);
-    }
-    return;
-  }
 
   /**
    * Assumption: the animation is bound to adt->slot_handle. This assumption will break when we

@@ -9,13 +9,12 @@
 #include "MEM_guardedalloc.h"
 
 #include "BKE_context.hh"
-#include "BKE_mask.h"
+#include "BKE_mask.hh"
 
 #include "BLI_listbase.h"
 #include "BLI_math_geom.h"
 #include "BLI_math_vector.h"
 
-#include "DEG_depsgraph.hh"
 #include "DEG_depsgraph_query.hh"
 
 #include "DNA_mask_types.h"
@@ -495,7 +494,7 @@ void ED_mask_mouse_pos(ScrArea *area, ARegion *region, const int mval[2], float 
         break;
       }
       case SPACE_SEQ: {
-        UI_view2d_region_to_view(&region->v2d, mval[0], mval[1], &r_co[0], &r_co[1]);
+        blender::ui::view2d_region_to_view(&region->v2d, mval[0], mval[1], &r_co[0], &r_co[1]);
         break;
       }
       case SPACE_IMAGE: {
@@ -639,7 +638,7 @@ bool ED_mask_selected_minmax(const bContext *C,
         const MaskSplinePoint *deform_point = &points_array[i];
         const BezTriple *bezt = &point->bezt;
         float handle[2];
-        if (!MASKPOINT_ISSEL_ANY(point)) {
+        if (!BKE_mask_point_selected(point)) {
           continue;
         }
         if (bezt->f2 & SELECT) {
@@ -802,7 +801,7 @@ void ED_mask_pixelspace_factor(ScrArea *area, ARegion *region, float *r_scalex, 
         SpaceClip *sc = static_cast<SpaceClip *>(area->spacedata.first);
         float aspx, aspy;
 
-        UI_view2d_scale_get(&region->v2d, r_scalex, r_scaley);
+        blender::ui::view2d_scale_get(&region->v2d, r_scalex, r_scaley);
         ED_space_clip_get_aspect(sc, &aspx, &aspy);
 
         *r_scalex *= aspx;
@@ -817,7 +816,7 @@ void ED_mask_pixelspace_factor(ScrArea *area, ARegion *region, float *r_scalex, 
         SpaceImage *sima = static_cast<SpaceImage *>(area->spacedata.first);
         float aspx, aspy;
 
-        UI_view2d_scale_get(&region->v2d, r_scalex, r_scaley);
+        blender::ui::view2d_scale_get(&region->v2d, r_scalex, r_scaley);
         ED_space_image_get_aspect(sima, &aspx, &aspy);
 
         *r_scalex *= aspx;

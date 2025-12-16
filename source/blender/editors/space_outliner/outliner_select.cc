@@ -439,6 +439,12 @@ static void tree_element_camera_activate(bContext *C, Scene *scene, TreeElement 
 {
   Object *ob = (Object *)outliner_search_back(te, ID_OB);
 
+  if (ob == nullptr) {
+    /* Happens in "Blender File" view (there is simply no object up in the hierarchy in this case).
+     */
+    return;
+  }
+
   scene->camera = ob;
 
   Main *bmain = CTX_data_main(C);
@@ -564,7 +570,7 @@ static void tree_element_posechannel_activate(bContext *C,
       }
 
       LISTBASE_FOREACH (bPoseChannel *, pchannel, &ob_iter->pose->chanbase) {
-        pchannel->flag &= ~POSE_SELECTED;
+        pchannel->flag &= ~POSE_SELECTED_ALL;
       }
 
       if (ob != ob_iter) {
@@ -574,11 +580,11 @@ static void tree_element_posechannel_activate(bContext *C,
   }
 
   if ((set == OL_SETSEL_EXTEND) && (pchan->flag & POSE_SELECTED)) {
-    pchan->flag &= ~POSE_SELECTED;
+    pchan->flag &= ~POSE_SELECTED_ALL;
   }
   else {
     if (blender::animrig::bone_is_visible(arm, pchan)) {
-      pchan->flag |= POSE_SELECTED;
+      pchan->flag |= POSE_SELECTED_ALL;
     }
     arm->act_bone = pchan->bone;
   }
@@ -748,11 +754,11 @@ static void tree_element_strip_activate(bContext *C,
     }
     vse::deselect_all_strips(sequencer_scene);
 
-    if ((set == OL_SETSEL_EXTEND) && strip->flag & SELECT) {
-      strip->flag &= ~SELECT;
+    if ((set == OL_SETSEL_EXTEND) && strip->flag & SEQ_SELECT) {
+      strip->flag &= ~SEQ_SELECT;
     }
     else {
-      strip->flag |= SELECT;
+      strip->flag |= SEQ_SELECT;
       seq::select_active_set(sequencer_scene, strip);
     }
   }
@@ -1032,7 +1038,7 @@ static eOLDrawState tree_element_strip_state_get(const WorkSpace *workspace, con
   const Strip *strip = &te_strip->get_strip();
   const Editing *ed = seq::editing_get(sequencer_scene);
 
-  if (ed && ed->act_strip == strip && strip->flag & SELECT) {
+  if (ed && ed->act_strip == strip && strip->flag & SEQ_SELECT) {
     return OL_DRAWSEL_NORMAL;
   }
   return OL_DRAWSEL_NONE;
@@ -1042,7 +1048,7 @@ static eOLDrawState tree_element_strip_dup_state_get(const TreeElement *te)
 {
   const TreeElementStripDuplicate *te_dup = tree_element_cast<TreeElementStripDuplicate>(te);
   const Strip *strip = &te_dup->get_strip();
-  if (strip->flag & SELECT) {
+  if (strip->flag & SEQ_SELECT) {
     return OL_DRAWSEL_NORMAL;
   }
   return OL_DRAWSEL_NONE;
@@ -1788,7 +1794,7 @@ static wmOperatorStatus outliner_item_do_activate_from_cursor(bContext *C,
   float view_mval[2];
   bool changed = false, rebuild_tree = false;
 
-  UI_view2d_region_to_view(&region->v2d, mval[0], mval[1], &view_mval[0], &view_mval[1]);
+  ui::view2d_region_to_view(&region->v2d, mval[0], mval[1], &view_mval[0], &view_mval[1]);
 
   if (outliner_is_co_within_restrict_columns(space_outliner, region, view_mval[0])) {
     return OPERATOR_CANCELLED;
@@ -1980,7 +1986,7 @@ static wmOperatorStatus outliner_box_select_exec(bContext *C, wmOperator *op)
   }
 
   WM_operator_properties_border_to_rctf(op, &rectf);
-  UI_view2d_region_to_view_rctf(&region->v2d, &rectf, &rectf);
+  ui::view2d_region_to_view_rctf(&region->v2d, &rectf, &rectf);
 
   outliner_box_select(C, space_outliner, &rectf, select);
 
@@ -2004,7 +2010,7 @@ static wmOperatorStatus outliner_box_select_invoke(bContext *C,
 
   int mval[2];
   WM_event_drag_start_mval(event, region, mval);
-  UI_view2d_region_to_view(&region->v2d, mval[0], mval[1], &view_mval[0], &view_mval[1]);
+  ui::view2d_region_to_view(&region->v2d, mval[0], mval[1], &view_mval[0], &view_mval[1]);
 
   /* Find element clicked on */
   TreeElement *te = outliner_find_item_at_y(space_outliner, &space_outliner->tree, view_mval[1]);

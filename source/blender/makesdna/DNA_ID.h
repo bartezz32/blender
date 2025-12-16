@@ -553,7 +553,9 @@ typedef struct Library {
 
   /** Flags defining specific characteristics of a library. See #LibraryFlag. */
   uint16_t flag;
-  char _pad[6];
+  /** #LibraryRuntime::tag need to be preserved in undo (memfile) case (#eLibrary_Tag). */
+  uint16_t undo_runtime_tag;
+  char _pad[4];
 
   /**
    * For archive library only (#LIBRARY_FLAG_IS_ARCHIVE): The main library owning it.
@@ -563,7 +565,7 @@ typedef struct Library {
   struct Library *archive_parent_library;
 
   /**
-   * Packed blendfile of the library, nullptr if not packed.
+   * Packed blend-file of the library, nullptr if not packed.
    *
    * \note Individual IDs may be packed even if the entire library is not packed.
    *
@@ -1041,9 +1043,15 @@ enum {
  * either have of very short lifetime (not expected to exist across undo steps), or are info that
  * will be re-generated when reading undo steps.
  *
+ * Linked/local tags also need to be preserved, since the addition of more complex 'linked data'
+ * modes & handlings (e.g. packed linked data are handled like local IDs when it comes to
+ * read/write of blend-files).
+ *
  * However a few of these need to be explicitly preserved across undo steps.
  */
-#define ID_TAG_KEEP_ON_UNDO (ID_TAG_EXTRAUSER | ID_TAG_MISSING | ID_TAG_RUNTIME)
+#define ID_TAG_KEEP_ON_UNDO \
+  (ID_TAG_EXTRAUSER | ID_TAG_MISSING | ID_TAG_RUNTIME | ID_TAG_LOCAL | ID_TAG_EXTERN | \
+   ID_TAG_INDIRECT)
 
 /* Tag given ID for an update in all the dependency graphs. */
 typedef enum IDRecalcFlag {

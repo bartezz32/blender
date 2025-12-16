@@ -66,7 +66,6 @@
 
 #include "SEQ_sequencer.hh"
 #include "SEQ_sound.hh"
-#include "SEQ_time.hh"
 
 #include "CLG_log.h"
 
@@ -841,8 +840,8 @@ void *BKE_sound_scene_add_scene_sound_defaults(Scene *scene, Strip *strip)
 {
   return BKE_sound_scene_add_scene_sound(scene,
                                          strip,
-                                         blender::seq::time_left_handle_frame_get(scene, strip),
-                                         blender::seq::time_right_handle_frame_get(scene, strip),
+                                         strip->left_handle(),
+                                         strip->right_handle(scene),
                                          strip->startofs + strip->anim_startofs);
 }
 
@@ -875,8 +874,8 @@ void *BKE_sound_add_scene_sound_defaults(Scene *scene, Strip *strip)
 {
   return BKE_sound_add_scene_sound(scene,
                                    strip,
-                                   blender::seq::time_left_handle_frame_get(scene, strip),
-                                   blender::seq::time_right_handle_frame_get(scene, strip),
+                                   strip->left_handle(),
+                                   strip->right_handle(scene),
                                    strip->startofs + strip->anim_startofs);
 }
 
@@ -918,8 +917,8 @@ void BKE_sound_move_scene_sound_defaults(Scene *scene, Strip *strip)
     }
     BKE_sound_move_scene_sound(scene,
                                strip->runtime->scene_sound,
-                               blender::seq::time_left_handle_frame_get(scene, strip),
-                               blender::seq::time_right_handle_frame_get(scene, strip),
+                               strip->left_handle(),
+                               strip->right_handle(scene),
                                strip->startofs + strip->anim_startofs,
                                offset_time);
   }
@@ -1430,7 +1429,7 @@ bool BKE_sound_stream_info_get(Main *main,
 #  ifdef WITH_RUBBERBAND
 void *BKE_sound_ensure_time_stretch_effect(void *sound_handle, void *sequence_handle, float fps)
 {
-  /* If sequence handle is already the time stretch effect with the same framerate, use that. */
+  /* If sequence handle is already the time stretch effect with the same frame-rate, use that. */
   AUD_Sound *cur_seq_sound = sequence_handle ? AUD_SequenceEntry_getSound(sequence_handle) :
                                                nullptr;
   if (AUD_Sound_isAnimateableTimeStretchPitchScale(cur_seq_sound) &&

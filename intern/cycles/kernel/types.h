@@ -182,7 +182,6 @@ CCL_NAMESPACE_BEGIN
 #define __RAY_DIFFERENTIALS__
 #define __SHADER_RAYTRACE__
 #define __SHADOW_CATCHER__
-#define __SHADOW_RECORD_ALL__
 #define __SUBSURFACE__
 #define __SVM__
 #define __TRANSPARENT_SHADOWS__
@@ -225,7 +224,6 @@ CCL_NAMESPACE_BEGIN
 #    undef __VOLUME__
 #    if !(__KERNEL_FEATURES__ & KERNEL_FEATURE_TRANSPARENT)
 #      undef __TRANSPARENT_SHADOWS__
-#      undef __SHADOW_RECORD_ALL__
 #    endif
 #  endif
 #  if !(__KERNEL_FEATURES__ & KERNEL_FEATURE_SUBSURFACE)
@@ -441,10 +439,11 @@ enum PathRayFlag : uint32_t {
   PATH_RAY_SHADOW_CATCHER_BACKGROUND = (1U << 31U),
 
   /* TODO(weizhen): should add another flag to record only the primary scatter, but then we need to
-     change the flag to 64 bits or split path_flags in two. Right now we also write volume scatter
-     if the primary hit is surface, but that seems fine. */
+   * change the flag to 64 bits or split path_flags in two. Right now we also write volume scatter
+   * if the primary hit is surface, but that seems fine. */
+
   /* Volume scattering probability guiding. This flag is added to path where the primary ray passed
-     through the volume without scattering. */
+   * through the volume without scattering. */
   PATH_RAY_VOLUME_PRIMARY_TRANSMIT = (1U << 23U),
 };
 
@@ -1058,6 +1057,8 @@ enum ShaderDataFlag {
 
   /* If Light Path Node is present in the shader graph. */
   SD_HAS_LIGHT_PATH_NODE = (1 << 13),
+  /* Has bump mapping from BSDF connected to surface socket. */
+  SD_HAS_BUMP_FROM_SURFACE = (1 << 14),
   /* Apply a correction term to smooth illumination on grazing angles when using bump mapping. */
   SD_USE_BUMP_MAP_CORRECTION = (1 << 15),
   /* Use front side for direct light sampling. */
@@ -1078,8 +1079,9 @@ enum ShaderDataFlag {
   SD_VOLUME_MIS = (1 << 23),
   /* Use cubic interpolation for voxels. */
   SD_VOLUME_CUBIC = (1 << 24),
-  /* Has data connected to the displacement input or uses bump map. */
-  SD_HAS_BUMP = (1 << 25),
+  /* Has bump mapping from the displacement socket. */
+  SD_HAS_BUMP_FROM_DISPLACEMENT = (1 << 25),
+  SD_HAS_BUMP = (SD_HAS_BUMP_FROM_DISPLACEMENT | SD_HAS_BUMP_FROM_SURFACE),
   /* Has true displacement. */
   SD_HAS_DISPLACEMENT = (1 << 26),
   /* Has constant emission (value stored in __shaders) */

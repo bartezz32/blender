@@ -12,7 +12,9 @@
 #include "GEO_reverse_uv_sampler.hh"
 
 struct Mesh;
-struct KDTree_3d;
+namespace blender {
+template<int DimsNum> struct KDTree;
+}  // namespace blender
 
 namespace blender::geometry {
 
@@ -42,7 +44,7 @@ struct AddCurvesOnMeshInputs {
    * KD-Tree that contains the root points of existing curves. This is only necessary when
    * interpolation is used.
    */
-  KDTree_3d *old_roots_kdtree = nullptr;
+  KDTree<3> *old_roots_kdtree = nullptr;
 
   bool r_uv_error = false;
 };

@@ -25,6 +25,7 @@
 #include "DNA_listBase.h"
 
 #include "BLI_compiler_attrs.h"
+#include "BLI_map.hh"
 #include "BLI_math_matrix_types.hh"
 #include "BLI_set.hh"
 #include "BLI_sys_types.h"
@@ -127,7 +128,7 @@ struct MainIDRelations {
    * Mapping from an ID pointer to all of its parents (IDs using it) and children (IDs it uses).
    * Values are `MainIDRelationsEntry` pointers.
    */
-  GHash *relations_from_pointers;
+  blender::Map<const ID *, MainIDRelationsEntry *> *relations_from_pointers;
   /* NOTE: we could add more mappings when needed (e.g. from session uid?). */
 
   short flag;
@@ -142,16 +143,16 @@ enum {
 };
 
 struct MainColorspace {
-  /*
-   * File working colorspace for all scene linear colors.
+  /**
+   * File working color-space for all scene linear colors.
    * The name is only for the user interface and is not a unique identifier, the matrix is
-   * the XYZ colorspace is the source of truth.
+   * the XYZ color-space is the source of truth.
    * */
   char scene_linear_name[64 /*MAX_COLORSPACE_NAME*/] = "";
   blender::float3x3 scene_linear_to_xyz = blender::float3x3::zero();
 
-  /*
-   * A colorspace, view or display was not found, which likely means the OpenColorIO config
+  /**
+   * A color-space, view or display was not found, which likely means the OpenColorIO config
    * used to create this blend file is missing.
    */
   bool is_missing_opencolorio_config = false;
@@ -162,6 +163,11 @@ struct Main : blender::NonCopyable, blender::NonMovable {
    * Runtime vector storing all split Mains (one Main for each library data), during readfile or
    * linking process.
    * Shared across all of the split mains when defined.
+   *
+   * \note The order stability properties of #VectorSet elements is used in readfile code (in
+   * particular during memfile/undo reading), to ensure that the local Main is always the first
+   * item, even once library ones are moved between the old and new Mains (see also
+   * #read_undo_move_libmain_data).
    */
   std::shared_ptr<blender::VectorSet<Main *>> split_mains = {};
   /**
@@ -268,8 +274,8 @@ struct Main : blender::NonCopyable, blender::NonMovable {
    */
   Library *curlib = nullptr;
 
-  /*
-   * Colorspace information for this file.
+  /**
+   * Color-space information for this file.
    */
   MainColorspace colorspace;
 
@@ -667,9 +673,11 @@ MainListsArray BKE_main_lists_get(Main &bmain);
   ((main)->versionfile < (ver) || \
    ((main)->versionfile == (ver) && (main)->subversionfile <= (subver)))
 
-/* NOTE: in case versionfile is 0, this check is invalid, always return false then. This happens
+/**
+ * \note in case `versionfile` is 0, this check is invalid, always return false then. This happens
  * typically when a library is missing, by definition its data (placeholder IDs) does not need
- * versionning anyway then. */
+ * versioning anyway then.
+ */
 #define LIBRARY_VERSION_FILE_ATLEAST(lib, ver, subver) \
   ((lib)->runtime->versionfile == 0 || (lib)->runtime->versionfile > (ver) || \
    ((lib)->runtime->versionfile == (ver) && (lib)->runtime->subversionfile >= (subver)))

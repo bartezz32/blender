@@ -320,6 +320,12 @@ typedef enum eNodeSocketDatatype {
   SOCK_MATRIX = 16,
   SOCK_BUNDLE = 17,
   SOCK_CLOSURE = 18,
+  SOCK_FONT = 19,
+  SOCK_SCENE = 20,
+  /** Has _ID suffix to avoid using it instead of SOCK_STRING accidentally. */
+  SOCK_TEXT_ID = 21,
+  SOCK_MASK = 22,
+  SOCK_SOUND = 23,
 } eNodeSocketDatatype;
 
 /** Socket shape. */
@@ -1039,6 +1045,26 @@ typedef struct bNodeSocketValueMaterial {
   struct Material *value;
 } bNodeSocketValueMaterial;
 
+typedef struct bNodeSocketValueFont {
+  struct VFont *value;
+} bNodeSocketValueFont;
+
+typedef struct bNodeSocketValueScene {
+  struct Scene *value;
+} bNodeSocketValueScene;
+
+typedef struct bNodeSocketValueText {
+  struct Text *value;
+} bNodeSocketValueText;
+
+typedef struct bNodeSocketValueMask {
+  struct Mask *value;
+} bNodeSocketValueMask;
+
+typedef struct bNodeSocketValueSound {
+  struct bSound *value;
+} bNodeSocketValueSound;
+
 typedef struct bNodeSocketValueMenu {
   /* Default input enum identifier. */
   int value;
@@ -1054,6 +1080,8 @@ typedef struct bNodeSocketValueMenu {
 
 typedef struct GeometryNodeAssetTraits {
   int flag;
+  char _pad[4];
+  char *node_tool_idname;
 } GeometryNodeAssetTraits;
 
 typedef enum GeometryNodeAssetTraitFlag {
@@ -3360,6 +3388,7 @@ typedef enum GeometryNodeMergeByDistanceMode {
 typedef enum GeometryNodeUVUnwrapMethod {
   GEO_NODE_UV_UNWRAP_METHOD_ANGLE_BASED = 0,
   GEO_NODE_UV_UNWRAP_METHOD_CONFORMAL = 1,
+  GEO_NODE_UV_UNWRAP_METHOD_MINIMUM_STRETCH = 2,
 } GeometryNodeUVUnwrapMethod;
 
 typedef enum GeometryNodeRealizeInstanceFlag {

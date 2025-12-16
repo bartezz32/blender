@@ -25,7 +25,6 @@ struct PointerRNA;
 struct Scene;
 struct SpaceLink;
 struct SpaceType;
-struct uiBlock;
 struct uiList;
 struct uiListType;
 struct wmDrawBuffer;
@@ -165,7 +164,6 @@ enum LayoutPanelStateFlag {
   LAYOUT_PANEL_STATE_FLAG_OPEN = (1 << 0),
 };
 
-/** The part from uiBlock that needs saved in file. */
 typedef struct Panel {
   struct Panel *next, *prev;
 
@@ -284,9 +282,6 @@ typedef struct uiListDyn {
   int visual_height;
   /** Minimal visual height of the list (in rows). */
   int visual_height_min;
-
-  /** Number of columns drawn for grid layouts. */
-  int columns;
 
   /** Number of items in collection. */
   int items_len;
@@ -489,6 +484,8 @@ typedef struct ScrArea {
   /** Non-NULL if this area is global. */
   ScrGlobalAreaData *global;
 
+  float quadview_ratio[2];
+
   /**
    * #SpaceLink.
    * A list of space links (editors) that were open in this area before. When
@@ -661,7 +658,6 @@ enum {
 enum {
   UILST_LAYOUT_DEFAULT = 0,
   UILST_LAYOUT_COMPACT = 1,
-  UILST_LAYOUT_BIG_PREVIEW_GRID = 3,
 };
 
 /** #uiList.flag */
@@ -741,9 +737,6 @@ typedef enum eRegion_Type {
 
 /** Use for function args. */
 #define RGN_TYPE_ANY -1
-
-/** Region supports panel tabs (categories). */
-#define RGN_TYPE_HAS_CATEGORY_MASK (1 << RGN_TYPE_UI)
 
 /** Check for any kind of header region. */
 #define RGN_TYPE_IS_HEADER_ANY(regiontype) \

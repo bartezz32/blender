@@ -288,12 +288,12 @@ static void mesh_merge_transform(Mesh *result,
   int *index_orig;
   int i;
   int2 *edge;
-  const blender::Span<int> cap_face_offsets = cap_mesh->face_offsets();
-  blender::MutableSpan<float3> result_positions = result->vert_positions_for_write();
-  blender::MutableSpan<int2> result_edges = result->edges_for_write();
-  blender::MutableSpan<int> result_face_offsets = result->face_offsets_for_write();
-  blender::MutableSpan<int> result_corner_verts = result->corner_verts_for_write();
-  blender::MutableSpan<int> result_corner_edges = result->corner_edges_for_write();
+  const Span<int> cap_face_offsets = cap_mesh->face_offsets();
+  MutableSpan<float3> result_positions = result->vert_positions_for_write();
+  MutableSpan<int2> result_edges = result->edges_for_write();
+  MutableSpan<int> result_face_offsets = result->face_offsets_for_write();
+  MutableSpan<int> result_corner_verts = result->corner_verts_for_write();
+  MutableSpan<int> result_corner_edges = result->corner_edges_for_write();
   bke::MutableAttributeAccessor result_attributes = result->attributes_for_write();
 
   bke::LegacyMeshInterpolator vert_interp(*cap_mesh, *result, bke::AttrDomain::Point);
@@ -564,11 +564,11 @@ static Mesh *arrayModifier_doArray(ArrayModifierData *amd,
   /* Initialize a result dm */
   result = BKE_mesh_new_nomain_from_template(
       mesh, result_nverts, result_nedges, result_nfaces, result_nloops);
-  blender::MutableSpan<float3> result_positions = result->vert_positions_for_write();
-  blender::MutableSpan<int2> result_edges = result->edges_for_write();
-  blender::MutableSpan<int> result_face_offsets = result->face_offsets_for_write();
-  blender::MutableSpan<int> result_corner_verts = result->corner_verts_for_write();
-  blender::MutableSpan<int> result_corner_edges = result->corner_edges_for_write();
+  MutableSpan<float3> result_positions = result->vert_positions_for_write();
+  MutableSpan<int2> result_edges = result->edges_for_write();
+  MutableSpan<int> result_face_offsets = result->face_offsets_for_write();
+  MutableSpan<int> result_corner_verts = result->corner_verts_for_write();
+  MutableSpan<int> result_corner_edges = result->corner_edges_for_write();
   bke::MutableAttributeAccessor result_attributes = result->attributes_for_write();
 
   if (use_merge) {
@@ -594,7 +594,7 @@ static Mesh *arrayModifier_doArray(ArrayModifierData *amd,
   first_chunk_nverts = chunk_nverts;
 
   unit_m4(current_offset);
-  blender::Span<blender::float3> src_vert_normals;
+  Span<blender::float3> src_vert_normals;
   Vector<float3> dst_vert_normals;
   if (!use_recalc_normals) {
     src_vert_normals = mesh->vert_normals();
@@ -901,24 +901,24 @@ static bool is_disabled(const Scene * /*scene*/, ModifierData *md, bool /*use_re
 
 static void panel_draw(const bContext * /*C*/, Panel *panel)
 {
-  uiLayout *layout = panel->layout;
+  ui::Layout &layout = *panel->layout;
 
   PointerRNA ob_ptr;
   PointerRNA *ptr = modifier_panel_get_property_pointers(panel, &ob_ptr);
 
-  layout->use_property_split_set(true);
+  layout.use_property_split_set(true);
 
-  layout->prop(ptr, "fit_type", UI_ITEM_NONE, std::nullopt, ICON_NONE);
+  layout.prop(ptr, "fit_type", UI_ITEM_NONE, std::nullopt, ICON_NONE);
 
   int fit_type = RNA_enum_get(ptr, "fit_type");
   if (fit_type == MOD_ARR_FIXEDCOUNT) {
-    layout->prop(ptr, "count", UI_ITEM_NONE, std::nullopt, ICON_NONE);
+    layout.prop(ptr, "count", UI_ITEM_NONE, std::nullopt, ICON_NONE);
   }
   else if (fit_type == MOD_ARR_FITLENGTH) {
-    layout->prop(ptr, "fit_length", UI_ITEM_NONE, std::nullopt, ICON_NONE);
+    layout.prop(ptr, "fit_length", UI_ITEM_NONE, std::nullopt, ICON_NONE);
   }
   else if (fit_type == MOD_ARR_FITCURVE) {
-    layout->prop(ptr, "curve", UI_ITEM_NONE, std::nullopt, ICON_NONE);
+    layout.prop(ptr, "curve", UI_ITEM_NONE, std::nullopt, ICON_NONE);
   }
 
   modifier_error_message_draw(layout, ptr);
@@ -926,48 +926,48 @@ static void panel_draw(const bContext * /*C*/, Panel *panel)
 
 static void relative_offset_header_draw(const bContext * /*C*/, Panel *panel)
 {
-  uiLayout *layout = panel->layout;
+  ui::Layout &layout = *panel->layout;
 
   PointerRNA *ptr = modifier_panel_get_property_pointers(panel, nullptr);
 
-  layout->prop(ptr, "use_relative_offset", UI_ITEM_NONE, std::nullopt, ICON_NONE);
+  layout.prop(ptr, "use_relative_offset", UI_ITEM_NONE, std::nullopt, ICON_NONE);
 }
 
 static void relative_offset_draw(const bContext * /*C*/, Panel *panel)
 {
-  uiLayout *layout = panel->layout;
+  ui::Layout &layout = *panel->layout;
 
   PointerRNA *ptr = modifier_panel_get_property_pointers(panel, nullptr);
 
-  layout->use_property_split_set(true);
+  layout.use_property_split_set(true);
 
-  uiLayout *col = &layout->column(false);
+  ui::Layout &col = layout.column(false);
 
-  col->active_set(RNA_boolean_get(ptr, "use_relative_offset"));
-  col->prop(ptr, "relative_offset_displace", UI_ITEM_NONE, IFACE_("Factor"), ICON_NONE);
+  col.active_set(RNA_boolean_get(ptr, "use_relative_offset"));
+  col.prop(ptr, "relative_offset_displace", UI_ITEM_NONE, IFACE_("Factor"), ICON_NONE);
 }
 
 static void constant_offset_header_draw(const bContext * /*C*/, Panel *panel)
 {
-  uiLayout *layout = panel->layout;
+  ui::Layout &layout = *panel->layout;
 
   PointerRNA *ptr = modifier_panel_get_property_pointers(panel, nullptr);
 
-  layout->prop(ptr, "use_constant_offset", UI_ITEM_NONE, std::nullopt, ICON_NONE);
+  layout.prop(ptr, "use_constant_offset", UI_ITEM_NONE, std::nullopt, ICON_NONE);
 }
 
 static void constant_offset_draw(const bContext * /*C*/, Panel *panel)
 {
-  uiLayout *layout = panel->layout;
+  ui::Layout &layout = *panel->layout;
 
   PointerRNA *ptr = modifier_panel_get_property_pointers(panel, nullptr);
 
-  layout->use_property_split_set(true);
+  layout.use_property_split_set(true);
 
-  uiLayout *col = &layout->column(false);
+  ui::Layout &col = layout.column(false);
 
-  col->active_set(RNA_boolean_get(ptr, "use_constant_offset"));
-  col->prop(ptr, "constant_offset_displace", UI_ITEM_NONE, IFACE_("Distance"), ICON_NONE);
+  col.active_set(RNA_boolean_get(ptr, "use_constant_offset"));
+  col.prop(ptr, "constant_offset_displace", UI_ITEM_NONE, IFACE_("Distance"), ICON_NONE);
 }
 
 /**
@@ -975,77 +975,75 @@ static void constant_offset_draw(const bContext * /*C*/, Panel *panel)
  */
 static void object_offset_header_draw(const bContext * /*C*/, Panel *panel)
 {
-  uiLayout *layout = panel->layout;
+  ui::Layout &layout = *panel->layout;
 
   PointerRNA *ptr = modifier_panel_get_property_pointers(panel, nullptr);
 
-  layout->prop(ptr, "use_object_offset", UI_ITEM_NONE, std::nullopt, ICON_NONE);
+  layout.prop(ptr, "use_object_offset", UI_ITEM_NONE, std::nullopt, ICON_NONE);
 }
 
 static void object_offset_draw(const bContext * /*C*/, Panel *panel)
 {
-  uiLayout *layout = panel->layout;
+  ui::Layout &layout = *panel->layout;
 
   PointerRNA *ptr = modifier_panel_get_property_pointers(panel, nullptr);
 
-  layout->use_property_split_set(true);
+  layout.use_property_split_set(true);
 
-  uiLayout *col = &layout->column(false);
+  ui::Layout &col = layout.column(false);
 
-  col->active_set(RNA_boolean_get(ptr, "use_object_offset"));
-  col->prop(ptr, "offset_object", UI_ITEM_NONE, IFACE_("Object"), ICON_NONE);
+  col.active_set(RNA_boolean_get(ptr, "use_object_offset"));
+  col.prop(ptr, "offset_object", UI_ITEM_NONE, IFACE_("Object"), ICON_NONE);
 }
 
 static void symmetry_panel_header_draw(const bContext * /*C*/, Panel *panel)
 {
-  uiLayout *layout = panel->layout;
+  ui::Layout &layout = *panel->layout;
 
   PointerRNA *ptr = modifier_panel_get_property_pointers(panel, nullptr);
 
-  layout->prop(ptr, "use_merge_vertices", UI_ITEM_NONE, IFACE_("Merge"), ICON_NONE);
+  layout.prop(ptr, "use_merge_vertices", UI_ITEM_NONE, IFACE_("Merge"), ICON_NONE);
 }
 
 static void symmetry_panel_draw(const bContext * /*C*/, Panel *panel)
 {
-  uiLayout *layout = panel->layout;
+  ui::Layout &layout = *panel->layout;
 
   PointerRNA *ptr = modifier_panel_get_property_pointers(panel, nullptr);
 
-  layout->use_property_split_set(true);
+  layout.use_property_split_set(true);
 
-  uiLayout *col = &layout->column(false);
-  col->active_set(RNA_boolean_get(ptr, "use_merge_vertices"));
-  col->prop(ptr, "merge_threshold", UI_ITEM_NONE, IFACE_("Distance"), ICON_NONE);
-  col->prop(
+  ui::Layout &col = layout.column(false);
+  col.active_set(RNA_boolean_get(ptr, "use_merge_vertices"));
+  col.prop(ptr, "merge_threshold", UI_ITEM_NONE, IFACE_("Distance"), ICON_NONE);
+  col.prop(
       ptr, "use_merge_vertices_cap", UI_ITEM_NONE, IFACE_("First and Last Copies"), ICON_NONE);
 }
 
 static void uv_panel_draw(const bContext * /*C*/, Panel *panel)
 {
-  uiLayout *col;
-  uiLayout *layout = panel->layout;
+  ui::Layout &layout = *panel->layout;
 
   PointerRNA *ptr = modifier_panel_get_property_pointers(panel, nullptr);
 
-  layout->use_property_split_set(true);
+  layout.use_property_split_set(true);
 
-  col = &layout->column(true);
-  col->prop(ptr, "offset_u", UI_ITEM_R_EXPAND, IFACE_("Offset U"), ICON_NONE);
-  col->prop(ptr, "offset_v", UI_ITEM_R_EXPAND, IFACE_("V"), ICON_NONE);
+  ui::Layout &col = layout.column(true);
+  col.prop(ptr, "offset_u", ui::ITEM_R_EXPAND, IFACE_("Offset U"), ICON_NONE);
+  col.prop(ptr, "offset_v", ui::ITEM_R_EXPAND, IFACE_("V"), ICON_NONE);
 }
 
 static void caps_panel_draw(const bContext * /*C*/, Panel *panel)
 {
-  uiLayout *col;
-  uiLayout *layout = panel->layout;
+  ui::Layout &layout = *panel->layout;
 
   PointerRNA *ptr = modifier_panel_get_property_pointers(panel, nullptr);
 
-  layout->use_property_split_set(true);
+  layout.use_property_split_set(true);
 
-  col = &layout->column(false);
-  col->prop(ptr, "start_cap", UI_ITEM_NONE, IFACE_("Cap Start"), ICON_NONE);
-  col->prop(ptr, "end_cap", UI_ITEM_NONE, IFACE_("End"), ICON_NONE);
+  ui::Layout &col = layout.column(false);
+  col.prop(ptr, "start_cap", UI_ITEM_NONE, IFACE_("Cap Start"), ICON_NONE);
+  col.prop(ptr, "end_cap", UI_ITEM_NONE, IFACE_("End"), ICON_NONE);
 }
 
 static void panel_register(ARegionType *region_type)

@@ -325,6 +325,7 @@ set(GLSL_SRC
   engines/eevee/shaders/infos/eevee_deferred_infos.hh
   engines/eevee/shaders/infos/eevee_depth_of_field_infos.hh
   engines/eevee/shaders/infos/eevee_film_infos.hh
+  engines/eevee/shaders/infos/eevee_forward_infos.hh
   engines/eevee/shaders/infos/eevee_fullscreen_infos.hh
   engines/eevee/shaders/infos/eevee_geom_infos.hh
   engines/eevee/shaders/infos/eevee_hiz_infos.hh
@@ -579,6 +580,7 @@ set(GLSL_SRC
   engines/eevee/shaders/eevee_surfel_ray_comp.glsl
   engines/eevee/shaders/eevee_thickness_lib.glsl
   engines/eevee/shaders/eevee_transparency_lib.glsl
+  engines/eevee/shaders/eevee_transparency_resolve_frag.glsl
   engines/eevee/shaders/eevee_utility_tx_lib.glsl
   engines/eevee/shaders/eevee_velocity_lib.glsl
   engines/eevee/shaders/eevee_vertex_copy_comp.glsl
@@ -791,7 +793,6 @@ set(GLSL_SRC
   engines/overlay/shaders/overlay_facing_frag.glsl
   engines/overlay/shaders/overlay_facing_vert.glsl
   engines/overlay/shaders/overlay_fullscreen_vert.glsl
-  engines/overlay/shaders/overlay_grid_background_frag.glsl
   engines/overlay/shaders/overlay_grid_frag.glsl
   engines/overlay/shaders/overlay_grid_vert.glsl
   engines/overlay/shaders/overlay_image_frag.glsl
@@ -952,18 +953,29 @@ if(WITH_GTESTS)
     set(TEST_SRC
       tests/draw_curves_test.cc
       tests/draw_pass_test.cc
-      tests/draw_testing.cc
       tests/eevee_test.cc
 
       tests/draw_testing.hh
     )
     set(TEST_INC
+      ${INC}
       ../../../intern/ghost
       ../gpu/tests
     )
     set(TEST_LIB
-      gpu_tests
+      ${LIB}
     )
-    blender_add_test_suite_lib(draw "${TEST_SRC}" "${INC};${TEST_INC}" "${INC_SYS}" "${LIB};${TEST_LIB}")
+    set(TEST_COMMON_SRC
+      tests/draw_testing.cc
+    )
+    if(NOT WITH_TESTS_SINGLE_BINARY)
+      list(APPEND TEST_COMMON_SRC
+        ../gpu/tests/gpu_testing.cc
+        ../gpu/tests/gpu_testing.hh
+      )
+    else()
+      list(APPEND TEST_LIB gpu_tests)
+    endif()
+    blender_add_test_suite_lib(draw "${TEST_SRC}" "${TEST_INC}" "${INC_SYS}" "${TEST_LIB}" "${TEST_COMMON_SRC}")
   endif()
 endif()

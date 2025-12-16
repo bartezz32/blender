@@ -28,7 +28,6 @@
 #include "SEQ_relations.hh"
 #include "SEQ_sequencer.hh"
 #include "SEQ_thumbnail_cache.hh"
-#include "SEQ_time.hh"
 #include "SEQ_utils.hh"
 
 #include "cache/final_image_cache.hh"
@@ -127,11 +126,21 @@ bool evict_caches_if_full(Scene *scene)
   return !(evicted_final || evicted_source);
 }
 
+static void update_range_with_effects(const Scene *scene, const Strip *strip, int2 &r_range)
+{
+  r_range.x = std::min(r_range.x, strip->left_handle());
+  r_range.y = std::max(r_range.y, strip->right_handle(scene));
+  Span<Strip *> effects = SEQ_lookup_effects_by_strip(scene->ed, strip);
+  for (Strip *effect : effects) {
+    update_range_with_effects(scene, effect, r_range);
+  }
+}
+
 static void invalidate_final_cache_strip_range(Scene *scene, const Strip *strip)
 {
-  const int strip_left = time_left_handle_frame_get(scene, strip);
-  const int strip_right = time_right_handle_frame_get(scene, strip);
-  final_image_cache_invalidate_frame_range(scene, strip_left, strip_right);
+  int2 range{MAXFRAME, -MAXFRAME};
+  update_range_with_effects(scene, strip, range);
+  final_image_cache_invalidate_frame_range(scene, range.x, range.y);
 }
 
 static void invalidate_raw_cache_of_parent_meta(Scene *scene, Strip *strip)
@@ -147,6 +156,7 @@ static void invalidate_raw_cache_of_parent_meta(Scene *scene, Strip *strip)
 void relations_invalidate_cache_raw(Scene *scene, Strip *strip)
 {
   source_image_cache_invalidate_strip(scene, strip);
+  media_presence_invalidate_strip(scene, strip);
   relations_invalidate_cache(scene, strip);
 }
 
@@ -155,8 +165,6 @@ void relations_invalidate_cache(Scene *scene, Strip *strip)
   if (strip->effectdata && strip->type == STRIP_TYPE_SPEED) {
     strip_effect_speed_rebuild_map(scene, strip);
   }
-
-  media_presence_invalidate_strip(scene, strip);
 
   invalidate_final_cache_strip_range(scene, strip);
   intra_frame_cache_invalidate(scene, strip);
@@ -224,7 +232,7 @@ void relations_free_imbuf(Scene *scene, ListBase *seqbase, bool for_render)
   prefetch_stop(scene);
 
   LISTBASE_FOREACH (Strip *, strip, seqbase) {
-    if (for_render && time_strip_intersects_frame(scene, strip, scene->r.cfra)) {
+    if (for_render && strip->intersects_frame(scene, scene->r.cfra)) {
       continue;
     }
 
@@ -254,7 +262,7 @@ static void sequencer_all_free_anim_ibufs(const Scene *scene,
   Editing *ed = editing_get(scene);
   for (Strip *strip = static_cast<Strip *>(seqbase->first); strip != nullptr; strip = strip->next)
   {
-    if (!time_strip_intersects_frame(scene, strip, timeline_frame) ||
+    if (!strip->intersects_frame(scene, timeline_frame) ||
         !((frame_range[0] <= timeline_frame) && (frame_range[1] > timeline_frame)))
     {
       strip_free_movie_readers(strip);
@@ -269,8 +277,8 @@ static void sequencer_all_free_anim_ibufs(const Scene *scene,
       }
       else {
         /* Limit frame range to meta strip. */
-        meta_range[0] = max_ii(frame_range[0], time_left_handle_frame_get(scene, strip));
-        meta_range[1] = min_ii(frame_range[1], time_right_handle_frame_get(scene, strip));
+        meta_range[0] = max_ii(frame_range[0], strip->left_handle());
+        meta_range[1] = min_ii(frame_range[1], strip->right_handle(scene));
       }
 
       sequencer_all_free_anim_ibufs(scene, &strip->seqbase, timeline_frame, meta_range);
@@ -327,7 +335,7 @@ bool relations_check_scene_recursion(Scene *scene, ReportList *reports)
                 RPT_WARNING,
                 "Recursion detected in video sequencer. Strip %s at frame %d will not be rendered",
                 recursive_seq->name + 2,
-                time_left_handle_frame_get(scene, recursive_seq));
+                recursive_seq->left_handle());
 
     LISTBASE_FOREACH (Strip *, strip, &ed->seqbase) {
       if (strip->type != STRIP_TYPE_SCENE && sequencer_strip_generates_image(strip)) {

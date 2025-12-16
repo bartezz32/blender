@@ -150,7 +150,7 @@ bool ED_scene_replace_active_for_deletion(bContext &C, Main &bmain, Scene &scene
 
   /* In theory, the call to #WM_window_set_active_scene above should have handled this through
    * calls to #ED_screen_scene_change. But there can be unusual cases (e.g. on file opening in
-   * brackground mode) where the state of available Windows may prevent this from happening. */
+   * background mode) where the state of available Windows may prevent this from happening. */
   if (CTX_data_scene(&C) == &scene) {
 #ifdef WITH_PYTHON
     BPy_BEGIN_ALLOW_THREADS;
@@ -177,6 +177,11 @@ bool ED_scene_delete(bContext *C, Main *bmain, Scene *scene)
 void ED_scene_change_update(Main *bmain, Scene *scene, ViewLayer *layer)
 {
   Depsgraph *depsgraph = BKE_scene_ensure_depsgraph(bmain, scene, layer);
+  /* When switching to a scene for the first time after loading a file, the dependency graph above
+   * will not be active. This can cause issues (e.g. #151159) because there might be code running
+   * immediately after that expects this dependency graph to be active and then silently fail.
+   * Similar to #CTX_data_depsgraph_pointer. */
+  DEG_make_active(depsgraph);
 
   BKE_scene_set_background(bmain, scene);
   DEG_graph_relations_update(depsgraph);
@@ -429,7 +434,7 @@ static wmOperatorStatus new_sequencer_scene_exec(bContext *C, wmOperator *op)
    * new users to the VSE. For example, this prevents the case where attempting to change
    * resolution properties would have no effect.
    *
-   * FIXME: This logic is meant to address a temporary papercut and may be removed later in 5.1+
+   * FIXME: This logic is meant to address a temporary paper-cut and may be removed later in 5.1+
    * when properties for scenes and sequencer scenes can be more properly separated. */
   WM_window_set_active_scene(bmain, C, win, new_scene);
   BKE_reportf(

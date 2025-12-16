@@ -33,9 +33,8 @@
 
 #include "ED_undo.hh"
 
-using blender::StringRefNull;
-
-namespace blender::ui::light_linking {
+namespace blender::ui {
+namespace light_linking {
 
 namespace {
 
@@ -213,14 +212,14 @@ class ItemDragController : public AbstractViewItemDragController {
 };
 
 class CollectionViewItem : public BasicTreeViewItem {
-  uiLayout &context_layout_;
+  Layout &context_layout_;
   Collection &collection_;
 
   ID &id_;
   CollectionLightLinking &collection_light_linking_;
 
  public:
-  CollectionViewItem(uiLayout &context_layout,
+  CollectionViewItem(Layout &context_layout,
                      Collection &collection,
                      ID &id,
                      CollectionLightLinking &collection_light_linking,
@@ -233,7 +232,7 @@ class CollectionViewItem : public BasicTreeViewItem {
   {
   }
 
-  void build_row(uiLayout &row) override
+  void build_row(Layout &row) override
   {
     if (is_active()) {
       PointerRNA id_ptr = RNA_id_pointer_create(&id_);
@@ -245,10 +244,10 @@ class CollectionViewItem : public BasicTreeViewItem {
 
     add_label(row);
 
-    uiLayout *sub = &row.row(true);
-    sub->use_property_decorate_set(false);
+    Layout &sub = row.row(true);
+    sub.use_property_decorate_set(false);
 
-    build_state_button(*sub);
+    build_state_button(sub);
   }
 
   std::unique_ptr<AbstractViewItemDragController> create_drag_controller() const override
@@ -288,40 +287,40 @@ class CollectionViewItem : public BasicTreeViewItem {
     BLI_assert_unreachable();
   }
 
-  void build_state_button(uiLayout &row)
+  void build_state_button(Layout &row)
   {
-    uiBlock *block = row.block();
+    Block *block = row.block();
     const int icon = get_state_icon();
 
     PointerRNA collection_light_linking_ptr = RNA_pointer_create_discrete(
         &collection_.id, &RNA_CollectionLightLinking, &collection_light_linking_);
 
-    uiBut *button = uiDefIconButR(block,
-                                  ButType::But,
-                                  icon,
-                                  0,
-                                  0,
-                                  UI_UNIT_X,
-                                  UI_UNIT_Y,
-                                  &collection_light_linking_ptr,
-                                  "link_state",
-                                  0,
-                                  0.0f,
-                                  0.0f,
-                                  std::nullopt);
+    Button *button = uiDefIconButR(block,
+                                   ButtonType::But,
+                                   icon,
+                                   0,
+                                   0,
+                                   UI_UNIT_X,
+                                   UI_UNIT_Y,
+                                   &collection_light_linking_ptr,
+                                   "link_state",
+                                   0,
+                                   0.0f,
+                                   0.0f,
+                                   std::nullopt);
 
-    UI_but_func_set(button, [&collection_light_linking = collection_light_linking_](bContext &) {
+    button_func_set(button, [&collection_light_linking = collection_light_linking_](bContext &) {
       link_state_toggle(collection_light_linking);
     });
   }
 };
 
 class CollectionView : public AbstractTreeView {
-  uiLayout &context_layout_;
+  Layout &context_layout_;
   Collection &collection_;
 
  public:
-  CollectionView(uiLayout &context_layout, Collection &collection)
+  CollectionView(Layout &context_layout, Collection &collection)
       : context_layout_(context_layout), collection_(collection)
   {
   }
@@ -354,14 +353,13 @@ class CollectionView : public AbstractTreeView {
 };
 
 }  // namespace
+}  // namespace light_linking
 
-}  // namespace blender::ui::light_linking
-
-void uiTemplateLightLinkingCollection(uiLayout *layout,
-                                      bContext *C,
-                                      uiLayout *context_layout,
-                                      PointerRNA *ptr,
-                                      const StringRefNull propname)
+void template_light_linking_collection(Layout *layout,
+                                       bContext *C,
+                                       Layout *context_layout,
+                                       PointerRNA *ptr,
+                                       const StringRefNull propname)
 {
   if (!ptr->data) {
     return;
@@ -398,14 +396,16 @@ void uiTemplateLightLinkingCollection(uiLayout *layout,
 
   Collection *collection = static_cast<Collection *>(collection_ptr.data);
 
-  uiBlock *block = layout->block();
+  Block *block = layout->block();
 
-  blender::ui::AbstractTreeView *tree_view = UI_block_add_view(
+  AbstractTreeView *tree_view = block_add_view(
       *block,
       "Light Linking Collection Tree View",
-      std::make_unique<blender::ui::light_linking::CollectionView>(*context_layout, *collection));
+      std::make_unique<light_linking::CollectionView>(*context_layout, *collection));
   tree_view->set_context_menu_title("Light Linking");
   tree_view->set_default_rows(5);
 
-  blender::ui::TreeViewBuilder::build_tree_view(*C, *tree_view, *layout);
+  TreeViewBuilder::build_tree_view(*C, *tree_view, *layout);
 }
+
+}  // namespace blender::ui

@@ -145,6 +145,11 @@ void transform_snap_flag_from_modifiers_set(TransInfo *t)
                      (((t->modifiers & (MOD_SNAP | MOD_SNAP_INVERT)) == MOD_SNAP) ||
                       ((t->modifiers & (MOD_SNAP | MOD_SNAP_INVERT)) == MOD_SNAP_INVERT)),
                      SCE_SNAP);
+
+  /* Clear stale snap flags when snapping is disabled. */
+  if (!(t->tsnap.flag & SCE_SNAP)) {
+    t->tsnap.status &= ~(SNAP_TARGET_FOUND | SNAP_SOURCE_FOUND);
+  }
 }
 
 bool transform_snap_is_active(const TransInfo *t)
@@ -215,17 +220,17 @@ void drawSnapping(TransInfo *t)
   }
 
   if (t->spacetype == SPACE_SEQ) {
-    UI_GetThemeColor3ubv(TH_SEQ_ACTIVE, col);
+    ui::theme::get_color_3ubv(TH_SEQ_ACTIVE, col);
     col[3] = 128;
   }
   else if (t->spacetype != SPACE_IMAGE) {
-    UI_GetThemeColor3ubv(TH_TRANSFORM, col);
+    ui::theme::get_color_3ubv(TH_TRANSFORM, col);
     col[3] = 128;
 
-    UI_GetThemeColor3ubv(TH_SELECT, selectedCol);
+    ui::theme::get_color_3ubv(TH_SELECT, selectedCol);
     selectedCol[3] = 128;
 
-    UI_GetThemeColor3ubv(TH_ACTIVE, activeCol);
+    ui::theme::get_color_3ubv(TH_ACTIVE, activeCol);
     activeCol[3] = 192;
   }
 
@@ -239,7 +244,7 @@ void drawSnapping(TransInfo *t)
     if (!BLI_listbase_is_empty(&t->tsnap.points)) {
       /* Draw snap points. */
 
-      float size = 2.0f * UI_GetThemeValuef(TH_VERTEX_SIZE);
+      float size = 2.0f * blender::ui::theme::get_value_f(TH_VERTEX_SIZE);
       float view_inv[4][4];
       copy_m4_m4(view_inv, rv3d->viewinv);
 
@@ -302,8 +307,8 @@ void drawSnapping(TransInfo *t)
         t->tsnap.snap_target[0] / t->aspect[0],
         t->tsnap.snap_target[1] / t->aspect[1],
     };
-    UI_view2d_view_to_region_fl(&t->region->v2d, UNPACK2(snap_point), &x, &y);
-    float radius = 2.5f * UI_GetThemeValuef(TH_VERTEX_SIZE) * U.pixelsize;
+    blender::ui::view2d_view_to_region_fl(&t->region->v2d, UNPACK2(snap_point), &x, &y);
+    float radius = 2.5f * blender::ui::theme::get_value_f(TH_VERTEX_SIZE) * U.pixelsize;
 
     GPU_matrix_push_projection();
     wmOrtho2_region_pixelspace(t->region);
@@ -552,8 +557,9 @@ static bool transform_snap_mixed_is_active(const TransInfo *t)
   }
 
   return (t->tsnap.mode &
-          (SCE_SNAP_TO_VERTEX | SCE_SNAP_TO_EDGE | SCE_SNAP_TO_FACE | SCE_SNAP_TO_VOLUME |
-           SCE_SNAP_TO_EDGE_MIDPOINT | SCE_SNAP_TO_EDGE_PERPENDICULAR | SCE_SNAP_TO_GRID)) != 0;
+          (SCE_SNAP_TO_VERTEX | SCE_SNAP_TO_EDGE | SCE_SNAP_TO_FACE | SCE_SNAP_TO_FACE_MIDPOINT |
+           SCE_SNAP_TO_VOLUME | SCE_SNAP_TO_EDGE_MIDPOINT | SCE_SNAP_TO_EDGE_PERPENDICULAR |
+           SCE_SNAP_TO_GRID)) != 0;
 }
 
 void transform_snap_mixed_apply(TransInfo *t, float *vec)
@@ -729,15 +735,8 @@ static eSnapMode snap_mode_from_spacetype(TransInfo *t)
     if (t->options & (CTX_CAMERA | CTX_EDGE_DATA | CTX_PAINT_CURVE)) {
       return SCE_SNAP_TO_INCREMENT;
     }
-    eSnapMode snap_mode = eSnapMode(ts->snap_mode);
-    if (t->mode == TFM_TRANSLATION) {
-      /* Use grid-snap for absolute snap while translating, see: #147246. */
-      if ((snap_mode & SCE_SNAP_TO_INCREMENT) && (ts->snap_flag & SCE_SNAP_ABS_GRID)) {
-        snap_mode &= ~SCE_SNAP_TO_INCREMENT;
-        snap_mode |= SCE_SNAP_TO_GRID;
-      }
-    }
-    return snap_mode;
+
+    return eSnapMode(ts->snap_mode);
   }
 
   if (ELEM(t->spacetype, SPACE_ACTION, SPACE_NLA)) {

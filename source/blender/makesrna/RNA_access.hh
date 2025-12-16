@@ -33,7 +33,7 @@ struct Scene;
 struct bContext;
 
 /* Types */
-extern BlenderRNA BLENDER_RNA;
+BlenderRNA &RNA_blender_rna_get();
 
 /* Pointer
  *
@@ -156,7 +156,7 @@ bool RNA_struct_system_idprops_check(StructRNA *srna);
  * (e.g. by assigning an IDP_GROUP containing some IDP_ID pointers...).
  *
  * \note This is currently giving results for both user-defined and system-defined IDProperties,
- * there is no distinction for this between both storages.
+ * there is no distinction for this between both kinds of storage.
  */
 bool RNA_struct_idprops_contains_datablock(const StructRNA *type);
 /**
@@ -284,8 +284,9 @@ bool RNA_property_string_is_utf8(PropertyRNA *prop);
 
 const char *RNA_property_ui_name(const PropertyRNA *prop, const PointerRNA *ptr = nullptr);
 const char *RNA_property_ui_name_raw(const PropertyRNA *prop, const PointerRNA *ptr = nullptr);
-const char *RNA_property_ui_description(const PropertyRNA *prop);
-const char *RNA_property_ui_description_raw(const PropertyRNA *prop);
+const char *RNA_property_ui_description(const PropertyRNA *prop, const PointerRNA *ptr = nullptr);
+const char *RNA_property_ui_description_raw(const PropertyRNA *prop,
+                                            const PointerRNA *ptr = nullptr);
 const char *RNA_property_translation_context(const PropertyRNA *prop);
 int RNA_property_ui_icon(const PropertyRNA *prop);
 
@@ -588,8 +589,9 @@ PointerRNA RNA_property_pointer_get(PointerRNA *ptr, PropertyRNA *prop) ATTR_NON
  * Same as above, but never creates an empty IDPGroup property for Pointer runtime properties that
  * are not set yet.
  *
- * Ideally this should never be done ever, as it is intrisically not threadsafe, but for the time
- * being at least provide a way to avoid this bad behavior. */
+ * Ideally this should never be done ever, as it is intrinsically not thread-safe,
+ * but for the time being at least provide a way to avoid this bad behavior.
+ */
 PointerRNA RNA_property_pointer_get_never_create(PointerRNA *ptr, PropertyRNA *prop)
     ATTR_NONNULL(1, 2);
 void RNA_property_pointer_set(PointerRNA *ptr,

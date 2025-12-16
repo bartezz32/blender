@@ -26,10 +26,8 @@
 #  include "BKE_collection.hh"
 #  include "BKE_curve.hh"
 #  include "BKE_curves.h"
-#  include "BKE_displist.h"
 #  include "BKE_gpencil_legacy.h"
 #  include "BKE_grease_pencil.hh"
-#  include "BKE_icons.hh"
 #  include "BKE_idtype.hh"
 #  include "BKE_image.hh"
 #  include "BKE_lattice.hh"
@@ -39,11 +37,11 @@
 #  include "BKE_lightprobe.h"
 #  include "BKE_linestyle.h"
 #  include "BKE_main_invariants.hh"
-#  include "BKE_mask.h"
+#  include "BKE_mask.hh"
 #  include "BKE_material.hh"
 #  include "BKE_mball.hh"
 #  include "BKE_mesh.hh"
-#  include "BKE_movieclip.h"
+#  include "BKE_movieclip.hh"
 #  include "BKE_node.hh"
 #  include "BKE_object.hh"
 #  include "BKE_paint.hh"
@@ -56,7 +54,6 @@
 #  include "BKE_texture.h"
 #  include "BKE_vfont.hh"
 #  include "BKE_volume.hh"
-#  include "BKE_workspace.hh"
 #  include "BKE_world.h"
 
 #  include "DEG_depsgraph_build.hh"
@@ -91,7 +88,8 @@
 
 #  include "ED_node.hh"
 #  include "ED_scene.hh"
-#  include "ED_screen.hh"
+
+#  include "NOD_defaults.hh"
 
 #  include "BLT_translation.hh"
 
@@ -268,7 +266,7 @@ static Material *rna_Main_materials_new(Main *bmain, const char *name)
   Material *material = BKE_material_add(bmain, safe_name);
   id_us_min(&material->id);
 
-  ED_node_shader_default(nullptr, bmain, &material->id);
+  blender::nodes::node_tree_shader_default(nullptr, bmain, &material->id);
 
   WM_main_add_notifier(NC_ID | NA_ADDED, nullptr);
 
@@ -540,7 +538,7 @@ static World *rna_Main_worlds_new(Main *bmain, const char *name)
   World *world = BKE_world_add(bmain, safe_name);
   id_us_min(&world->id);
 
-  ED_node_shader_default(nullptr, bmain, &world->id);
+  blender::nodes::node_tree_shader_default(nullptr, bmain, &world->id);
 
   WM_main_add_notifier(NC_ID | NA_ADDED, nullptr);
 
