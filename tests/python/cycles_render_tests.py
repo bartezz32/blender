@@ -128,7 +128,16 @@ BLOCKLIST_GPU = [
 
 
 class CyclesReport(render_report.Report):
-    def __init__(self, title, test_dir_name, output_dir, oiiotool, device=None, blocklist=[], osl=False, ray_marching=False):
+    def __init__(
+            self,
+            title,
+            test_dir_name,
+            output_dir,
+            oiiotool,
+            device=None,
+            blocklist=[],
+            osl=False,
+            ray_marching=False):
         # Split device name in format "<device_type>[-<RT>]" into individual
         # tokens, setting the RT suffix to an empty string if its not specified.
         self.device, suffix = (device.split("-") + [""])[:2]
@@ -143,7 +152,6 @@ class CyclesReport(render_report.Report):
             variation += ' OSL'
         if ray_marching:
             variation += ' Ray Marching'
-
 
         # Use texture cache directory in output folder, and clear it to test auto generating.
         self.texture_cache_dir = Path(output_dir) / test_dir_name / "texture_cache"
@@ -160,7 +168,13 @@ class CyclesReport(render_report.Report):
             self.set_compare_engine('cycles', 'CPU')
 
     def _get_render_arguments(self, arguments_cb, filepath, base_output_filepath):
-        return arguments_cb(filepath, base_output_filepath, self.use_hwrt, self.osl, self.ray_marching, self.texture_cache_dir)
+        return arguments_cb(
+            filepath,
+            base_output_filepath,
+            self.use_hwrt,
+            self.osl,
+            self.ray_marching,
+            self.texture_cache_dir)
 
     def _get_arguments_suffix(self):
         return ['--', '--cycles-device', self.device] if self.device else []
@@ -240,7 +254,15 @@ def create_argparse():
 def test_volume_ray_marching(args, device, blocklist):
     # Default volume rendering algorithm is null scattering, but we also want to test ray marching
     test_dir_name = Path(args.testdir).name
-    report = CyclesReport('Cycles', test_dir_name, args.outdir, args.oiiotool, device, blocklist, args.osl == 'all', ray_marching=True)
+    report = CyclesReport(
+        'Cycles',
+        test_dir_name,
+        args.outdir,
+        args.oiiotool,
+        device,
+        blocklist,
+        args.osl == 'all',
+        ray_marching=True)
     report.set_reference_dir("cycles_ray_marching_renders")
     return report.run(args.testdir, args.blender, get_arguments, batch=args.batch)
 
@@ -275,7 +297,6 @@ def main():
     if device == 'METAL-RT':
         blocklist += BLOCKLIST_METAL
         blocklist += BLOCKLIST_METAL_RT
-
 
     test_dir_name = Path(args.testdir).name
     report = CyclesReport('Cycles', test_dir_name, args.outdir, args.oiiotool, device, blocklist, args.osl == 'all')
