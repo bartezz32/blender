@@ -377,8 +377,8 @@ bool OIIOImageLoader::load_pixels_tile(const ImageMetaData &metadata,
     return false;
   }
 
-  const int64_t width = divide_up(metadata.width, 1 << int64_t(miplevel));
-  const int64_t height = divide_up(metadata.height, 1 << int64_t(miplevel));
+  const int64_t width = divide_up(metadata.width, int64_t(1 << miplevel));
+  const int64_t height = divide_up(metadata.height, int64_t(1 << miplevel));
 
   /* Load center pixels. */
   bool ok = oiio_load_pixels_tile(file_handle_user.get(),
