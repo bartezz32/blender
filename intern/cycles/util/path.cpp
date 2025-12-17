@@ -453,22 +453,7 @@ string path_normalize(const string &path)
 
 bool path_is_relative(const string &path)
 {
-#ifdef _WIN32
-#  ifdef HAVE_SHLWAPI_H
-  return PathIsRelative(path.c_str());
-#  else  /* HAVE_SHLWAPI_H */
-  if (path.size() >= 3) {
-    return !(((path[0] >= 'a' && path[0] <= 'z') || (path[0] >= 'A' && path[0] <= 'Z')) &&
-             path[1] == ':' && path[2] == DIR_SEP);
-  }
-  return true;
-#  endif /* HAVE_SHLWAPI_H */
-#else    /* _WIN32 */
-  if (path.empty()) {
-    return true;
-  }
-  return path[0] != DIR_SEP;
-#endif   /* _WIN32 */
+  return std::filesystem::path(path).is_relative();
 }
 
 string path_make_relative(const string &path_, const string &base_)
