@@ -99,10 +99,8 @@ static void generate_texture_cache(Main *bmain,
 
     /* Handle each UDIM tile. */
     if (image->source == IMA_SRC_TILED) {
-      char file_name[FILE_MAX];
-      BLI_path_split_file_part(filepath, file_name, FILE_MAX);
       eUDIM_TILE_FORMAT tile_format = UDIM_TILE_FORMAT_NONE;
-      char *udim_pattern = BKE_image_get_tile_strformat(file_name, &tile_format);
+      char *udim_pattern = BKE_image_get_tile_strformat(filepath, &tile_format);
 
       if (tile_format != UDIM_TILE_FORMAT_NONE) {
         LISTBASE_FOREACH (ImageTile *, tile, &image->tiles) {
