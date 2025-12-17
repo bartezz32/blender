@@ -147,7 +147,7 @@ struct OSLTextureOptions {};
 
 enum class OSLTextureHandleType : unsigned int { IMAGE = 0, IES = 1, BEVEL = 2, AO = 3 };
 
-#define OSL_TEXTURE_HANDLE_ENCODE(type, slot) ((uintptr_t(type) << 32) | uintptr_t(slot))
+#define OSL_TEXTURE_HANDLE_ENCODE(type, slot) ((uintptr_t(type) << 32) | uintptr_t(uint(slot)))
 #define OSL_TEXTURE_HANDLE_TYPE(handle) OSLTextureHandleType(uintptr_t(handle) >> 32)
 #define OSL_TEXTURE_HANDLE_SLOT(handle) int(uint(uintptr_t(handle) & uintptr_t(0xFFFFFFFF)))
 
