@@ -104,11 +104,16 @@ kernel_image_tile_map(KernelGlobals kg,
   /* Select mipmap level. */
   float flevel = fast_log2f(sampledxy);
   if (sd->lcg_state != 0) {
+    /* For rounding instead of flooring. */
+    flevel += 0.5f;
     /* Randomize mip level, except for some cases like displacement or background. */
     /* TODO: What is the appropriate value here? Smaller means fewer tiles loaded but also
      * potential artifacts. */
     const float transition = 0.5f;
     flevel += (lcg_step_float(&sd->lcg_state) - 0.5f) * transition;
+  }
+  else {
+    /* When not using stochastic interpolation, round to higher level. */
   }
   const int level = clamp(int(flevel), 0, tex.tile_levels - 1);
 
