@@ -255,32 +255,36 @@ void ImageManager::load_image_metadata(ImageSingle *img, Progress &progress)
     return;
   }
 
-  /* Change image to use tx file if supported. */
-  /* TODO: Can we further delay auto generating until we are certain the image is used.
-   * On the other hand, shold we move this earlier so explicit use of the same tx file
-   * and source iamge is deduplicated? */
-  if (use_texture_cache) {
-    img->loader->resolve_texture_cache(auto_texture_cache,
-                                       texture_cache_path,
-                                       img->params.colorspace,
-                                       img->params.alpha_type,
-                                       progress);
-  }
+  /* Isolate threading since we are holding a mutex lock and resolving the texture
+   * cache may involve multithreaded auto generation. */
+  isolate_task([&]() {
+    /* Change image to use tx file if supported. */
+    /* TODO: Can we further delay auto generating until we are certain the image is used.
+     * On the other hand, shold we move this earlier so explicit use of the same tx file
+     * and source iamge is deduplicated? */
+    if (use_texture_cache) {
+      img->loader->resolve_texture_cache(auto_texture_cache,
+                                         texture_cache_path,
+                                         img->params.colorspace,
+                                         img->params.alpha_type,
+                                         progress);
+    }
 
-  ImageMetaData &metadata = img->metadata;
-  metadata = ImageMetaData();
-  metadata.colorspace = img->params.colorspace;
+    ImageMetaData &metadata = img->metadata;
+    metadata = ImageMetaData();
+    metadata.colorspace = img->params.colorspace;
 
-  if (img->loader->load_metadata(metadata)) {
-    assert(metadata.type != IMAGE_DATA_NUM_TYPES);
-  }
-  else {
-    metadata.type = IMAGE_DATA_TYPE_BYTE4;
-  }
+    if (img->loader->load_metadata(metadata)) {
+      assert(metadata.type != IMAGE_DATA_NUM_TYPES);
+    }
+    else {
+      metadata.type = IMAGE_DATA_TYPE_BYTE4;
+    }
 
-  metadata.finalize(img->params.alpha_type);
+    metadata.finalize(img->params.alpha_type);
 
-  img->need_metadata = false;
+    img->need_metadata = false;
+  });
 }
 
 ImageHandle ImageManager::add_image(const string &filename, const ImageParams &params)
